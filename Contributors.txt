@@ -1,0 +1,7 @@
+﻿#The following people contributed to JDO:
+
+Silvio Clecio
+Luciano Souza
+Marcos Douglas
+
+#and special thanks to the Lazarus-BR group and FPC-Lazarus team.
