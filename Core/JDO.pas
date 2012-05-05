@@ -409,7 +409,6 @@ end;
 constructor TJDOQuery.Create(ADataBase: TJDODataBase;
   const ATableName: string);
 begin
-  inherited Create;
   FItems := TObjectList.Create(True);
   FFields := TJSONObject.Create;
   FSQL := TStringList.Create;
@@ -424,7 +423,6 @@ end;
 
 constructor TJDOQuery.Create;
 begin
-  inherited Create;
   Create(FDataBase, FTableName);
 end;
 
