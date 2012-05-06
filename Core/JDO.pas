@@ -116,6 +116,7 @@ type
     function First: TJSONObject;
     function Last: TJSONObject;
     function AsJSON: TJSONStringType;
+    function AsJSONArray: TJSONArray;
     function Field(const AFieldName: string): TField;
     function Param(const AParamName: string): TParam;
     property DataBase: TJDODataBase read FDataBase write FDataBase;
@@ -744,6 +745,17 @@ begin
       Result += CS;
   end;
   Result := BS + Result + BE;
+end;
+
+function TJDOQuery.AsJSONArray: TJSONArray;
+var
+  I: Integer;
+  A: TJSONArray;
+begin
+  A := TJSONArray.Create;
+  for I := 0 to Pred(FItems.Count) do
+    A.Add((FItems[I] as TJSONObject).Clone);
+  Result := A;
 end;
 
 function TJDOQuery.Field(const AFieldName: string): TField;
