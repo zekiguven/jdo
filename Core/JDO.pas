@@ -113,6 +113,7 @@ type
     function Delete(AJSONArray: TJSONArray): Boolean; virtual;
     function Open(const AAdditionalSQL: string = ES): Boolean; virtual;
     function Count: Integer;
+    procedure Clear;
     function First: TJSONObject;
     function Last: TJSONObject;
     function AsJSON: TJSONStringType;
@@ -721,6 +722,17 @@ end;
 function TJDOQuery.Count: Integer;
 begin
   Result := FItems.Count;
+end;
+
+procedure TJDOQuery.Clear;
+begin
+  FDataBase.Query.Close;
+  FDataBase.Query.SQL.Clear;
+  FItems.Clear;
+  FFields.Clear;
+  FAdditionalSQL.Clear;
+  FSQL.Clear;
+  FLastSQLOperation := soNone;
 end;
 
 function TJDOQuery.First: TJSONObject;
