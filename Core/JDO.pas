@@ -70,8 +70,8 @@ type
     function Execute: Boolean;
     procedure StartTrans(const ANativeError: Boolean = True);
     procedure RestartTrans;
-    procedure Commit(const ANativeError: Boolean = True);
-    procedure Rollback(const ANativeError: Boolean = True);
+    procedure Commit;
+    procedure Rollback;
     property Config: TStrings read FConfig;
     property ConfigFileName: TFileName read FConfigFileName write FConfigFileName;
     property Connection: TSQLConnection read FConnection;
@@ -424,19 +424,15 @@ begin
     FOnRestartTrans(Self);
 end;
 
-procedure TJDODataBase.Commit(const ANativeError: Boolean);
+procedure TJDODataBase.Commit;
 begin
-  if (not ANativeError) and (not FTransaction.Active) then
-    Exit;
   FTransaction.Commit;
   if Assigned(FOnCommit) then
     FOnCommit(Self);
 end;
 
-procedure TJDODataBase.Rollback(const ANativeError: Boolean);
+procedure TJDODataBase.Rollback;
 begin
-  if (not ANativeError) and (not FTransaction.Active) then
-    Exit;
   FTransaction.Rollback;
   if Assigned(FOnRollback) then
     FOnRollback(Self);
