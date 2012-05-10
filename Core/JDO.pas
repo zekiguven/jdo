@@ -78,6 +78,7 @@ type
 
   TJDOQuery = class
   private
+    FIsCustomSQL: Boolean;
     FAdditionalSQL: TStrings;
     FLike: string;
     FLikeKey: string;
@@ -92,7 +93,9 @@ type
     FSQL: TStrings;
     FTableAlias: string;
     FTableName: string;
+    function GetAdditionalSQL: TStrings;
     function GetItems(AIndex: Integer): TJSONObject;
+    function GetSQL: TStrings;
     procedure SetItems(AIndex: Integer; const AValue: TJSONObject);
   public
     constructor Create;
@@ -127,8 +130,8 @@ type
     property TableName: string read FTableName write FTableName;
     property TableAlias: string read FTableAlias write FTableAlias;
     property PrimaryKey: string read FPrimaryKey write FPrimaryKey;
-    property SQL: TStrings read FSQL write FSQL;
-    property AdditionalSQL: TStrings read FAdditionalSQL write FAdditionalSQL;
+    property SQL: TStrings read GetSQL;
+    property AdditionalSQL: TStrings read GetAdditionalSQL;
     property OrderBy: Boolean read FOrderBy write FOrderBy;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
   end;
@@ -404,8 +407,6 @@ constructor TJDOQuery.Create(ADataBase: TJDODataBase;
 begin
   FItems := TObjectList.Create(True);
   FFields := TJSONObject.Create;
-  FSQL := TStringList.Create;
-  FAdditionalSQL := TStringList.Create;
   FDataBase := ADataBase;
   FTableName := ATableName;
   FDateAsString := True;
@@ -421,7 +422,6 @@ end;
 destructor TJDOQuery.Destroy;
 begin
   FAdditionalSQL.Free;
-  FSQL.Free;
   FFields.Free;
   FItems.Free;
   inherited Destroy;
@@ -467,11 +467,9 @@ procedure TJDOQuery.Prepare(const ASQLOperation: TJDOSQLOperation;
 var
   VSQL: string;
 begin
-  if FSQL.Count > 0 then
+  if FIsCustomSQL then
   begin
     FLastSQLOperation := soNone;
-    FDataBase.SQL.Assign(FSQL);
-    FDataBase.SQL.AddStrings(FAdditionalSQL);
     Exit;
   end;
   case ASQLOperation of
@@ -483,7 +481,7 @@ begin
           VSQL += SQL_WHERE_TOKEN + FLike;
         if AAdditionalSQL <> ES then
           VSQL += SP + AAdditionalSQL;
-        if FAdditionalSQL.Count > 0 then
+        if Assigned(FAdditionalSQL) and (FAdditionalSQL.Count > 0) then
           VSQL += SP + FAdditionalSQL.Text;
         if FOrderBy then
         begin
@@ -519,6 +517,19 @@ end;
 function TJDOQuery.GetItems(AIndex: Integer): TJSONObject;
 begin
   Result := FItems[AIndex] as TJSONObject;
+end;
+
+function TJDOQuery.GetAdditionalSQL: TStrings;
+begin
+  if not Assigned(FAdditionalSQL) then
+    FAdditionalSQL := TStringList.Create;
+  Result := FAdditionalSQL;
+end;
+
+function TJDOQuery.GetSQL: TStrings;
+begin
+  FIsCustomSQL := True;
+  Result := FDataBase.Query.SQL;
 end;
 
 procedure TJDOQuery.SetItems(AIndex: Integer; const AValue: TJSONObject);
@@ -719,7 +730,8 @@ begin
   FDataBase.Query.SQL.Clear;
   FItems.Clear;
   FFields.Clear;
-  FAdditionalSQL.Clear;
+  if Assigned(FAdditionalSQL) then
+    FAdditionalSQL.Clear;
   FSQL.Clear;
   FLastSQLOperation := soNone;
 end;
