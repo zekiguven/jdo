@@ -43,6 +43,13 @@ type
     FConfigFileName: TFileName;
     FConnection: TSQLConnection;
     FFields: TFields;
+    FOnCommit: TNotifyEvent;
+    FOnExecute: TNotifyEvent;
+    FOnOpen: TNotifyEvent;
+    FOnPrepare: TNotifyEvent;
+    FOnRestartTrans: TNotifyEvent;
+    FOnRollback: TNotifyEvent;
+    FOnStartTrans: TNotifyEvent;
     FParams: TParams;
     FQuery: TSQLQuery;
     FSQL: TStringList;
@@ -61,9 +68,10 @@ type
     function Param(const AParamName: string): TParam;
     function Open: Boolean;
     function Execute: Boolean;
-    procedure StartTrans;
-    procedure Commit;
-    procedure Rollback;
+    procedure StartTrans(const ANativeError: Boolean = True);
+    procedure RestartTrans;
+    procedure Commit(const ANativeError: Boolean = True);
+    procedure Rollback(const ANativeError: Boolean = True);
     property Config: TStrings read FConfig;
     property ConfigFileName: TFileName read FConfigFileName write FConfigFileName;
     property Connection: TSQLConnection read FConnection;
@@ -72,6 +80,13 @@ type
     property SQL: TStringList read FSQL;
     property Fields: TFields read FFields;
     property Params: TParams read FParams;
+    property OnPrepare: TNotifyEvent read FOnPrepare write FOnPrepare;
+    property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
+    property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
+    property OnStartTrans: TNotifyEvent read FOnStartTrans write FOnStartTrans;
+    property OnRestartTrans: TNotifyEvent read FOnRestartTrans write FOnRestartTrans;
+    property OnCommit: TNotifyEvent read FOnCommit write FOnCommit;
+    property OnRollback: TNotifyEvent read FOnRollback write FOnRollback;
   end;
 
   { TJDOQuery }
@@ -361,6 +376,8 @@ end;
 procedure TJDODataBase.Prepare(const ASQL: string);
 begin
   FQuery.SQL.Text := ASQL;
+  if Assigned(FOnPrepare) then
+    FOnPrepare(Self);
 end;
 
 function TJDODataBase.Field(const AFieldByName: string): TField;
@@ -377,27 +394,52 @@ function TJDODataBase.Open: Boolean;
 begin
   FQuery.Open;
   Result := FQuery.RecordCount > 0;
+  if Assigned(FOnOpen) then
+    FOnOpen(Self);
 end;
 
 function TJDODataBase.Execute: Boolean;
 begin
   FQuery.ExecSQL;
   Result := FQuery.RowsAffected > 0;
+  if Assigned(FOnExecute) then
+    FOnExecute(Self);
 end;
 
-procedure TJDODataBase.StartTrans;
+procedure TJDODataBase.StartTrans(const ANativeError: Boolean);
 begin
+  if (not ANativeError) and FTransaction.Active then
+    Exit;
   FTransaction.StartTransaction;
+  if Assigned(FOnStartTrans) then
+    FOnStartTrans(Self);
 end;
 
-procedure TJDODataBase.Commit;
+procedure TJDODataBase.RestartTrans;
 begin
+  if FTransaction.Active then
+    FTransaction.Rollback;
+  StartTrans;
+  if Assigned(FOnRestartTrans) then
+    FOnRestartTrans(Self);
+end;
+
+procedure TJDODataBase.Commit(const ANativeError: Boolean);
+begin
+  if (not ANativeError) and (not FTransaction.Active) then
+    Exit;
   FTransaction.Commit;
+  if Assigned(FOnCommit) then
+    FOnCommit(Self);
 end;
 
-procedure TJDODataBase.Rollback;
+procedure TJDODataBase.Rollback(const ANativeError: Boolean);
 begin
+  if (not ANativeError) and (not FTransaction.Active) then
+    Exit;
   FTransaction.Rollback;
+  if Assigned(FOnRollback) then
+    FOnRollback(Self);
 end;
 
 { TJDOQuery }
