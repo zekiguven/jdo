@@ -31,7 +31,7 @@ type
 
   TJDOFieldTypes = (ftNull, ftStr, ftBool, ftDate, ftFloat, ftInt);
 
-  TJDOQuerySQLOperation = (soNone, soSelect, soInsert, soUpdate, soDelete);
+  TJDOSQLOperation = (soNone, soSelect, soInsert, soUpdate, soDelete);
 
   TJDOLikeOptions = set of (loCaseInsensitive, loPartialKey);
 
@@ -42,11 +42,11 @@ type
     FConfig: TStrings;
     FConfigFileName: TFileName;
     FConnection: TSQLConnection;
+    FFields: TFields;
+    FParams: TParams;
     FQuery: TSQLQuery;
     FSQL: TStringList;
     FTransaction: TSQLTransaction;
-    function GetFields: TFields;
-    function GetParams: TParams;
     procedure InternalCreateConnection;
     procedure InternalCreateTransaction;
     procedure InternalCreateQuery;
@@ -70,8 +70,8 @@ type
     property Transaction: TSQLTransaction read FTransaction;
     property Query: TSQLQuery read FQuery;
     property SQL: TStringList read FSQL;
-    property Fields: TFields read GetFields;
-    property Params: TParams read GetParams;
+    property Fields: TFields read FFields;
+    property Params: TParams read FParams;
   end;
 
   { TJDOQuery }
@@ -82,7 +82,7 @@ type
     FLike: string;
     FLikeKey: string;
     FLikeValue: string;
-    FLastSQLOperation: TJDOQuerySQLOperation;
+    FLastSQLOperation: TJDOSQLOperation;
     FDataBase: TJDODataBase;
     FFields: TJSONObject;
     FItems: TObjectList;
@@ -98,7 +98,7 @@ type
     constructor Create;
     constructor Create(ADataBase: TJDODataBase; const ATableName: string);
     destructor Destroy; override;
-    procedure Prepare(const ASQLOperation: TJDOQuerySQLOperation;
+    procedure Prepare(const ASQLOperation: TJDOSQLOperation;
       const AAdditionalSQL: string = ES); virtual;
     procedure AddField(const AFieldName: ShortString;
       const AFieldType: TJDOFieldTypes;
@@ -133,35 +133,35 @@ type
     property DateAsString: Boolean read FDateAsString write FDateAsString;
   end;
 
-function JDOFieldTypeToJDOFieldType(
+function FieldTypeToJDOFieldType(
   const AFieldType: TFieldType): ShortString;
-function JDOFieldTypeToJDOFieldTypeEnum(
+function FieldTypeToJDOFieldTypeEnum(
   const AFieldType: TFieldType): TJDOFieldTypes;
-procedure JDOFieldsToJSONObject(AFields: TFields;
+procedure FieldsToJSONObject(AFields: TFields;
   AJSONFiels, AJSONObject: TJSONObject; const ADateAsString: Boolean);
-procedure JDOJSONObjectToParams(AParams: TParams;
+procedure JSONObjectToParams(AParams: TParams;
   AJSONFiels, AJSONObject: TJSONObject; const APKFieldName: string = ES);
 
 implementation
 
-function JDOFieldTypeToJDOFieldType(
+function FieldTypeToJDOFieldType(
   const AFieldType: TFieldType): ShortString;
 begin
   case AFieldType of
     ftUnknown, ftCursor, ftADT, ftArray, ftReference,
-      ftDataSet, ftInterface, ftIDispatch: Result := JDO_FT_NULL;
+      ftDataSet, ftInterface, ftIDispatch: Result := FT_NULL;
     ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob, ftOraClob,
       ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes, ftGraphic, ftFmtMemo,
       ftParadoxOle, ftDBaseOle, ftTypedBinary, ftVariant,
-      ftGuid: Result := JDO_FT_STR;
-    ftSmallint, ftInteger, ftLargeint, ftWord, ftAutoInc: Result := JDO_FT_INT;
-    ftBoolean: Result := JDO_FT_BOOL;
-    DB.ftFloat, ftCurrency, ftBCD, ftFMTBcd: Result := JDO_FT_FLOAT;
-    DB.ftDate, ftTime, ftDateTime, ftTimeStamp: Result := JDO_FT_DATE;
+      ftGuid: Result := FT_STR;
+    ftSmallint, ftInteger, ftLargeint, ftWord, ftAutoInc: Result := FT_INT;
+    ftBoolean: Result := FT_BOOL;
+    DB.ftFloat, ftCurrency, ftBCD, ftFMTBcd: Result := FT_FLOAT;
+    DB.ftDate, ftTime, ftDateTime, ftTimeStamp: Result := FT_DATE;
   end;
 end;
 
-function JDOFieldTypeToJDOFieldTypeEnum(
+function FieldTypeToJDOFieldTypeEnum(
   const AFieldType: TFieldType): TJDOFieldTypes;
 begin
   case AFieldType of
@@ -178,7 +178,7 @@ begin
   end;
 end;
 
-procedure JDOFieldsToJSONObject(AFields: TFields;
+procedure FieldsToJSONObject(AFields: TFields;
   AJSONFiels, AJSONObject: TJSONObject; const ADateAsString: Boolean);
 var
   I: Integer;
@@ -195,33 +195,33 @@ begin
     end
     else
     begin
-      VFieldType := JDOFieldTypeToJDOFieldType(VField.DataType);
+      VFieldType := FieldTypeToJDOFieldType(VField.DataType);
       VFieldName := VField.FieldName;
     end;
-    if (VFieldType = JDO_FT_NULL) or VField.IsNull then
+    if (VFieldType = FT_NULL) or VField.IsNull then
     begin
       AJSONObject.Add(VFieldName);
       Continue;
     end;
-    if VFieldType = JDO_FT_STR then
+    if VFieldType = FT_STR then
       AJSONObject.Add(VFieldName, VField.AsString);
-    if VFieldType = JDO_FT_BOOL then
+    if VFieldType = FT_BOOL then
       AJSONObject.Add(VFieldName, VField.AsBoolean);
-    if VFieldType = JDO_FT_DATE then
+    if VFieldType = FT_DATE then
     begin
       if ADateAsString then
         AJSONObject.Add(VFieldName, VField.AsString)
       else
         AJSONObject.Add(VFieldName, VField.AsFloat);
     end;
-    if VFieldType = JDO_FT_FLOAT then
+    if VFieldType = FT_FLOAT then
       AJSONObject.Add(VFieldName, VField.AsFloat);
-    if VFieldType = JDO_FT_INT then
+    if VFieldType = FT_INT then
       AJSONObject.Add(VFieldName, VField.AsInteger);
   end;
 end;
 
-procedure JDOJSONObjectToParams(AParams: TParams;
+procedure JSONObjectToParams(AParams: TParams;
   AJSONFiels, AJSONObject: TJSONObject; const APKFieldName: string);
 var
   VParam: TParam;
@@ -231,7 +231,7 @@ var
 begin
   VJSONObjsCount := AJSONObject.Count;
   if AJSONFiels.Count <> VJSONObjsCount then
-    raise EJDOException.Create(SJDOJSONObjectToParamsError);
+    raise EJDOException.Create(SJSONObjectToParamsError);
   for I := 0 to Pred(VJSONObjsCount) do
   begin
     VName := AJSONFiels.Names[I];
@@ -245,25 +245,25 @@ begin
       Continue;
     end;
     VFieldType := VField.AsString;
-    if (VFieldType = JDO_FT_NULL) or VData.IsNull or VField.IsNull then
+    if (VFieldType = FT_NULL) or VData.IsNull or VField.IsNull then
     begin
       AParams.Clear;
       Continue;
     end;
-    if VFieldType = JDO_FT_STR then
+    if VFieldType = FT_STR then
       VParam.AsString := VData.AsString;
-    if VFieldType = JDO_FT_BOOL then
+    if VFieldType = FT_BOOL then
       VParam.AsBoolean := (VData.AsString = 'on') or VData.AsBoolean;
-    if VFieldType = JDO_FT_DATE then
+    if VFieldType = FT_DATE then
     begin
       if VData.JSONType = jtNumber then
         VParam.AsDateTime := VData.AsFloat
       else
         VParam.AsDateTime := StrToDateTime(VData.AsString);
     end;
-    if VFieldType = JDO_FT_FLOAT then
+    if VFieldType = FT_FLOAT then
       VParam.AsFloat := VData.AsFloat;
-    if VFieldType = JDO_FT_INT then
+    if VFieldType = FT_INT then
       VParam.AsInteger := VData.AsInteger;
   end;
 end;
@@ -282,7 +282,6 @@ begin
     InternalCreateTransaction;
     InternalCreateQuery;
     SetProperties;
-    FSQL := FQuery.SQL;
     if AConnect then
       FConnection.Open;
   end;
@@ -302,25 +301,15 @@ var
   VConnectorName: ShortString;
   VConnectionDef: TConnectionDef;
 begin
-  VConnectorName := FConfig.Values[JDO_CONNECTOR_NAME];
+  VConnectorName := FConfig.Values[CONNECTOR_NAME];
   if Trim(VConnectorName) = ES then
-    raise EJDOConnection.Create(SJDOConnectorNameEmptyError);
+    raise EJDOConnection.Create(SEmptyConnectorNameError);
   VConnectionDef := GetConnectionDef(VConnectorName);
   if Assigned(VConnectionDef) then
     FConnection := VConnectionDef.ConnectionClass.Create(nil)
   else
     raise EJDOConnection.CreateFmt(
-      SJDOConnectorUnitWasNotDeclaredError, [VConnectorName]);
-end;
-
-function TJDODataBase.GetFields: TFields;
-begin
-  Result := FQuery.Fields;
-end;
-
-function TJDODataBase.GetParams: TParams;
-begin
-  Result := FQuery.Params;
+      SConnectorUnitWasNotDeclaredError, [VConnectorName]);
 end;
 
 procedure TJDODataBase.InternalCreateTransaction;
@@ -334,13 +323,15 @@ begin
   FQuery := TSQLQuery.Create(nil);
   FQuery.DataBase := FConnection;
   FQuery.Transaction := FTransaction;
+  FSQL := FQuery.SQL;
+  FFields := FQuery.Fields;
+  FParams := FQuery.Params;
 end;
 
 procedure TJDODataBase.LoadConfig;
 begin
   if not FileExists(FConfigFileName) then
-    raise EJDOConnection.CreateFmt(
-      SJDOConfigFileNotFoundError, [FConfigFileName]);
+    raise EJDOConnection.CreateFmt(SConfigFileNotFoundError, [FConfigFileName]);
   FConfig.LoadFromFile(FConfigFileName);
 end;
 
@@ -353,13 +344,13 @@ begin
   begin
     VPropName := FConfig.Names[I];
     VToken := Copy(VPropName, 1, 1);
-    if (CompareText(VPropName, JDO_CONNECTOR_NAME) = 0) or
-      (VToken = PO) or (VToken = ES) then
+    if (CompareText(VPropName, CONNECTOR_NAME) = 0) or (VToken = PO) or
+      (VToken = ES) then
       Continue;
     if IsPublishedProp(FConnection, VPropName) then
       SetPropValue(FConnection, VPropName, FConfig.Values[VPropName])
     else
-      raise EJDOConnection.CreateFmt(SJDOInvalidPropInConfigFile,
+      raise EJDOConnection.CreateFmt(SInvalidPropInConfigFile,
         [ExtractFileName(FConfigFileName), VPropName]);
   end;
 end;
@@ -417,15 +408,14 @@ begin
   FAdditionalSQL := TStringList.Create;
   FDataBase := ADataBase;
   FTableName := ATableName;
-  FLastSQLOperation := soNone;
   FDateAsString := True;
-  FPrimaryKey := JDO_DEFAULT_PRIMARY_KEY;
+  FPrimaryKey := DEFAULT_PRIMARY_KEY;
   FOrderBy := True;
 end;
 
 constructor TJDOQuery.Create;
 begin
-  Create(FDataBase, FTableName);
+  Create(nil, ES);
 end;
 
 destructor TJDOQuery.Destroy;
@@ -437,7 +427,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TJDOQuery.Prepare(const ASQLOperation: TJDOQuerySQLOperation;
+procedure TJDOQuery.Prepare(const ASQLOperation: TJDOSQLOperation;
   const AAdditionalSQL: string);
 
   function _SQLSet(const Token, PK: string;
@@ -487,10 +477,10 @@ begin
   case ASQLOperation of
     soSelect:
       begin
-        VSQL := JDO_SQL_SELECT_TOKEN + _SQLSet(ES, FPrimaryKey, False, False) +
-          JDO_SQL_FROM_TOKEN + FTableName;
+        VSQL := SQL_SELECT_TOKEN + _SQLSet(ES, FPrimaryKey, False, False) +
+          SQL_FROM_TOKEN + FTableName;
         if FLike <> ES then
-          VSQL += JDO_SQL_WHERE_TOKEN + FLike;
+          VSQL += SQL_WHERE_TOKEN + FLike;
         if AAdditionalSQL <> ES then
           VSQL += SP + AAdditionalSQL;
         if FAdditionalSQL.Count > 0 then
@@ -498,31 +488,29 @@ begin
         if FOrderBy then
         begin
           if FTableAlias <> ES then
-            VSQL += JDO_SQL_ORDER_BY_TOKEN + FTableAlias + DT + FPrimaryKey
+            VSQL += SQL_ORDER_BY_TOKEN + FTableAlias + DT + FPrimaryKey
           else
-            VSQL += JDO_SQL_ORDER_BY_TOKEN + FPrimaryKey;
+            VSQL += SQL_ORDER_BY_TOKEN + FPrimaryKey;
         end;
-        FDataBase.Prepare(VSQL);
+        FDataBase.SQL.Text := VSQL;
       end;
-    soInsert: FDataBase.Prepare(JDO_SQL_INSERT_TOKEN + FTableName +
+    soInsert: FDataBase.SQL.Text := SQL_INSERT_TOKEN + FTableName +
       SP + PS + _SQLSet(ES, FPrimaryKey, False, False) + PE +
-      JDO_SQL_VALUES_TOKEN + PS + _SQLSet(CO, FPrimaryKey, False, False) + PE);
+      SQL_VALUES_TOKEN + PS + _SQLSet(CO, FPrimaryKey, False, False) + PE;
     soUpdate:
       begin
         if Trim(FPrimaryKey) = ES then
-          raise EJDOQuery.Create(SJDOPrimaryKeyEmptyError);
-        FDataBase.Prepare(JDO_SQL_UPDATE_TOKEN + FTableName +
-          JDO_SQL_SET_TOKEN + _SQLSet(CO, FPrimaryKey, True, True) +
-          JDO_SQL_WHERE_TOKEN + FPrimaryKey + JDO_SQL_EQ_PARAM_TOKEN +
-          FPrimaryKey);
+          raise EJDOQuery.Create(SEmptyPrimaryKeyError);
+        FDataBase.SQL.Text := SQL_UPDATE_TOKEN + FTableName + SQL_SET_TOKEN +
+          _SQLSet(CO, FPrimaryKey, True, True) + SQL_WHERE_TOKEN + FPrimaryKey +
+          SQL_EQ_PARAM_TOKEN + FPrimaryKey;
       end;
     soDelete:
       begin
         if Trim(FPrimaryKey) = ES then
-          raise EJDOQuery.Create(SJDOPrimaryKeyEmptyError);
-        FDataBase.Prepare(JDO_SQL_DELETE_TOKEN + JDO_SQL_FROM_TOKEN +
-          FTableName + JDO_SQL_WHERE_TOKEN + FPrimaryKey +
-          JDO_SQL_EQ_PARAM_TOKEN + FPrimaryKey);
+          raise EJDOQuery.Create(SEmptyPrimaryKeyError);
+        FDataBase.SQL.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FTableName +
+          SQL_WHERE_TOKEN + FPrimaryKey + SQL_EQ_PARAM_TOKEN + FPrimaryKey;
       end;
   end;
   FLastSQLOperation := ASQLOperation;
@@ -550,12 +538,12 @@ begin
   else
     VFieldName := AFieldName;
   case AFieldType of
-    ftNull: FFields.Add(VFieldName, JDO_FT_NULL);
-    ftStr: FFields.Add(VFieldName, JDO_FT_STR);
-    ftBool: FFields.Add(VFieldName, JDO_FT_BOOL);
-    ftDate: FFields.Add(VFieldName, JDO_FT_DATE);
-    ftFloat: FFields.Add(VFieldName, JDO_FT_FLOAT);
-    ftInt: FFields.Add(VFieldName, JDO_FT_INT);
+    ftNull: FFields.Add(VFieldName, FT_NULL);
+    ftStr: FFields.Add(VFieldName, FT_STR);
+    ftBool: FFields.Add(VFieldName, FT_BOOL);
+    ftDate: FFields.Add(VFieldName, FT_DATE);
+    ftFloat: FFields.Add(VFieldName, FT_FLOAT);
+    ftInt: FFields.Add(VFieldName, FT_INT);
   end;
 end;
 
@@ -570,18 +558,17 @@ begin
   if loCaseInsensitive in AOptions then
   begin
     FLikeValue := LowerCase(FLikeValue);
-    FLike := JDO_SQL_LOWER_TOKEN + PS + FLikeKey + PE + JDO_SQL_LIKE_TOKEN +
-      AKey + PE;
+    FLike := SQL_LOWER_TOKEN + PS + FLikeKey + PE + SQL_LIKE_TOKEN + AKey + PE;
   end
   else
-    FLike := FLikeKey + JDO_SQL_LIKE_TOKEN + AKey + PE;
+    FLike := FLikeKey + SQL_LIKE_TOKEN + AKey + PE;
 end;
 
 function TJDOQuery.Insert(AJSONObject: TJSONObject): Boolean;
 begin
   if FLastSQLOperation <> soInsert then
     Prepare(soInsert);
-  JDOJSONObjectToParams(FDataBase.Params, FFields, AJSONObject);
+  JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
 end;
 
@@ -595,7 +582,8 @@ begin
   for I := 0 to Pred(AJSONArray.Count) do
   begin
     VJSONObject := AJSONArray[I] as TJSONObject;
-    JDOJSONObjectToParams(FDataBase.Params, FFields, VJSONObject, FPrimaryKey);
+    JSONObjectToParams(FDataBase.Query.Params, FFields, VJSONObject,
+      FPrimaryKey);
     Result := FDataBase.Execute;
   end;
 end;
@@ -604,7 +592,7 @@ function TJDOQuery.Update(AJSONObject: TJSONObject): Boolean;
 begin
   if FLastSQLOperation <> soUpdate then
     Prepare(soUpdate);
-  JDOJSONObjectToParams(FDataBase.Params, FFields, AJSONObject);
+  JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
 end;
 
@@ -618,7 +606,8 @@ begin
   for I := 0 to Pred(AJSONArray.Count) do
   begin
     VJSONObject := AJSONArray[I] as TJSONObject;
-    JDOJSONObjectToParams(FDataBase.Params, FFields, VJSONObject, FPrimaryKey);
+    JSONObjectToParams(FDataBase.Query.Params, FFields, VJSONObject,
+      FPrimaryKey);
     Result := FDataBase.Execute;
   end;
 end;
@@ -627,7 +616,7 @@ function TJDOQuery.Delete(AJSONObject: TJSONObject): Boolean;
 begin
   if FLastSQLOperation <> soDelete then
     Prepare(soDelete);
-  JDOJSONObjectToParams(FDataBase.Params, FFields, AJSONObject);
+  JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
 end;
 
@@ -646,14 +635,15 @@ begin
     jtNumber:
       for I := 0 to Pred(VCount) do
       begin
-        FDataBase.Param(FPrimaryKey).AsInteger := AJSONArray[I].AsInt64;
+        FDataBase.Query.Params.ParamByName(FPrimaryKey).AsInteger :=
+          AJSONArray[I].AsInt64;
         Result := FDataBase.Execute;
       end;
     jtObject:
       for I := 0 to Pred(VCount) do
       begin
         VJSONObject := AJSONArray[I] as TJSONObject;
-        JDOJSONObjectToParams(FDataBase.Params, FFields, VJSONObject,
+        JSONObjectToParams(FDataBase.Query.Params, FFields, VJSONObject,
           FPrimaryKey);
         Result := FDataBase.Execute;
       end;
@@ -680,9 +670,9 @@ begin
     while not FDataBase.Query.EOF do
     begin
       VItem := TJSONObject.Create;
-      for I := 0 to Pred(FDataBase.Fields.Count) do
+      for I := 0 to Pred(FDataBase.Query.Fields.Count) do
       begin
-        VField := FDataBase.Fields[I];
+        VField := FDataBase.Query.Fields[I];
         VFieldName := VField.FieldName;
         case VField.DataType of
           ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
@@ -712,8 +702,7 @@ begin
     while not FDataBase.Query.EOF do
     begin
       VItem := TJSONObject.Create;
-      JDOFieldsToJSONObject(FDataBase.Query.Fields, FFields, VItem,
-        FDateAsString);
+      FieldsToJSONObject(FDataBase.Query.Fields, FFields, VItem, FDateAsString);
       FItems.Add(VItem);
       FDataBase.Query.Next;
     end;

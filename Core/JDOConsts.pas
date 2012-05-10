@@ -31,34 +31,34 @@ const
   PS = '(';
   PO = '#';
   SP = ' ';
-  JDO_DEFAULT_PRIMARY_KEY = 'id';
-  JDO_CONNECTOR_NAME = 'connectorname';
-  JDO_SQL_SELECT_TOKEN = 'select ';
-  JDO_SQL_FROM_TOKEN = ' from ';
-  JDO_SQL_WHERE_TOKEN = ' where ';
-  JDO_SQL_ORDER_BY_TOKEN = ' order by ';
-  JDO_SQL_INSERT_TOKEN = 'insert into ';
-  JDO_SQL_VALUES_TOKEN = ' values ';
-  JDO_SQL_UPDATE_TOKEN = 'update ';
-  JDO_SQL_SET_TOKEN = ' set ';
-  JDO_SQL_DELETE_TOKEN = 'delete';
-  JDO_SQL_EQ_PARAM_TOKEN = ' = :';
-  JDO_SQL_LOWER_TOKEN = 'lower';
-  JDO_SQL_LIKE_TOKEN = ' like (:';
-  JDO_FT_NULL = 'null';
-  JDO_FT_STR = 'str';
-  JDO_FT_BOOL = 'bool';
-  JDO_FT_DATE = 'date';
-  JDO_FT_FLOAT = 'float';
-  JDO_FT_INT = 'int';
+  DEFAULT_PRIMARY_KEY = 'id';
+  CONNECTOR_NAME = 'connectorname';
+  SQL_SELECT_TOKEN = 'select ';
+  SQL_FROM_TOKEN = ' from ';
+  SQL_WHERE_TOKEN = ' where ';
+  SQL_ORDER_BY_TOKEN = ' order by ';
+  SQL_INSERT_TOKEN = 'insert into ';
+  SQL_VALUES_TOKEN = ' values ';
+  SQL_UPDATE_TOKEN = 'update ';
+  SQL_SET_TOKEN = ' set ';
+  SQL_DELETE_TOKEN = 'delete';
+  SQL_EQ_PARAM_TOKEN = ' = :';
+  SQL_LOWER_TOKEN = 'lower';
+  SQL_LIKE_TOKEN = ' like (:';
+  FT_NULL = 'null';
+  FT_STR = 'str';
+  FT_BOOL = 'bool';
+  FT_DATE = 'date';
+  FT_FLOAT = 'float';
+  FT_INT = 'int';
 
 var
-  SJDOPrimaryKeyEmptyError: string = '"PrimaryKey" must not be empty.';
-  SJDOJSONObjectToParamsError: string = '"AJSONFiels.Count" may not be different from the "AJSONObject.Count".';
-  SJDOConnectorNameEmptyError: string = '"ConnectorName" must not be empty.';
-  SJDOConnectorUnitWasNotDeclaredError: string = 'The unit of "%s" was not declared in uses clause.';
-  SJDOConfigFileNotFoundError: string = 'Config file not found: %s';
-  SJDOInvalidPropInConfigFile: string = 'Invalid property in "%s" file: %s';
+  SEmptyPrimaryKeyError: string = '"PrimaryKey" must not be empty.';
+  SJSONObjectToParamsError: string = '"AJSONFiels.Count" may not be different from the "AJSONObject.Count".';
+  SEmptyConnectorNameError: string = '"ConnectorName" must not be empty.';
+  SConnectorUnitWasNotDeclaredError: string = 'The unit of "%s" was not declared in uses clause.';
+  SConfigFileNotFoundError: string = 'Config file not found: %s';
+  SInvalidPropInConfigFile: string = 'Invalid property in "%s" file: %s';
 
 implementation
 
