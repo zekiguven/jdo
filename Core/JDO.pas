@@ -263,11 +263,13 @@ var
   VParam: TParam;
   VField, VData: TJSONData;
   VFieldType, VName: ShortString;
-  I, VJSONObjsCount: Integer;
+  I, VJSONFielsCount, VJSONObjsCount: Integer;
 begin
   VJSONObjsCount := AJSONObject.Count;
-  if AJSONFiels.Count <> VJSONObjsCount then
-    raise EJDOException.Create(SJSONObjectToParamsError);
+  VJSONFielsCount := AJSONFiels.Count;
+  if VJSONFielsCount <> VJSONObjsCount then
+    raise EJDOException.CreateFmt(SJSONObjectToParamsError,
+      [VJSONFielsCount, VJSONObjsCount]);
   for I := 0 to Pred(VJSONObjsCount) do
   begin
     VName := AJSONFiels.Names[I];

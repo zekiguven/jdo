@@ -54,7 +54,7 @@ const
 
 var
   SEmptyPrimaryKeyError: string = '"PrimaryKey" must not be empty.';
-  SJSONObjectToParamsError: string = '"AJSONFiels.Count" may not be different from the "AJSONObject.Count".';
+  SJSONObjectToParamsError: string = '"AJSONFiels.Count" (%d) may not be different from the "AJSONObject.Count" (%d).';
   SEmptyConnectorNameError: string = '"ConnectorName" must not be empty.';
   SConnectorUnitWasNotDeclaredError: string = 'The unit of "%s" was not declared in uses clause.';
   SConfigFileNotFoundError: string = 'Config file not found: %s';
