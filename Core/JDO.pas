@@ -810,7 +810,8 @@ begin
   FFields.Clear;
   if Assigned(FAdditionalSQL) then
     FAdditionalSQL.Clear;
-  FSQL.Clear;
+  if Assigned(FSQL) then
+    FSQL.Clear;
   FLastSQLOperation := soNone;
   if Assigned(FOnNotify) then
     FOnNotify(ntClear);
