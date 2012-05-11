@@ -35,6 +35,15 @@ type
 
   TJDOLikeOptions = set of (loCaseInsensitive, loPartialKey);
 
+  TJDOQueryNotifyTypes = (ntNone, ntInsert, ntUpdate, ntDelete, ntOpen, ntFirst,
+    ntLast, ntClear);
+
+  TJDOQueryNotifyEvent = procedure(
+    const ANotifyType: TJDOQueryNotifyTypes) of object;
+
+  TJDOQueryAddingItemsEvent = procedure(
+    AItem: TJSONObject; const AItemNo: Integer) of object;
+
   { TJDODataBase }
 
   TJDODataBase = class
@@ -102,10 +111,14 @@ type
     FDataBase: TJDODataBase;
     FFields: TJSONObject;
     FItems: TObjectList;
+    FOnAddingItems: TJDOQueryAddingItemsEvent;
+    FOnNotify: TJDOQueryNotifyEvent;
+    FOnPrepare: TNotifyEvent;
     FOrderBy: Boolean;
     FPrimaryKey: string;
     FDateAsString: Boolean;
     FSQL: TStrings;
+    FSQLOperation: TJDOSQLOperation;
     FTableAlias: string;
     FTableName: string;
     function GetAdditionalSQL: TStrings;
@@ -149,6 +162,11 @@ type
     property AdditionalSQL: TStrings read GetAdditionalSQL;
     property OrderBy: Boolean read FOrderBy write FOrderBy;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
+    property SQLOperation: TJDOSQLOperation read FSQLOperation;
+    property OnAddingItems: TJDOQueryAddingItemsEvent read FOnAddingItems
+      write FOnAddingItems;
+    property OnPrepare: TNotifyEvent read FOnPrepare write FOnPrepare;
+    property OnNotify: TJDOQueryNotifyEvent read FOnNotify write FOnNotify;
   end;
 
 function FieldTypeToJDOFieldType(
@@ -508,8 +526,10 @@ begin
   if FIsCustomSQL then
   begin
     FLastSQLOperation := soNone;
+    FSQLOperation := soNone;
     Exit;
   end;
+  FSQLOperation := ASQLOperation;
   case ASQLOperation of
     soSelect:
       begin
@@ -550,6 +570,8 @@ begin
       end;
   end;
   FLastSQLOperation := ASQLOperation;
+  if Assigned(FOnPrepare) then
+    FOnPrepare(Self);
 end;
 
 function TJDOQuery.GetItems(AIndex: Integer): TJSONObject;
@@ -619,6 +641,8 @@ begin
     Prepare(soInsert);
   JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntInsert);
 end;
 
 function TJDOQuery.Insert(AJSONArray: TJSONArray): Boolean;
@@ -635,6 +659,8 @@ begin
       FPrimaryKey);
     Result := FDataBase.Execute;
   end;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntInsert);
 end;
 
 function TJDOQuery.Update(AJSONObject: TJSONObject): Boolean;
@@ -643,6 +669,8 @@ begin
     Prepare(soUpdate);
   JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntUpdate);
 end;
 
 function TJDOQuery.Update(AJSONArray: TJSONArray): Boolean;
@@ -659,6 +687,8 @@ begin
       FPrimaryKey);
     Result := FDataBase.Execute;
   end;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntUpdate);
 end;
 
 function TJDOQuery.Delete(AJSONObject: TJSONObject): Boolean;
@@ -667,6 +697,8 @@ begin
     Prepare(soDelete);
   JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntDelete);
 end;
 
 function TJDOQuery.Delete(AJSONArray: TJSONArray): Boolean;
@@ -697,6 +729,8 @@ begin
         Result := FDataBase.Execute;
       end;
   end;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntDelete);
 end;
 
 function TJDOQuery.Open(const AAdditionalSQL: string): Boolean;
@@ -744,6 +778,8 @@ begin
         end;
       end;
       FItems.Add(VItem);
+      if Assigned(FOnAddingItems) then
+        FOnAddingItems(VItem, FDataBase.Query.RecNo);
       FDataBase.Query.Next;
     end;
   end
@@ -753,8 +789,12 @@ begin
       VItem := TJSONObject.Create;
       FieldsToJSONObject(FDataBase.Query.Fields, FFields, VItem, FDateAsString);
       FItems.Add(VItem);
+      if Assigned(FOnAddingItems) then
+        FOnAddingItems(VItem, FDataBase.Query.RecNo);
       FDataBase.Query.Next;
     end;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntOpen);
 end;
 
 function TJDOQuery.Count: Integer;
@@ -772,16 +812,22 @@ begin
     FAdditionalSQL.Clear;
   FSQL.Clear;
   FLastSQLOperation := soNone;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntClear);
 end;
 
 function TJDOQuery.First: TJSONObject;
 begin
   Result := FItems.First as TJSONObject;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntFirst);
 end;
 
 function TJDOQuery.Last: TJSONObject;
 begin
   Result := FItems.Last as TJSONObject;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntLast);
 end;
 
 function TJDOQuery.AsJSON: TJSONStringType;
