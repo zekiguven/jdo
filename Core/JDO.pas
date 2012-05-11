@@ -35,9 +35,9 @@ type
 
   TJDOLikeOptions = set of (loCaseInsensitive, loPartialKey);
 
-  { TJDOCustomDataBase }
+  { TJDODataBase }
 
-  TJDOCustomDataBase = class
+  TJDODataBase = class
   private
     FConfig: TStrings;
     FConfigFileName: TFileName;
@@ -87,25 +87,6 @@ type
     property OnRestartTrans: TNotifyEvent read FOnRestartTrans write FOnRestartTrans;
     property OnCommit: TNotifyEvent read FOnCommit write FOnCommit;
     property OnRollback: TNotifyEvent read FOnRollback write FOnRollback;
-  end;
-
-  { TJDODataBase }
-
-  TJDODataBase = class(TJDOCustomDataBase)
-  published
-    property Connection;
-    property Transaction;
-    property Query;
-    property Fields;
-    property Params;
-    property SQL;
-    property OnPrepare;
-    property OnOpen;
-    property OnExecute;
-    property OnStartTrans;
-    property OnRestartTrans;
-    property OnCommit;
-    property OnRollback;
   end;
 
   { TJDOQuery }
@@ -305,9 +286,9 @@ begin
   end;
 end;
 
-{ TJDOCustomDataBase }
+{ TJDODataBase }
 
-constructor TJDOCustomDataBase.Create(const AConfigFileName: TFileName;
+constructor TJDODataBase.Create(const AConfigFileName: TFileName;
   const AConnect: Boolean);
 begin
   FConfig := TStringList.Create;
@@ -324,7 +305,7 @@ begin
   end;
 end;
 
-destructor TJDOCustomDataBase.Destroy;
+destructor TJDODataBase.Destroy;
 begin
   FConfig.Free;
   FQuery.Free;
@@ -333,7 +314,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TJDOCustomDataBase.InternalCreateConnection;
+procedure TJDODataBase.InternalCreateConnection;
 var
   VConnectorName: ShortString;
   VConnectionDef: TConnectionDef;
@@ -349,13 +330,13 @@ begin
       SConnectorUnitWasNotDeclaredError, [VConnectorName]);
 end;
 
-procedure TJDOCustomDataBase.InternalCreateTransaction;
+procedure TJDODataBase.InternalCreateTransaction;
 begin
   FTransaction := TSQLTransaction.Create(nil);
   FTransaction.DataBase := FConnection;
 end;
 
-procedure TJDOCustomDataBase.InternalCreateQuery;
+procedure TJDODataBase.InternalCreateQuery;
 begin
   FQuery := TSQLQuery.Create(nil);
   FQuery.DataBase := FConnection;
@@ -365,14 +346,14 @@ begin
   FParams := FQuery.Params;
 end;
 
-procedure TJDOCustomDataBase.LoadConfig;
+procedure TJDODataBase.LoadConfig;
 begin
   if not FileExists(FConfigFileName) then
     raise EJDOConnection.CreateFmt(SConfigFileNotFoundError, [FConfigFileName]);
   FConfig.LoadFromFile(FConfigFileName);
 end;
 
-procedure TJDOCustomDataBase.SetProperties;
+procedure TJDODataBase.SetProperties;
 var
   I: Integer;
   VPropName, VToken: ShortString;
@@ -392,24 +373,24 @@ begin
   end;
 end;
 
-procedure TJDOCustomDataBase.Prepare(const ASQL: string);
+procedure TJDODataBase.Prepare(const ASQL: string);
 begin
   FQuery.SQL.Text := ASQL;
   if Assigned(FOnPrepare) then
     FOnPrepare(Self);
 end;
 
-function TJDOCustomDataBase.Field(const AFieldByName: string): TField;
+function TJDODataBase.Field(const AFieldByName: string): TField;
 begin
   Result := FQuery.Fields.FieldByName(AFieldByName);
 end;
 
-function TJDOCustomDataBase.Param(const AParamName: string): TParam;
+function TJDODataBase.Param(const AParamName: string): TParam;
 begin
   Result := FQuery.Params.ParamByName(AParamName);
 end;
 
-function TJDOCustomDataBase.Open: Boolean;
+function TJDODataBase.Open: Boolean;
 begin
   FQuery.Open;
   Result := FQuery.RecordCount > 0;
@@ -417,7 +398,7 @@ begin
     FOnOpen(Self);
 end;
 
-function TJDOCustomDataBase.Execute: Boolean;
+function TJDODataBase.Execute: Boolean;
 begin
   FQuery.ExecSQL;
   Result := FQuery.RowsAffected > 0;
@@ -425,7 +406,7 @@ begin
     FOnExecute(Self);
 end;
 
-procedure TJDOCustomDataBase.StartTrans(const ANativeError: Boolean);
+procedure TJDODataBase.StartTrans(const ANativeError: Boolean);
 begin
   if (not ANativeError) and FTransaction.Active then
     Exit;
@@ -434,7 +415,7 @@ begin
     FOnStartTrans(Self);
 end;
 
-procedure TJDOCustomDataBase.RestartTrans;
+procedure TJDODataBase.RestartTrans;
 begin
   if FTransaction.Active then
     FTransaction.Rollback;
@@ -443,14 +424,14 @@ begin
     FOnRestartTrans(Self);
 end;
 
-procedure TJDOCustomDataBase.Commit;
+procedure TJDODataBase.Commit;
 begin
   FTransaction.Commit;
   if Assigned(FOnCommit) then
     FOnCommit(Self);
 end;
 
-procedure TJDOCustomDataBase.Rollback;
+procedure TJDODataBase.Rollback;
 begin
   FTransaction.Rollback;
   if Assigned(FOnRollback) then
