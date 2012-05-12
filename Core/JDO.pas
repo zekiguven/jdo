@@ -102,6 +102,7 @@ type
 
   TJDOQuery = class
   private
+    FFreeObjects: Boolean;
     FIsCustomSQL: Boolean;
     FAdditionalSQL: TStrings;
     FLike: string;
@@ -156,6 +157,7 @@ type
     property Items[AIndex: Integer]: TJSONObject read GetItems
       write SetItems; default;
     property Fields: TJSONObject read FFields;
+    property FreeObjects: Boolean read FFreeObjects write FFreeObjects;
     property TableName: string read FTableName write FTableName;
     property TableAlias: string read FTableAlias write FTableAlias;
     property PrimaryKey: string read FPrimaryKey write FPrimaryKey;
@@ -468,6 +470,7 @@ begin
   FItems := TObjectList.Create(True);
   FFields := TJSONObject.Create;
   FDataBase := ADataBase;
+  FFreeObjects := True;
   FTableName := ATableName;
   FDateAsString := True;
   FPrimaryKey := DEFAULT_PRIMARY_KEY;
@@ -650,6 +653,8 @@ begin
     Prepare(soInsert);
   JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
+  if FFreeObjects then
+    AJSONObject.Free;
   if Assigned(FOnNotify) then
     FOnNotify(ntInsert);
 end;
@@ -668,6 +673,8 @@ begin
       FPrimaryKey);
     Result := FDataBase.Execute;
   end;
+  if FFreeObjects then
+    AJSONArray.Free;
   if Assigned(FOnNotify) then
     FOnNotify(ntInsert);
 end;
@@ -678,6 +685,8 @@ begin
     Prepare(soUpdate);
   JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
+  if FFreeObjects then
+    AJSONObject.Free;
   if Assigned(FOnNotify) then
     FOnNotify(ntUpdate);
 end;
@@ -696,6 +705,8 @@ begin
       FPrimaryKey);
     Result := FDataBase.Execute;
   end;
+  if FFreeObjects then
+    AJSONArray.Free;
   if Assigned(FOnNotify) then
     FOnNotify(ntUpdate);
 end;
@@ -706,6 +717,8 @@ begin
     Prepare(soDelete);
   JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
   Result := FDataBase.Execute;
+  if FFreeObjects then
+    AJSONObject.Free;
   if Assigned(FOnNotify) then
     FOnNotify(ntDelete);
 end;
@@ -738,6 +751,8 @@ begin
         Result := FDataBase.Execute;
       end;
   end;
+  if FFreeObjects then
+    AJSONArray.Free;
   if Assigned(FOnNotify) then
     FOnNotify(ntDelete);
 end;
