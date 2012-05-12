@@ -122,6 +122,7 @@ type
     FTableAlias: string;
     FTableName: string;
     function GetAdditionalSQL: TStrings;
+    function GetIsPrepared: Boolean;
     function GetItems(AIndex: Integer): TJSONObject;
     function GetSQL: TStrings;
     procedure SetItems(AIndex: Integer; const AValue: TJSONObject);
@@ -161,6 +162,7 @@ type
     property SQL: TStrings read GetSQL;
     property AdditionalSQL: TStrings read GetAdditionalSQL;
     property OrderBy: Boolean read FOrderBy write FOrderBy;
+    property IsPrepared: Boolean read GetIsPrepared;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property SQLOperation: TJDOSQLOperation read FSQLOperation;
     property OnAddingItems: TJDOQueryAddingItemsEvent read FOnAddingItems
@@ -586,6 +588,11 @@ begin
   if not Assigned(FAdditionalSQL) then
     FAdditionalSQL := TStringList.Create;
   Result := FAdditionalSQL;
+end;
+
+function TJDOQuery.GetIsPrepared: Boolean;
+begin
+  Result := FDataBase.Query.SQL.Text <> ES;
 end;
 
 function TJDOQuery.GetSQL: TStrings;
