@@ -21,9 +21,6 @@ var
 begin
   db := TJDODataBase.Create('db.cfg');
   q := TJDOQuery.Create(db, 'jdo_demo');
-  a := TJSONArray.Create;
-  j := TJSONObject.Create;
-  j2 := TJSONObject.Create;
   try
     db.StartTrans;
     try
@@ -33,13 +30,16 @@ begin
       q.AddField('ftdate', ftDate);
       q.AddField('ftfloat', ftFloat);
       q.AddField('ftint', ftInt);
+      j := TJSONObject.Create;
       j.Add('id', 1);
       j.Add('ftstr', 'TOBALDO');
       j.Add('ftbool', False);
       j.Add('ftdate', Now - 1);
       j.Add('ftfloat', 0.5);
       j.Add('ftint', 789);
+      a := TJSONArray.Create;
       a.Add(j);
+      j2 := TJSONObject.Create;
       j2.Add('id', 2);
       j2.Add('ftstr', 'MARICOTA');
       j2.Add('ftbool', True);
@@ -58,7 +58,6 @@ begin
       raise;
     end;
   finally
-    a.Free;
     q.Free;
     db.Free;
   end;

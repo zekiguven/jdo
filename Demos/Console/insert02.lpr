@@ -21,7 +21,6 @@ var
 begin
   db := TJDODataBase.Create('db.cfg');
   q := TJDOQuery.Create(db, 'jdo_demo');
-  a := TJSONArray.Create;
   j := TJSONObject.Create;
   j2 := TJSONObject.Create;
   try
@@ -37,6 +36,7 @@ begin
       j.Add('ftdate', Now);
       j.Add('ftfloat', 1.5);
       j.Add('ftint', 123);
+      a := TJSONArray.Create;
       a.Add(j);
       j2.Add('ftstr', 'JENOVEVA');
       j2.Add('ftbool', False);
@@ -55,7 +55,6 @@ begin
       raise;
     end;
   finally
-    a.Free;
     q.Free;
     db.Free;
   end;

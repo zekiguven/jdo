@@ -20,11 +20,11 @@ var
 begin
   db := TJDODataBase.Create('db.cfg');
   q := TJDOQuery.Create(db, 'jdo_demo');
-  a := TJSONArray.Create;
   try
     db.StartTrans;
     try
       q.AddField('id', ftInt, True);
+      a := TJSONArray.Create;
       a.Add(1);
       a.Add(2);
       if q.Delete(a) then
@@ -38,7 +38,6 @@ begin
       raise;
     end;
   finally
-    a.Free;
     q.Free;
     db.Free;
   end;

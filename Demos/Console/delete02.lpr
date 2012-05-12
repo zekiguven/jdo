@@ -21,7 +21,6 @@ var
 begin
   db := TJDODataBase.Create('db.cfg');
   q := TJDOQuery.Create(db, 'jdo_demo');
-  a := TJSONArray.Create;
   j := TJSONObject.Create;
   j2 := TJSONObject.Create;
   try
@@ -29,6 +28,7 @@ begin
     try
       q.AddField('id', ftInt, True);
       j.Add('id', 1);
+      a := TJSONArray.Create;
       a.Add(j);
       j2.Add('id', 2);
       a.Add(j2);
@@ -43,7 +43,6 @@ begin
       raise;
     end;
   finally
-    a.Free;
     q.Free;
     db.Free;
   end;
