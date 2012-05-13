@@ -32,7 +32,7 @@ const
   PO = '#';
   SP = ' ';
   DEFAULT_PRIMARY_KEY = 'id';
-  CONNECTOR_NAME = 'connectorname';
+  CONNECTOR_TYPE = 'connectortype';
   SQL_SELECT_TOKEN = 'select ';
   SQL_FROM_TOKEN = ' from ';
   SQL_WHERE_TOKEN = ' where ';
@@ -55,7 +55,7 @@ const
 var
   SEmptyPrimaryKeyError: string = '"PrimaryKey" must not be empty.';
   SJSONObjectToParamsError: string = '"AJSONFiels.Count" (%d) may not be different from the "AJSONObject.Count" (%d).';
-  SEmptyConnectorNameError: string = '"ConnectorName" must not be empty.';
+  SEmptyConnectorTypeError: string = '"ConnectorType" must not be empty.';
   SConnectorUnitWasNotDeclaredError: string = 'The unit of "%s" was not declared in uses clause.';
   SConfigFileNotFoundError: string = 'Config file not found: %s';
   SInvalidPropInConfigFile: string = 'Invalid property in "%s" file: %s';

@@ -22,10 +22,9 @@ uses
   JDOConsts, Classes, SysUtils, SQLdb, DB, TypInfo, Contnrs, FPJSON;
 
 type
-
   EJDOException = class(Exception);
 
-  EJDOConnection = class(EJDOException);
+  EJDODataBase = class(EJDOException);
 
   EJDOQuery = class(EJDOException);
 
@@ -43,8 +42,6 @@ type
 
   TJDOQueryAddingItemsEvent = procedure(
     AItem: TJSONObject; const AItemNo: Integer) of object;
-
-  { TJDODataBase }
 
   TJDODataBase = class
   private
@@ -97,8 +94,6 @@ type
     property OnCommit: TNotifyEvent read FOnCommit write FOnCommit;
     property OnRollback: TNotifyEvent read FOnRollback write FOnRollback;
   end;
-
-  { TJDOQuery }
 
   TJDOQuery = class
   private
@@ -343,14 +338,14 @@ var
   VConnectorName: ShortString;
   VConnectionDef: TConnectionDef;
 begin
-  VConnectorName := FConfig.Values[CONNECTOR_NAME];
+  VConnectorName := FConfig.Values[CONNECTOR_TYPE];
   if Trim(VConnectorName) = ES then
-    raise EJDOConnection.Create(SEmptyConnectorNameError);
+    raise EJDODataBase.Create(SEmptyConnectorTypeError);
   VConnectionDef := GetConnectionDef(VConnectorName);
   if Assigned(VConnectionDef) then
     FConnection := VConnectionDef.ConnectionClass.Create(nil)
   else
-    raise EJDOConnection.CreateFmt(
+    raise EJDODataBase.CreateFmt(
       SConnectorUnitWasNotDeclaredError, [VConnectorName]);
 end;
 
@@ -373,7 +368,7 @@ end;
 procedure TJDODataBase.LoadConfig;
 begin
   if not FileExists(FConfigFileName) then
-    raise EJDOConnection.CreateFmt(SConfigFileNotFoundError, [FConfigFileName]);
+    raise EJDODataBase.CreateFmt(SConfigFileNotFoundError, [FConfigFileName]);
   FConfig.LoadFromFile(FConfigFileName);
 end;
 
@@ -386,13 +381,13 @@ begin
   begin
     VPropName := FConfig.Names[I];
     VToken := Copy(VPropName, 1, 1);
-    if (CompareText(VPropName, CONNECTOR_NAME) = 0) or (VToken = PO) or
+    if (CompareText(VPropName, CONNECTOR_TYPE) = 0) or (VToken = PO) or
       (VToken = ES) then
       Continue;
     if IsPublishedProp(FConnection, VPropName) then
       SetPropValue(FConnection, VPropName, FConfig.Values[VPropName])
     else
-      raise EJDOConnection.CreateFmt(SInvalidPropInConfigFile,
+      raise EJDODataBase.CreateFmt(SInvalidPropInConfigFile,
         [ExtractFileName(FConfigFileName), VPropName]);
   end;
 end;
