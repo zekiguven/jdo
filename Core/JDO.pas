@@ -95,6 +95,8 @@ type
     property OnRollback: TNotifyEvent read FOnRollback write FOnRollback;
   end;
 
+  TJDODataBaseClass = class of TJDODataBase;
+
   TJDOQuery = class
   private
     FFreeObjects: Boolean;
@@ -167,6 +169,8 @@ type
     property OnPrepare: TNotifyEvent read FOnPrepare write FOnPrepare;
     property OnNotify: TJDOQueryNotifyEvent read FOnNotify write FOnNotify;
   end;
+
+  TJDOQueryClass = class of TJDOQuery;
 
 function FieldTypeToJDOFieldType(
   const AFieldType: TFieldType): ShortString;
