@@ -311,17 +311,14 @@ constructor TJDODataBase.Create(const AConfigFileName: TFileName;
   const AConnect: Boolean);
 begin
   FConfig := TStringList.Create;
-  if AConfigFileName <> ES then
-  begin
-    FConfigFileName := AConfigFileName;
-    LoadConfig;
-    InternalCreateConnection;
-    InternalCreateTransaction;
-    InternalCreateQuery;
-    SetProperties;
-    if AConnect then
-      FConnection.Open;
-  end;
+  FConfigFileName := AConfigFileName;
+  LoadConfig;
+  InternalCreateConnection;
+  InternalCreateTransaction;
+  InternalCreateQuery;
+  SetProperties;
+  if AConnect then
+    FConnection.Open;
 end;
 
 destructor TJDODataBase.Destroy;
@@ -335,18 +332,18 @@ end;
 
 procedure TJDODataBase.InternalCreateConnection;
 var
-  VConnectorName: ShortString;
+  VConnectorType: ShortString;
   VConnectionDef: TConnectionDef;
 begin
-  VConnectorName := FConfig.Values[CONNECTOR_TYPE];
-  if Trim(VConnectorName) = ES then
+  VConnectorType := FConfig.Values[CONNECTOR_TYPE];
+  if Trim(VConnectorType) = ES then
     raise EJDODataBase.Create(SEmptyConnectorTypeError);
-  VConnectionDef := GetConnectionDef(VConnectorName);
+  VConnectionDef := GetConnectionDef(VConnectorType);
   if Assigned(VConnectionDef) then
     FConnection := VConnectionDef.ConnectionClass.Create(nil)
   else
     raise EJDODataBase.CreateFmt(
-      SConnectorUnitWasNotDeclaredError, [VConnectorName]);
+      SConnectorUnitWasNotDeclaredError, [VConnectorType]);
 end;
 
 procedure TJDODataBase.InternalCreateTransaction;
