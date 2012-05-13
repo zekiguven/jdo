@@ -43,11 +43,24 @@ type
   TJDOQueryAddingItemsEvent = procedure(
     AItem: TJSONObject; const AItemNo: Integer) of object;
 
+  TJDOSQLConnection = class(TSQLConnection)
+  end;
+
+  TJDOSQLConnectionClass = class of TJDOSQLConnection;
+
+  TJDOSQLTransaction = class(TSQLTransaction)
+  public
+    procedure StartTrans(const ANativeError: Boolean = True);
+    procedure RestartTrans;
+  end;
+
+  TJDOSQLTransactionClass = class of TJDOSQLTransaction;
+
   TJDODataBase = class
   private
     FConfig: TStrings;
     FConfigFileName: TFileName;
-    FConnection: TSQLConnection;
+    FConnection: TJDOSQLConnection;
     FFields: TFields;
     FOnCommit: TNotifyEvent;
     FOnExecute: TNotifyEvent;
@@ -59,7 +72,7 @@ type
     FParams: TParams;
     FQuery: TSQLQuery;
     FSQL: TStringList;
-    FTransaction: TSQLTransaction;
+    FTransaction: TJDOSQLTransaction;
     procedure InternalCreateConnection;
     procedure InternalCreateTransaction;
     procedure InternalCreateQuery;
@@ -80,8 +93,8 @@ type
     procedure Rollback;
     property Config: TStrings read FConfig;
     property ConfigFileName: TFileName read FConfigFileName write FConfigFileName;
-    property Connection: TSQLConnection read FConnection;
-    property Transaction: TSQLTransaction read FTransaction;
+    property Connection: TJDOSQLConnection read FConnection;
+    property Transaction: TJDOSQLTransaction read FTransaction;
     property Query: TSQLQuery read FQuery;
     property SQL: TStringList read FSQL;
     property Fields: TFields read FFields;
@@ -309,6 +322,22 @@ begin
   end;
 end;
 
+{ TJDOSQLTransaction }
+
+procedure TJDOSQLTransaction.StartTrans(const ANativeError: Boolean);
+begin
+  if (not ANativeError) and Active then
+    Exit;
+  StartTransaction;
+end;
+
+procedure TJDOSQLTransaction.RestartTrans;
+begin
+  if Active then
+    Rollback;
+  StartTransaction;
+end;
+
 { TJDODataBase }
 
 constructor TJDODataBase.Create(const AConfigFileName: TFileName;
@@ -344,7 +373,8 @@ begin
     raise EJDODataBase.Create(SEmptyConnectorTypeError);
   VConnectionDef := GetConnectionDef(VConnectorType);
   if Assigned(VConnectionDef) then
-    FConnection := VConnectionDef.ConnectionClass.Create(nil)
+    FConnection := TJDOSQLConnectionClass(
+      VConnectionDef.ConnectionClass).Create(nil)
   else
     raise EJDODataBase.CreateFmt(
       SConnectorUnitWasNotDeclaredError, [VConnectorType]);
@@ -352,7 +382,7 @@ end;
 
 procedure TJDODataBase.InternalCreateTransaction;
 begin
-  FTransaction := TSQLTransaction.Create(nil);
+  FTransaction := TJDOSQLTransaction.Create(nil);
   FTransaction.DataBase := FConnection;
 end;
 
@@ -428,18 +458,14 @@ end;
 
 procedure TJDODataBase.StartTrans(const ANativeError: Boolean);
 begin
-  if (not ANativeError) and FTransaction.Active then
-    Exit;
-  FTransaction.StartTransaction;
+  FTransaction.StartTrans(ANativeError);
   if Assigned(FOnStartTrans) then
     FOnStartTrans(Self);
 end;
 
 procedure TJDODataBase.RestartTrans;
 begin
-  if FTransaction.Active then
-    FTransaction.Rollback;
-  StartTrans;
+  FTransaction.RestartTrans;
   if Assigned(FOnRestartTrans) then
     FOnRestartTrans(Self);
 end;
