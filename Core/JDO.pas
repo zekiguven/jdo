@@ -182,6 +182,7 @@ type
     function Open(const AAdditionalSQL: string = ES): Boolean; virtual;
     function Count: Integer;
     procedure Clear;
+    procedure Close;
     function First: TJSONObject;
     function Last: TJSONObject;
     function AsJSON: TJSONStringType;
@@ -947,6 +948,11 @@ begin
   FLastSQLOperation := soNone;
   if Assigned(FOnNotify) then
     FOnNotify(ntClear);
+end;
+
+procedure TJDOQuery.Close;
+begin
+  FQuery.Close;
 end;
 
 function TJDOQuery.First: TJSONObject;
