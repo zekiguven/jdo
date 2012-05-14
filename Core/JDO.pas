@@ -34,8 +34,8 @@ type
 
   TJDOLikeOptions = set of (loCaseInsensitive, loPartialKey);
 
-  TJDOQueryNotifyTypes = (ntNone, ntInsert, ntUpdate, ntDelete, ntOpen, ntFirst,
-    ntLast, ntClear);
+  TJDOQueryNotifyTypes = (ntNone, ntInsert, ntUpdate, ntDelete, ntOpen, ntClose,
+    ntFirst, ntLast, ntClear);
 
   TJDOQueryNotifyEvent = procedure(
     const ANotifyType: TJDOQueryNotifyTypes) of object;
@@ -51,7 +51,7 @@ type
   TJDOSQLTransaction = class(TSQLTransaction)
   public
     procedure Start(const ANativeError: Boolean = True);
-    procedure RestartTrans;
+    procedure Restart;
   end;
 
   TJDOSQLTransactionClass = class of TJDOSQLTransaction;
@@ -236,7 +236,7 @@ begin
   StartTransaction;
 end;
 
-procedure TJDOSQLTransaction.RestartTrans;
+procedure TJDOSQLTransaction.Restart;
 begin
   if Active then
     Rollback;
@@ -353,7 +353,7 @@ begin
     if (APrimaryKey <> ES) and (APrimaryKey = VName) and
       (not VData.IsNull) and Assigned(VParam) then
     begin
-      VParam.AsInteger := VData.AsInt64;
+      VParam.AsInteger := VData.AsInteger;
       Continue;
     end;
     VFieldType := VField.AsString;
@@ -513,7 +513,7 @@ end;
 
 procedure TJDODataBase.RestartTrans;
 begin
-  FTransaction.RestartTrans;
+  FTransaction.Restart;
   if Assigned(FOnRestartTrans) then
     FOnRestartTrans(Self);
 end;
@@ -815,7 +815,7 @@ begin
     AJSONObject[FPrimaryKey].Value;
 {$ELSE}
   FQuery.Params.ParamByName(FPrimaryKey).AsInteger :=
-    AJSONObject[FPrimaryKey].AsInt64;
+    AJSONObject[FPrimaryKey].AsInteger;
 {$ENDIF}
   Result := FQuery.Execute;
   if FFreeObjects then
@@ -842,7 +842,8 @@ begin
 {$IFDEF JDO_DELETE_WITH_VARIANTS}
         FQuery.Params.ParamByName(FPrimaryKey).Value := AJSONArray[I].Value;
 {$ELSE}
-        FQuery.Params.ParamByName(FPrimaryKey).AsInteger := AJSONArray[I].AsInt64;
+        FQuery.Params.ParamByName(FPrimaryKey).AsInteger :=
+          AJSONArray[I].AsInteger;
 {$ENDIF}
         Result := FQuery.Execute;
       end;
@@ -855,7 +856,7 @@ begin
           VJSONObject[FPrimaryKey].Value;
 {$ELSE}
         FQuery.Params.ParamByName(FPrimaryKey).AsInteger :=
-          VJSONObject[FPrimaryKey].AsInt64;
+          VJSONObject[FPrimaryKey].AsInteger;
 {$ENDIF}
         Result := FQuery.Execute;
       end;
@@ -920,7 +921,6 @@ begin
     while not FQuery.EOF do
     begin
       VItem := TJSONObject.Create;
-      FQuery.DateAsString := FQuery.DateAsString;
       FQuery.ReadFields(FFields, VItem);
       FItems.Add(VItem);
       if Assigned(FOnAddingItems) then
@@ -953,6 +953,8 @@ end;
 procedure TJDOQuery.Close;
 begin
   FQuery.Close;
+  if Assigned(FOnNotify) then
+    FOnNotify(ntClose);
 end;
 
 function TJDOQuery.First: TJSONObject;
