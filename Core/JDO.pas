@@ -19,7 +19,7 @@ unit JDO;
 interface
 
 uses
-  JDOConsts, Classes, SysUtils, SQLdb, DB, TypInfo, Contnrs, FPJSON;
+  JDOConsts, Classes, SysUtils, SQLdb, DB, TypInfo, Contnrs, FPJSON, FGL;
 
 type
   EJDOException = class(Exception);
@@ -72,6 +72,10 @@ type
 
   TSQLQueryClass = class of TJDOSQLQuery;
 
+  TJDOQuery = class;
+
+  TJDOQueries = specialize TFPGObjectList<TJDOQuery>;
+
   TJDODataBase = class
   private
     FConfig: TStrings;
@@ -86,9 +90,11 @@ type
     FOnRollback: TNotifyEvent;
     FOnStartTrans: TNotifyEvent;
     FParams: TParams;
+    FQueries: TJDOQueries;
     FQuery: TJDOSQLQuery;
     FSQL: TStringList;
     FTransaction: TJDOSQLTransaction;
+    function GetQueries: TJDOQueries;
     procedure InternalCreateConnection;
     procedure InternalCreateTransaction;
     procedure InternalCreateQuery;
@@ -112,6 +118,7 @@ type
     property Connection: TJDOSQLConnection read FConnection;
     property Transaction: TJDOSQLTransaction read FTransaction;
     property Query: TJDOSQLQuery read FQuery;
+    property Queries: TJDOQueries read GetQueries;
     property SQL: TStringList read FSQL;
     property Fields: TFields read FFields;
     property Params: TParams read FParams;
@@ -379,6 +386,7 @@ destructor TJDODataBase.Destroy;
 begin
   FConfig.Free;
   FQuery.Free;
+  FQueries.Free;
   FTransaction.Free;
   FConnection.Free;
   inherited Destroy;
@@ -399,6 +407,13 @@ begin
   else
     raise EJDODataBase.CreateFmt(
       SConnectorUnitWasNotDeclaredError, [VConnectorType]);
+end;
+
+function TJDODataBase.GetQueries: TJDOQueries;
+begin
+  if not Assigned(FQueries) then
+    FQueries := TJDOQueries.Create;
+  Result := FQueries;
 end;
 
 procedure TJDODataBase.InternalCreateTransaction;
@@ -659,6 +674,8 @@ begin
   FQuery.Transaction := nil;
   if Assigned(AValue) then
   begin
+    if FDataBase.Queries.IndexOf(Self) = -1 then
+      FDataBase.Queries.Add(Self);
     FQuery.DataBase := FDataBase.Connection;
     FQuery.Transaction := FDataBase.Transaction;
   end;
