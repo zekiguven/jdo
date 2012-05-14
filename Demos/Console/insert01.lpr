@@ -45,7 +45,6 @@ begin
       raise;
     end;
   finally
-    q.Free;
     db.Free;
   end;
 end.
