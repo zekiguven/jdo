@@ -56,6 +56,22 @@ type
 
   TJDOSQLTransactionClass = class of TJDOSQLTransaction;
 
+  TJDOSQLQuery = class(TSQLQuery)
+  private
+    FDateAsString: Boolean;
+  public
+    function Open: Boolean;
+    function Execute: Boolean;
+    function FieldType(const AFieldType: TFieldType): ShortString;
+    function FieldTypeEnum(const AFieldType: TFieldType): TJDOFieldTypes;
+    procedure ReadFields(AJSONFiels, AJSONObject: TJSONObject);
+    procedure WriteParams(AJSONFiels, AJSONObject: TJSONObject;
+      const APrimaryKey: string = ES);
+    property DateAsString: Boolean read FDateAsString write FDateAsString;
+  end;
+
+  TSQLQueryClass = class of TJDOSQLQuery;
+
   TJDODataBase = class
   private
     FConfig: TStrings;
@@ -70,7 +86,7 @@ type
     FOnRollback: TNotifyEvent;
     FOnStartTrans: TNotifyEvent;
     FParams: TParams;
-    FQuery: TSQLQuery;
+    FQuery: TJDOSQLQuery;
     FSQL: TStringList;
     FTransaction: TJDOSQLTransaction;
     procedure InternalCreateConnection;
@@ -95,7 +111,7 @@ type
     property ConfigFileName: TFileName read FConfigFileName write FConfigFileName;
     property Connection: TJDOSQLConnection read FConnection;
     property Transaction: TJDOSQLTransaction read FTransaction;
-    property Query: TSQLQuery read FQuery;
+    property Query: TJDOSQLQuery read FQuery;
     property SQL: TStringList read FSQL;
     property Fields: TFields read FFields;
     property Params: TParams read FParams;
@@ -127,15 +143,17 @@ type
     FOnPrepare: TNotifyEvent;
     FOrderBy: Boolean;
     FPrimaryKey: string;
-    FDateAsString: Boolean;
-    FSQL: TStrings;
+    FQuery: TJDOSQLQuery;
     FSQLOperation: TJDOSQLOperation;
     FTableAlias: string;
     FTableName: string;
     function GetAdditionalSQL: TStrings;
+    function GetDateAsString: Boolean;
     function GetIsPrepared: Boolean;
     function GetItems(AIndex: Integer): TJSONObject;
     function GetSQL: TStrings;
+    procedure SetDataBase(const AValue: TJDODataBase);
+    procedure SetDateAsString(const AValue: Boolean);
     procedure SetItems(AIndex: Integer; const AValue: TJSONObject);
   public
     constructor Create;
@@ -145,7 +163,7 @@ type
       const AAdditionalSQL: string = ES); virtual;
     procedure AddField(const AFieldName: ShortString;
       const AFieldType: TJDOFieldTypes;
-      const AIsPK: Boolean = False);
+      const APrimaryKey: Boolean = False);
     procedure Like(const AValue, AKey: string;
       const AOptions: TJDOLikeOptions = []);
     function Insert(AJSONObject: TJSONObject): Boolean; virtual;
@@ -163,7 +181,8 @@ type
     function AsJSONArray: TJSONArray;
     function Field(const AFieldName: string): TField;
     function Param(const AParamName: string): TParam;
-    property DataBase: TJDODataBase read FDataBase write FDataBase;
+    property DataBase: TJDODataBase read FDataBase write SetDataBase;
+    property Query: TJDOSQLQuery read FQuery write FQuery;
     property Items[AIndex: Integer]: TJSONObject read GetItems
       write SetItems; default;
     property Fields: TJSONObject read FFields;
@@ -175,7 +194,7 @@ type
     property AdditionalSQL: TStrings read GetAdditionalSQL;
     property OrderBy: Boolean read FOrderBy write FOrderBy;
     property IsPrepared: Boolean read GetIsPrepared;
-    property DateAsString: Boolean read FDateAsString write FDateAsString;
+    property DateAsString: Boolean read GetDateAsString write SetDateAsString;
     property SQLOperation: TJDOSQLOperation read FSQLOperation;
     property OnAddingItems: TJDOQueryAddingItemsEvent read FOnAddingItems
       write FOnAddingItems;
@@ -185,19 +204,39 @@ type
 
   TJDOQueryClass = class of TJDOQuery;
 
-function FieldTypeToJDOFieldType(
-  const AFieldType: TFieldType): ShortString;
-function FieldTypeToJDOFieldTypeEnum(
-  const AFieldType: TFieldType): TJDOFieldTypes;
-procedure FieldsToJSONObject(AFields: TFields;
-  AJSONFiels, AJSONObject: TJSONObject; const ADateAsString: Boolean);
-procedure JSONObjectToParams(AParams: TParams;
-  AJSONFiels, AJSONObject: TJSONObject; const APKFieldName: string = ES);
-
 implementation
 
-function FieldTypeToJDOFieldType(
-  const AFieldType: TFieldType): ShortString;
+{ TJDOSQLTransaction }
+
+procedure TJDOSQLTransaction.StartTrans(const ANativeError: Boolean);
+begin
+  if (not ANativeError) and Active then
+    Exit;
+  StartTransaction;
+end;
+
+procedure TJDOSQLTransaction.RestartTrans;
+begin
+  if Active then
+    Rollback;
+  StartTransaction;
+end;
+
+{ TJDOSQLQuery }
+
+function TJDOSQLQuery.Open: Boolean;
+begin
+  inherited Open;
+  Result := RecordCount > 0;
+end;
+
+function TJDOSQLQuery.Execute: Boolean;
+begin
+  ExecSQL;
+  Result := RowsAffected > 0;
+end;
+
+function TJDOSQLQuery.FieldType(const AFieldType: TFieldType): ShortString;
 begin
   case AFieldType of
     ftUnknown, ftCursor, ftADT, ftArray, ftReference,
@@ -213,8 +252,7 @@ begin
   end;
 end;
 
-function FieldTypeToJDOFieldTypeEnum(
-  const AFieldType: TFieldType): TJDOFieldTypes;
+function TJDOSQLQuery.FieldTypeEnum(const AFieldType: TFieldType): TJDOFieldTypes;
 begin
   case AFieldType of
     ftUnknown, ftCursor, ftADT, ftArray, ftReference,
@@ -230,16 +268,15 @@ begin
   end;
 end;
 
-procedure FieldsToJSONObject(AFields: TFields;
-  AJSONFiels, AJSONObject: TJSONObject; const ADateAsString: Boolean);
+procedure TJDOSQLQuery.ReadFields(AJSONFiels, AJSONObject: TJSONObject);
 var
   I: Integer;
   VField: TField;
   VFieldType, VFieldName: ShortString;
 begin
-  for I := 0 to Pred(AFields.Count) do
+  for I := 0 to Pred(Fields.Count) do
   begin
-    VField := AFields[I];
+    VField := Fields[I];
     if AJSONFiels.Count > 0 then
     begin
       VFieldType := AJSONFiels.Items[I].AsString;
@@ -247,7 +284,7 @@ begin
     end
     else
     begin
-      VFieldType := FieldTypeToJDOFieldType(VField.DataType);
+      VFieldType := FieldType(VField.DataType);
       VFieldName := VField.FieldName;
     end;
     if (VFieldType = FT_NULL) or VField.IsNull then
@@ -261,7 +298,7 @@ begin
       AJSONObject.Add(VFieldName, VField.AsBoolean);
     if VFieldType = FT_DATE then
     begin
-      if ADateAsString then
+      if FDateAsString then
         AJSONObject.Add(VFieldName, VField.AsString)
       else
         AJSONObject.Add(VFieldName, VField.AsFloat);
@@ -273,8 +310,8 @@ begin
   end;
 end;
 
-procedure JSONObjectToParams(AParams: TParams;
-  AJSONFiels, AJSONObject: TJSONObject; const APKFieldName: string);
+procedure TJDOSQLQuery.WriteParams(AJSONFiels, AJSONObject: TJSONObject;
+  const APrimaryKey: string);
 var
   VParam: TParam;
   VField, VData: TJSONData;
@@ -290,9 +327,9 @@ begin
   begin
     VName := AJSONFiels.Names[I];
     VField := AJSONFiels.Items[I];
-    VParam := AParams.ParamByName(VName);
+    VParam := Params.ParamByName(VName);
     VData := AJSONObject[VName];
-    if (APKFieldName <> ES) and (APKFieldName = VName) and
+    if (APrimaryKey <> ES) and (APrimaryKey = VName) and
       (not VData.IsNull) and Assigned(VParam) then
     begin
       VParam.AsInteger := VData.AsInt64;
@@ -301,7 +338,7 @@ begin
     VFieldType := VField.AsString;
     if (VFieldType = FT_NULL) or VData.IsNull or VField.IsNull then
     begin
-      AParams.Clear;
+      Params.Clear;
       Continue;
     end;
     if VFieldType = FT_STR then
@@ -320,22 +357,6 @@ begin
     if VFieldType = FT_INT then
       VParam.AsInteger := VData.AsInteger;
   end;
-end;
-
-{ TJDOSQLTransaction }
-
-procedure TJDOSQLTransaction.StartTrans(const ANativeError: Boolean);
-begin
-  if (not ANativeError) and Active then
-    Exit;
-  StartTransaction;
-end;
-
-procedure TJDOSQLTransaction.RestartTrans;
-begin
-  if Active then
-    Rollback;
-  StartTransaction;
 end;
 
 { TJDODataBase }
@@ -388,7 +409,7 @@ end;
 
 procedure TJDODataBase.InternalCreateQuery;
 begin
-  FQuery := TSQLQuery.Create(nil);
+  FQuery := TJDOSQLQuery.Create(nil);
   FQuery.DataBase := FConnection;
   FQuery.Transaction := FTransaction;
   FSQL := FQuery.SQL;
@@ -442,16 +463,14 @@ end;
 
 function TJDODataBase.Open: Boolean;
 begin
-  FQuery.Open;
-  Result := FQuery.RecordCount > 0;
+  Result := FQuery.Open;
   if Assigned(FOnOpen) then
     FOnOpen(Self);
 end;
 
 function TJDODataBase.Execute: Boolean;
 begin
-  FQuery.ExecSQL;
-  Result := FQuery.RowsAffected > 0;
+  Result := FQuery.Execute;
   if Assigned(FOnExecute) then
     FOnExecute(Self);
 end;
@@ -489,12 +508,13 @@ end;
 constructor TJDOQuery.Create(ADataBase: TJDODataBase;
   const ATableName: string);
 begin
+  FQuery := TJDOSQLQuery.Create(nil);
   FItems := TObjectList.Create(True);
   FFields := TJSONObject.Create;
-  FDataBase := ADataBase;
+  SetDataBase(ADataBase);
+  FQuery.DateAsString := True;
   FFreeObjects := True;
   FTableName := ATableName;
-  FDateAsString := True;
   FPrimaryKey := DEFAULT_PRIMARY_KEY;
   FOrderBy := True;
 end;
@@ -509,6 +529,7 @@ begin
   FAdditionalSQL.Free;
   FFields.Free;
   FItems.Free;
+  FQuery.Free;
   inherited Destroy;
 end;
 
@@ -577,16 +598,16 @@ begin
           else
             VSQL += SQL_ORDER_BY_TOKEN + FPrimaryKey;
         end;
-        FDataBase.SQL.Text := VSQL;
+        FQuery.SQL.Text := VSQL;
       end;
-    soInsert: FDataBase.SQL.Text := SQL_INSERT_TOKEN + FTableName +
+    soInsert: FQuery.SQL.Text := SQL_INSERT_TOKEN + FTableName +
       SP + PS + _SQLSet(ES, FPrimaryKey, False, False) + PE +
       SQL_VALUES_TOKEN + PS + _SQLSet(CO, FPrimaryKey, False, False) + PE;
     soUpdate:
       begin
         if Trim(FPrimaryKey) = ES then
           raise EJDOQuery.Create(SEmptyPrimaryKeyError);
-        FDataBase.SQL.Text := SQL_UPDATE_TOKEN + FTableName + SQL_SET_TOKEN +
+        FQuery.SQL.Text := SQL_UPDATE_TOKEN + FTableName + SQL_SET_TOKEN +
           _SQLSet(CO, FPrimaryKey, True, True) + SQL_WHERE_TOKEN + FPrimaryKey +
           SQL_EQ_PARAM_TOKEN + FPrimaryKey;
       end;
@@ -594,7 +615,7 @@ begin
       begin
         if Trim(FPrimaryKey) = ES then
           raise EJDOQuery.Create(SEmptyPrimaryKeyError);
-        FDataBase.SQL.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FTableName +
+        FQuery.SQL.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FTableName +
           SQL_WHERE_TOKEN + FPrimaryKey + SQL_EQ_PARAM_TOKEN + FPrimaryKey;
       end;
   end;
@@ -615,15 +636,37 @@ begin
   Result := FAdditionalSQL;
 end;
 
+function TJDOQuery.GetDateAsString: Boolean;
+begin
+  Result := FQuery.DateAsString;
+end;
+
 function TJDOQuery.GetIsPrepared: Boolean;
 begin
-  Result := FDataBase.Query.SQL.Text <> ES;
+  Result := FQuery.SQL.Text <> ES;
 end;
 
 function TJDOQuery.GetSQL: TStrings;
 begin
   FIsCustomSQL := True;
-  Result := FDataBase.Query.SQL;
+  Result := FQuery.SQL;
+end;
+
+procedure TJDOQuery.SetDataBase(const AValue: TJDODataBase);
+begin
+  FDataBase := AValue;
+  FQuery.DataBase := nil;
+  FQuery.Transaction := nil;
+  if Assigned(AValue) then
+  begin
+    FQuery.DataBase := FDataBase.Connection;
+    FQuery.Transaction := FDataBase.Transaction;
+  end;
+end;
+
+procedure TJDOQuery.SetDateAsString(const AValue: Boolean);
+begin
+  FQuery.DateAsString := AValue;
 end;
 
 procedure TJDOQuery.SetItems(AIndex: Integer; const AValue: TJSONObject);
@@ -632,11 +675,11 @@ begin
 end;
 
 procedure TJDOQuery.AddField(const AFieldName: ShortString;
-  const AFieldType: TJDOFieldTypes; const AIsPK: Boolean);
+  const AFieldType: TJDOFieldTypes; const APrimaryKey: Boolean);
 var
   VFieldName: string;
 begin
-  if AIsPK then
+  if APrimaryKey then
     FPrimaryKey := AFieldName;
   if (FTableAlias <> ES) and (Pos(DT, AFieldName) = 0) then
     VFieldName := FTableAlias + DT + AFieldName
@@ -673,8 +716,8 @@ function TJDOQuery.Insert(AJSONObject: TJSONObject): Boolean;
 begin
   if FLastSQLOperation <> soInsert then
     Prepare(soInsert);
-  JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
-  Result := FDataBase.Execute;
+  FQuery.WriteParams(FFields, AJSONObject);
+  Result := FQuery.Execute;
   if FFreeObjects then
     AJSONObject.Free;
   if Assigned(FOnNotify) then
@@ -691,9 +734,8 @@ begin
   for I := 0 to Pred(AJSONArray.Count) do
   begin
     VJSONObject := AJSONArray[I] as TJSONObject;
-    JSONObjectToParams(FDataBase.Query.Params, FFields, VJSONObject,
-      FPrimaryKey);
-    Result := FDataBase.Execute;
+    FQuery.WriteParams(FFields, VJSONObject, FPrimaryKey);
+    Result := FQuery.Execute;
   end;
   if FFreeObjects then
     AJSONArray.Free;
@@ -705,8 +747,8 @@ function TJDOQuery.Update(AJSONObject: TJSONObject): Boolean;
 begin
   if FLastSQLOperation <> soUpdate then
     Prepare(soUpdate);
-  JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
-  Result := FDataBase.Execute;
+  FQuery.WriteParams(FFields, AJSONObject);
+  Result := FQuery.Execute;
   if FFreeObjects then
     AJSONObject.Free;
   if Assigned(FOnNotify) then
@@ -723,9 +765,8 @@ begin
   for I := 0 to Pred(AJSONArray.Count) do
   begin
     VJSONObject := AJSONArray[I] as TJSONObject;
-    JSONObjectToParams(FDataBase.Query.Params, FFields, VJSONObject,
-      FPrimaryKey);
-    Result := FDataBase.Execute;
+    FQuery.WriteParams(FFields, VJSONObject, FPrimaryKey);
+    Result := FQuery.Execute;
   end;
   if FFreeObjects then
     AJSONArray.Free;
@@ -737,8 +778,8 @@ function TJDOQuery.Delete(AJSONObject: TJSONObject): Boolean;
 begin
   if FLastSQLOperation <> soDelete then
     Prepare(soDelete);
-  JSONObjectToParams(FDataBase.Query.Params, FFields, AJSONObject);
-  Result := FDataBase.Execute;
+  FQuery.WriteParams(FFields, AJSONObject);
+  Result := FQuery.Execute;
   if FFreeObjects then
     AJSONObject.Free;
   if Assigned(FOnNotify) then
@@ -760,17 +801,15 @@ begin
     jtNumber:
       for I := 0 to Pred(VCount) do
       begin
-        FDataBase.Query.Params.ParamByName(FPrimaryKey).AsInteger :=
-          AJSONArray[I].AsInt64;
-        Result := FDataBase.Execute;
+        FQuery.Params.ParamByName(FPrimaryKey).AsInteger := AJSONArray[I].AsInt64;
+        Result := FQuery.Execute;
       end;
     jtObject:
       for I := 0 to Pred(VCount) do
       begin
         VJSONObject := AJSONArray[I] as TJSONObject;
-        JSONObjectToParams(FDataBase.Query.Params, FFields, VJSONObject,
-          FPrimaryKey);
-        Result := FDataBase.Execute;
+        FQuery.WriteParams(FFields, VJSONObject, FPrimaryKey);
+        Result := FQuery.Execute;
       end;
   end;
   if FFreeObjects then
@@ -790,18 +829,18 @@ begin
     Prepare(soSelect, AAdditionalSQL);
   if FLike <> ES then
     Param(FLikeKey).AsString := FLikeValue;
-  Result := FDataBase.Open;
+  Result := FQuery.Open;
   FItems.Clear;
-  FDataBase.Query.First;
-  if Pos(AK, FDataBase.Query.SQL.Text) <> 0 then
+  FQuery.First;
+  if Pos(AK, FQuery.SQL.Text) <> 0 then
   begin
-    FDataBase.Query.First;
-    while not FDataBase.Query.EOF do
+    FQuery.First;
+    while not FQuery.EOF do
     begin
       VItem := TJSONObject.Create;
-      for I := 0 to Pred(FDataBase.Query.Fields.Count) do
+      for I := 0 to Pred(FQuery.Fields.Count) do
       begin
-        VField := FDataBase.Query.Fields[I];
+        VField := FQuery.Fields[I];
         VFieldName := VField.FieldName;
         case VField.DataType of
           ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
@@ -817,7 +856,7 @@ begin
           DB.ftFloat, ftCurrency, ftBCD, ftFMTBcd:
             VItem.Add(VFieldName, VField.AsFloat);
           DB.ftDate, ftTime, ftDateTime, ftTimeStamp:
-            if FDateAsString then
+            if FQuery.DateAsString then
               VItem.Add(VFieldName, VField.AsString)
             else
               VItem.Add(VFieldName, VField.AsDateTime);
@@ -825,19 +864,20 @@ begin
       end;
       FItems.Add(VItem);
       if Assigned(FOnAddingItems) then
-        FOnAddingItems(VItem, FDataBase.Query.RecNo);
-      FDataBase.Query.Next;
+        FOnAddingItems(VItem, FQuery.RecNo);
+      FQuery.Next;
     end;
   end
   else
-    while not FDataBase.Query.EOF do
+    while not FQuery.EOF do
     begin
       VItem := TJSONObject.Create;
-      FieldsToJSONObject(FDataBase.Query.Fields, FFields, VItem, FDateAsString);
+      FQuery.DateAsString := FQuery.DateAsString;
+      FQuery.ReadFields(FFields, VItem);
       FItems.Add(VItem);
       if Assigned(FOnAddingItems) then
-        FOnAddingItems(VItem, FDataBase.Query.RecNo);
-      FDataBase.Query.Next;
+        FOnAddingItems(VItem, FQuery.RecNo);
+      FQuery.Next;
     end;
   if Assigned(FOnNotify) then
     FOnNotify(ntOpen);
@@ -850,14 +890,12 @@ end;
 
 procedure TJDOQuery.Clear;
 begin
-  FDataBase.Query.Close;
-  FDataBase.Query.SQL.Clear;
+  FIsCustomSQL := False;
+  FQuery.SQL.Clear;
   FItems.Clear;
   FFields.Clear;
   if Assigned(FAdditionalSQL) then
     FAdditionalSQL.Clear;
-  if Assigned(FSQL) then
-    FSQL.Clear;
   FLastSQLOperation := soNone;
   if Assigned(FOnNotify) then
     FOnNotify(ntClear);
@@ -904,12 +942,12 @@ end;
 
 function TJDOQuery.Field(const AFieldName: string): TField;
 begin
-  Result := FDataBase.Query.Fields.FieldByName(AFieldName);
+  Result := FQuery.Fields.FieldByName(AFieldName);
 end;
 
 function TJDOQuery.Param(const AParamName: string): TParam;
 begin
-  Result := FDataBase.Query.Params.ParamByName(AParamName);
+  Result := FQuery.Params.ParamByName(AParamName);
 end;
 
 end.
