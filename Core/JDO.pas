@@ -557,6 +557,7 @@ procedure TJDOQuery.Prepare(const ASQLOperation: TJDOSQLOperation;
     FN: string;
     I, C: Integer;
   begin
+    Result := ES;
     C := FFields.Count;
     for I := 0 to Pred(C) do
     begin
@@ -953,6 +954,7 @@ var
   I, C: Integer;
 begin
   C := FItems.Count;
+  Result := ES;
   for I := 0 to Pred(C) do
   begin
     Result += TJSONObject(FItems[I]).AsJSON;
