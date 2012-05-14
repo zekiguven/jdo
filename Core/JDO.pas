@@ -795,7 +795,13 @@ function TJDOQuery.Delete(AJSONObject: TJSONObject): Boolean;
 begin
   if FLastSQLOperation <> soDelete then
     Prepare(soDelete);
-  FQuery.WriteParams(FFields, AJSONObject);
+{$IFDEF JDO_DELETE_WITH_VARIANTS}
+  FQuery.Params.ParamByName(FPrimaryKey).Value :=
+    AJSONObject[FPrimaryKey].Value;
+{$ELSE}
+  FQuery.Params.ParamByName(FPrimaryKey).AsInteger :=
+    AJSONObject[FPrimaryKey].AsInt64;
+{$ENDIF}
   Result := FQuery.Execute;
   if FFreeObjects then
     FreeAndNil(AJSONObject);
@@ -818,14 +824,24 @@ begin
     jtNumber:
       for I := 0 to Pred(VCount) do
       begin
+{$IFDEF JDO_DELETE_WITH_VARIANTS}
+        FQuery.Params.ParamByName(FPrimaryKey).Value := AJSONArray[I].Value;
+{$ELSE}
         FQuery.Params.ParamByName(FPrimaryKey).AsInteger := AJSONArray[I].AsInt64;
+{$ENDIF}
         Result := FQuery.Execute;
       end;
     jtObject:
       for I := 0 to Pred(VCount) do
       begin
         VJSONObject := AJSONArray[I] as TJSONObject;
-        FQuery.WriteParams(FFields, VJSONObject, FPrimaryKey);
+{$IFDEF JDO_DELETE_WITH_VARIANTS}
+        FQuery.Params.ParamByName(FPrimaryKey).Value :=
+          VJSONObject[FPrimaryKey].Value;
+{$ELSE}
+        FQuery.Params.ParamByName(FPrimaryKey).AsInteger :=
+          VJSONObject[FPrimaryKey].AsInt64;
+{$ENDIF}
         Result := FQuery.Execute;
       end;
   end;
