@@ -22,7 +22,12 @@ uses
   JDOConsts, Classes, SysUtils, SQLdb, DB, TypInfo, Contnrs, FPJSON, FGL;
 
 type
-  EJDOException = class(Exception);
+  EJDOException = class(Exception)
+  public
+    constructor Create(AInstance: TObject; const AMsg: string); overload;
+    constructor CreateFmt(AInstance: TObject; const AMsg: string;
+      const AArgs: array of const); overload;
+  end;
 
   EJDODataBase = class(EJDOException);
 
@@ -227,6 +232,19 @@ type
 
 implementation
 
+{ EJDOException }
+
+constructor EJDOException.Create(AInstance: TObject; const AMsg: string);
+begin
+  inherited CreateFmt(ERROR_MASK, [AInstance.ClassName, AMsg]);
+end;
+
+constructor EJDOException.CreateFmt(AInstance: TObject; const AMsg: string;
+  const AArgs: array of const);
+begin
+  inherited CreateFmt(Format(ERROR_MASK, [AInstance.ClassName, AMsg]), AArgs);
+end;
+
 { TJDOSQLTransaction }
 
 procedure TJDOSQLTransaction.Start(const ANativeError: Boolean);
@@ -342,7 +360,7 @@ begin
   VJSONObjsCount := AJSONObject.Count;
   VJSONFielsCount := AJSONFiels.Count;
   if VJSONFielsCount <> VJSONObjsCount then
-    raise EJDOException.CreateFmt(SJSONObjectToParamsError,
+    raise EJDOException.CreateFmt(Self, SJSONObjectToParamsError,
       [VJSONFielsCount, VJSONObjsCount]);
   for I := 0 to Pred(VJSONObjsCount) do
   begin
@@ -413,14 +431,14 @@ var
 begin
   VConnectorType := FConfig.Values[CONNECTOR_TYPE];
   if Trim(VConnectorType) = ES then
-    raise EJDODataBase.Create(SEmptyConnectorTypeError);
+    raise EJDODataBase.Create(Self, SEmptyConnectorTypeError);
   VConnectionDef := GetConnectionDef(VConnectorType);
   if Assigned(VConnectionDef) then
     FConnection := TJDOSQLConnectionClass(
       VConnectionDef.ConnectionClass).Create(nil)
   else
-    raise EJDODataBase.CreateFmt(
-      SConnectorUnitWasNotDeclaredError, [VConnectorType]);
+    raise EJDODataBase.CreateFmt(Self, SConnectorUnitWasNotDeclaredError,
+      [VConnectorType]);
 end;
 
 function TJDODataBase.GetQueries: TJDOQueries;
@@ -449,7 +467,8 @@ end;
 procedure TJDODataBase.LoadConfig;
 begin
   if not FileExists(FConfigFileName) then
-    raise EJDODataBase.CreateFmt(SConfigFileNotFoundError, [FConfigFileName]);
+    raise EJDODataBase.CreateFmt(Self, SConfigFileNotFoundError,
+      [FConfigFileName]);
   FConfig.LoadFromFile(FConfigFileName);
 end;
 
@@ -468,7 +487,7 @@ begin
     if IsPublishedProp(FConnection, VPropName) then
       SetPropValue(FConnection, VPropName, FConfig.Values[VPropName])
     else
-      raise EJDODataBase.CreateFmt(SInvalidPropInConfigFile,
+      raise EJDODataBase.CreateFmt(Self, SInvalidPropInConfigFile,
         [ExtractFileName(FConfigFileName), VPropName]);
   end;
 end;
@@ -636,7 +655,7 @@ begin
     soUpdate:
       begin
         if Trim(FPrimaryKey) = ES then
-          raise EJDOQuery.Create(SEmptyPrimaryKeyError);
+          raise EJDOQuery.Create(Self, SEmptyPrimaryKeyError);
         FQuery.SQL.Text := SQL_UPDATE_TOKEN + FTableName + SQL_SET_TOKEN +
           _SQLSet(CO, FPrimaryKey, True, True) + SQL_WHERE_TOKEN + FPrimaryKey +
           SQL_EQ_PARAM_TOKEN + FPrimaryKey;
@@ -644,7 +663,7 @@ begin
     soDelete:
       begin
         if Trim(FPrimaryKey) = ES then
-          raise EJDOQuery.Create(SEmptyPrimaryKeyError);
+          raise EJDOQuery.Create(Self, SEmptyPrimaryKeyError);
         FQuery.SQL.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FTableName +
           SQL_WHERE_TOKEN + FPrimaryKey + SQL_EQ_PARAM_TOKEN + FPrimaryKey;
       end;
