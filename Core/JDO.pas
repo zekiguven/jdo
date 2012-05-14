@@ -736,7 +736,7 @@ begin
   FQuery.WriteParams(FFields, AJSONObject);
   Result := FQuery.Execute;
   if FFreeObjects then
-    AJSONObject.Free;
+    FreeAndNil(AJSONObject);
   if Assigned(FOnNotify) then
     FOnNotify(ntInsert);
 end;
@@ -755,7 +755,7 @@ begin
     Result := FQuery.Execute;
   end;
   if FFreeObjects then
-    AJSONArray.Free;
+    FreeAndNil(AJSONArray);
   if Assigned(FOnNotify) then
     FOnNotify(ntInsert);
 end;
@@ -767,7 +767,7 @@ begin
   FQuery.WriteParams(FFields, AJSONObject);
   Result := FQuery.Execute;
   if FFreeObjects then
-    AJSONObject.Free;
+    FreeAndNil(AJSONObject);
   if Assigned(FOnNotify) then
     FOnNotify(ntUpdate);
 end;
@@ -786,7 +786,7 @@ begin
     Result := FQuery.Execute;
   end;
   if FFreeObjects then
-    AJSONArray.Free;
+    FreeAndNil(AJSONArray);
   if Assigned(FOnNotify) then
     FOnNotify(ntUpdate);
 end;
@@ -798,7 +798,7 @@ begin
   FQuery.WriteParams(FFields, AJSONObject);
   Result := FQuery.Execute;
   if FFreeObjects then
-    AJSONObject.Free;
+    FreeAndNil(AJSONObject);
   if Assigned(FOnNotify) then
     FOnNotify(ntDelete);
 end;
@@ -830,7 +830,7 @@ begin
       end;
   end;
   if FFreeObjects then
-    AJSONArray.Free;
+    FreeAndNil(AJSONArray);
   if Assigned(FOnNotify) then
     FOnNotify(ntDelete);
 end;
