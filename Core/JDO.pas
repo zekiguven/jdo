@@ -925,6 +925,7 @@ end;
 procedure TJDOQuery.Clear;
 begin
   FIsCustomSQL := False;
+  FQuery.Close;
   FQuery.SQL.Clear;
   FItems.Clear;
   FFields.Clear;
