@@ -19,7 +19,7 @@ begin
   try
     db.StartTrans;
     try
-      q.OrderBy := False;
+      q.OrderBy := ES;
       q.Like('o', 'ftstr', [loCaseInsensitive, loPartialKey]);
       if q.Open('order by ftstr desc') then
         WriteLn(q.AsJSON)

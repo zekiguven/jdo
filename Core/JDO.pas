@@ -141,7 +141,7 @@ type
     FOnAddingItems: TJDOQueryAddingItemsEvent;
     FOnNotify: TJDOQueryNotifyEvent;
     FOnPrepare: TNotifyEvent;
-    FOrderBy: Boolean;
+    FOrderBy: string;
     FPrimaryKey: string;
     FQuery: TJDOSQLQuery;
     FSQLOperation: TJDOSQLOperation;
@@ -192,7 +192,7 @@ type
     property PrimaryKey: string read FPrimaryKey write FPrimaryKey;
     property SQL: TStrings read GetSQL;
     property AdditionalSQL: TStrings read GetAdditionalSQL;
-    property OrderBy: Boolean read FOrderBy write FOrderBy;
+    property OrderBy: string read FOrderBy write FOrderBy;
     property IsPrepared: Boolean read GetIsPrepared;
     property DateAsString: Boolean read GetDateAsString write SetDateAsString;
     property SQLOperation: TJDOSQLOperation read FSQLOperation;
@@ -512,11 +512,11 @@ begin
   FItems := TObjectList.Create(True);
   FFields := TJSONObject.Create;
   SetDataBase(ADataBase);
+  FPrimaryKey := DEFAULT_PRIMARY_KEY;
+  FOrderBy := DEFAULT_PRIMARY_KEY;
   FQuery.DateAsString := True;
   FFreeObjects := True;
   FTableName := ATableName;
-  FPrimaryKey := DEFAULT_PRIMARY_KEY;
-  FOrderBy := True;
 end;
 
 constructor TJDOQuery.Create;
@@ -591,12 +591,12 @@ begin
           VSQL += SP + AAdditionalSQL;
         if Assigned(FAdditionalSQL) and (FAdditionalSQL.Count > 0) then
           VSQL += SP + FAdditionalSQL.Text;
-        if FOrderBy then
+        if FOrderBy <> ES then
         begin
           if FTableAlias <> ES then
-            VSQL += SQL_ORDER_BY_TOKEN + FTableAlias + DT + FPrimaryKey
+            VSQL += SQL_ORDER_BY_TOKEN + FTableAlias + DT + FOrderBy
           else
-            VSQL += SQL_ORDER_BY_TOKEN + FPrimaryKey;
+            VSQL += SQL_ORDER_BY_TOKEN + FOrderBy;
         end;
         FQuery.SQL.Text := VSQL;
       end;
