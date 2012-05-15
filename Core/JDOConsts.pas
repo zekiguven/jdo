@@ -31,6 +31,7 @@ const
   PS = '(';
   PO = '#';
   SP = ' ';
+  SC = ';';
   DEFAULT_PRIMARY_KEY = 'id';
   CONNECTOR_TYPE = 'connectortype';
   SQL_SELECT_TOKEN = 'select ';
