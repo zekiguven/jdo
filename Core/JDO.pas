@@ -39,14 +39,13 @@ type
 
   TJDOLikeOptions = set of (loCaseInsensitive, loPartialKey);
 
-  TJDOQueryNotifyTypes = (ntNone, ntInsert, ntUpdate, ntDelete, ntOpen, ntClose,
+  TJDONotifyTypes = (ntNone, ntInsert, ntUpdate, ntDelete, ntOpen, ntClose,
     ntFirst, ntLast, ntClear);
 
-  TJDOQueryNotifyEvent = procedure(
-    const ANotifyType: TJDOQueryNotifyTypes) of object;
+  TJDONotifyEvent = procedure(const ANotifyType: TJDONotifyTypes) of object;
 
-  TJDOQueryAddingItemsEvent = procedure(
-    AItem: TJSONObject; const AItemNo: Integer) of object;
+  TJDOAddingItemsEvent = procedure(AItem: TJSONObject;
+    const AItemNo: Integer) of object;
 
   TJDOSQLConnection = class(TSQLConnection)
   end;
@@ -150,8 +149,8 @@ type
     FDataBase: TJDODataBase;
     FFields: TJSONObject;
     FItems: TObjectList;
-    FOnAddingItems: TJDOQueryAddingItemsEvent;
-    FOnNotify: TJDOQueryNotifyEvent;
+    FOnAddingItems: TJDOAddingItemsEvent;
+    FOnNotify: TJDONotifyEvent;
     FOnPrepare: TNotifyEvent;
     FOrderBy: string;
     FPrimaryKey: string;
@@ -209,10 +208,10 @@ type
     property IsPrepared: Boolean read GetIsPrepared;
     property DateAsString: Boolean read GetDateAsString write SetDateAsString;
     property SQLOperation: TJDOSQLOperation read FSQLOperation;
-    property OnAddingItems: TJDOQueryAddingItemsEvent read FOnAddingItems
+    property OnAddingItems: TJDOAddingItemsEvent read FOnAddingItems
       write FOnAddingItems;
     property OnPrepare: TNotifyEvent read FOnPrepare write FOnPrepare;
-    property OnNotify: TJDOQueryNotifyEvent read FOnNotify write FOnNotify;
+    property OnNotify: TJDONotifyEvent read FOnNotify write FOnNotify;
   end;
 
   TJDOQueryClass = class of TJDOQuery;
