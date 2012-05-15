@@ -82,8 +82,8 @@ type
 
   TJDODataBase = class
   private
-    FConfig: TStrings;
-    FConfigFileName: TFileName;
+    FConfigFile: TStrings;
+    FConfig: string;
     FConnection: TJDOSQLConnection;
     FFields: TFields;
     FOnCommit: TNotifyEvent;
@@ -103,8 +103,7 @@ type
     procedure InternalCreateTransaction;
     procedure InternalCreateQuery;
   public
-    constructor Create(const AConfigFileName: TFileName;
-      const AConnect: Boolean = True);
+    constructor Create(const AConfig: string; const AConnect: Boolean = True);
     destructor Destroy; override;
     procedure LoadConfig;
     procedure SetProperties;
@@ -117,8 +116,6 @@ type
     procedure RestartTrans;
     procedure Commit;
     procedure Rollback;
-    property Config: TStrings read FConfig;
-    property ConfigFileName: TFileName read FConfigFileName write FConfigFileName;
     property Connection: TJDOSQLConnection read FConnection;
     property Transaction: TJDOSQLTransaction read FTransaction;
     property Query: TJDOSQLQuery read FQuery;
@@ -399,11 +396,10 @@ end;
 
 { TJDODataBase }
 
-constructor TJDODataBase.Create(const AConfigFileName: TFileName;
-  const AConnect: Boolean);
+constructor TJDODataBase.Create(const AConfig: string; const AConnect: Boolean);
 begin
-  FConfig := TStringList.Create;
-  FConfigFileName := AConfigFileName;
+  FConfigFile := TStringList.Create;
+  FConfig := AConfig;
   LoadConfig;
   InternalCreateConnection;
   InternalCreateTransaction;
@@ -415,7 +411,7 @@ end;
 
 destructor TJDODataBase.Destroy;
 begin
-  FConfig.Free;
+  FConfigFile.Free;
   FQuery.Free;
   FQueries.Free;
   FTransaction.Free;
@@ -428,7 +424,7 @@ var
   VConnectorType: ShortString;
   VConnectionDef: TConnectionDef;
 begin
-  VConnectorType := FConfig.Values[CONNECTOR_TYPE];
+  VConnectorType := FConfigFile.Values[CONNECTOR_TYPE];
   if Trim(VConnectorType) = ES then
     raise EJDODataBase.Create(Self, SEmptyConnectorTypeError);
   VConnectionDef := GetConnectionDef(VConnectorType);
@@ -465,10 +461,17 @@ end;
 
 procedure TJDODataBase.LoadConfig;
 begin
-  if not FileExists(FConfigFileName) then
-    raise EJDODataBase.CreateFmt(Self, SConfigFileNotFoundError,
-      [FConfigFileName]);
-  FConfig.LoadFromFile(FConfigFileName);
+  if Pos(CONNECTOR_TYPE, LowerCase(FConfig)) <> 0 then
+  begin
+    FConfigFile.Delimiter := SC;
+    FConfigFile.DelimitedText := FConfig;
+  end
+  else
+  begin
+    if not FileExists(FConfig) then
+      raise EJDODataBase.CreateFmt(Self, SConfigFileNotFoundError, [FConfig]);
+    FConfigFile.LoadFromFile(FConfig);
+  end;
 end;
 
 procedure TJDODataBase.SetProperties;
@@ -476,18 +479,18 @@ var
   I: Integer;
   VPropName, VToken: ShortString;
 begin
-  for I := 0 to Pred(FConfig.Count) do
+  for I := 0 to Pred(FConfigFile.Count) do
   begin
-    VPropName := FConfig.Names[I];
+    VPropName := FConfigFile.Names[I];
     VToken := Copy(VPropName, 1, 1);
     if (CompareText(VPropName, CONNECTOR_TYPE) = 0) or (VToken = PO) or
       (VToken = ES) then
       Continue;
     if IsPublishedProp(FConnection, VPropName) then
-      SetPropValue(FConnection, VPropName, FConfig.Values[VPropName])
+      SetPropValue(FConnection, VPropName, FConfigFile.Values[VPropName])
     else
       raise EJDODataBase.CreateFmt(Self, SInvalidPropInConfigFile,
-        [ExtractFileName(FConfigFileName), VPropName]);
+        [ExtractFileName(FConfig), VPropName]);
   end;
 end;
 
