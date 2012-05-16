@@ -66,8 +66,8 @@ type
   public
     function Open: Boolean;
     function Execute: Boolean;
-    function FieldType(const AFieldType: TFieldType): ShortString;
-    function FieldTypeEnum(const AFieldType: TFieldType): TJDOFieldTypes;
+    function FieldType(AField: TField): ShortString;
+    function FieldTypeEnum(AField: TField): TJDOFieldTypes;
     procedure ReadFields(AJSONFiels, AJSONObject: TJSONObject);
     procedure WriteParams(AJSONFiels, AJSONObject: TJSONObject;
       const APrimaryKey: string = ES);
@@ -271,9 +271,9 @@ begin
   Result := RowsAffected > 0;
 end;
 
-function TJDOSQLQuery.FieldType(const AFieldType: TFieldType): ShortString;
+function TJDOSQLQuery.FieldType(AField: TField): ShortString;
 begin
-  case AFieldType of
+  case AField.DataType of
     ftUnknown, ftCursor, ftADT, ftArray, ftReference,
       ftDataSet, ftInterface, ftIDispatch: Result := FT_NULL;
     ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob, ftOraClob,
@@ -287,9 +287,9 @@ begin
   end;
 end;
 
-function TJDOSQLQuery.FieldTypeEnum(const AFieldType: TFieldType): TJDOFieldTypes;
+function TJDOSQLQuery.FieldTypeEnum(AField: TField): TJDOFieldTypes;
 begin
-  case AFieldType of
+  case AField.DataType of
     ftUnknown, ftCursor, ftADT, ftArray, ftReference,
       ftDataSet, ftInterface, ftIDispatch: Result := ftNull;
     ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob, ftOraClob,
@@ -319,7 +319,7 @@ begin
     end
     else
     begin
-      VFieldType := FieldType(VField.DataType);
+      VFieldType := FieldType(VField);
       VFieldName := VField.FieldName;
     end;
     if (VFieldType = FT_NULL) or VField.IsNull then
