@@ -66,8 +66,8 @@ type
   public
     function Open: Boolean;
     function Execute: Boolean;
-    function FieldType(AField: TField): ShortString;
-    function FieldTypeEnum(AField: TField): TJDOFieldTypes;
+    function FieldType(const ADataType: TFieldType): ShortString;
+    function FieldTypeEnum(const ADataType: TFieldType): TJDOFieldTypes;
     procedure ReadFields(AJSONFiels, AJSONObject: TJSONObject);
     procedure WriteParams(AJSONFiels, AJSONObject: TJSONObject;
       const APrimaryKey: string = ES);
@@ -188,6 +188,8 @@ type
     function Last: TJSONObject;
     function AsJSON: TJSONStringType;
     function AsJSONArray: TJSONArray;
+    function Schema: TJSONStringType;
+    function JSONSchema: TJSONObject;
     function Field(const AFieldName: string): TField;
     function Param(const AParamName: string): TParam;
     property DataBase: TJDODataBase read FDataBase write SetDataBase;
@@ -271,9 +273,9 @@ begin
   Result := RowsAffected > 0;
 end;
 
-function TJDOSQLQuery.FieldType(AField: TField): ShortString;
+function TJDOSQLQuery.FieldType(const ADataType: TFieldType): ShortString;
 begin
-  case AField.DataType of
+  case ADataType of
     ftUnknown, ftCursor, ftADT, ftArray, ftReference,
       ftDataSet, ftInterface, ftIDispatch: Result := FT_NULL;
     ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob, ftOraClob,
@@ -287,9 +289,9 @@ begin
   end;
 end;
 
-function TJDOSQLQuery.FieldTypeEnum(AField: TField): TJDOFieldTypes;
+function TJDOSQLQuery.FieldTypeEnum(const ADataType: TFieldType): TJDOFieldTypes;
 begin
-  case AField.DataType of
+  case ADataType of
     ftUnknown, ftCursor, ftADT, ftArray, ftReference,
       ftDataSet, ftInterface, ftIDispatch: Result := ftNull;
     ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob, ftOraClob,
@@ -319,7 +321,7 @@ begin
     end
     else
     begin
-      VFieldType := FieldType(VField);
+      VFieldType := FieldType(VField.DataType);
       VFieldName := VField.FieldName;
     end;
     if (VFieldType = FT_NULL) or VField.IsNull then
@@ -1016,6 +1018,65 @@ begin
   for I := 0 to Pred(FItems.Count) do
     A.Add((FItems[I] as TJSONObject).Clone);
   Result := A;
+end;
+
+function TJDOQuery.Schema: TJSONStringType;
+var
+  I, C: Integer;
+  FD: TFieldDef;
+  FT: ShortString;
+begin
+  Result := ES;
+  C := FQuery.FieldDefs.Count;
+  if C = 0 then
+  begin
+    Result := '{}';
+    Exit;
+  end;
+  for I := 0 to Pred(C) do
+  begin
+    FD := FQuery.FieldDefs[I];
+    FT := FQuery.FieldType(FD.DataType);
+    Result += '{ "name": "' + FD.Name + '"';
+    Result += ', "type": "' + FT + '"';
+    if FT = FT_STR then
+      Result += ', "maxlen": ' + IntToStr(FD.Size);
+    if FD.Required then
+      Result += ', "required": true';
+    if FD.Precision <> -1 then
+      Result += ', "precision": ' + IntToStr(FD.Precision);
+    if Succ(I) < C then
+      Result += ' }, '
+    else
+      Result += ' }';
+  end;
+end;
+
+function TJDOQuery.JSONSchema: TJSONObject;
+var
+  I: Integer;
+  A: TJSONArray;
+  O: TJSONObject;
+  FD: TFieldDef;
+  FT: ShortString;
+begin
+  Result := TJSONObject.Create;
+  A := TJSONArray.Create;
+  Result.Add('fields', A);
+  for I := 0 to Pred(FQuery.FieldDefs.Count) do
+  begin
+    FD := FQuery.FieldDefs[I];
+    O := TJSONObject.Create(['name', FD.name]);
+    A.Add(O);
+    FT := FQuery.FieldType(FD.DataType);
+    O.Strings['type'] := FT;
+    if FT = FT_STR then
+      O.Integers['maxlen'] := FD.Size;
+    if FD.Required then
+      O.Booleans['required'] := True;
+    if FD.Precision <> -1 then
+      O.Integers['precision'] := FD.Precision;
+  end;
 end;
 
 function TJDOQuery.Field(const AFieldName: string): TField;
