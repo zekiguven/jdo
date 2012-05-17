@@ -53,6 +53,7 @@ const
   FT_FLOAT = 'float';
   FT_INT = 'int';
   ERROR_MASK = '%s: %s';
+  NullDate = 0;
 
 var
   SEmptyPrimaryKeyError: string = '"PrimaryKey" must not be empty.';
