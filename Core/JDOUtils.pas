@@ -24,9 +24,9 @@ uses
 function TimeOf(AData: TJSONData): TTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
 function DateOf(AData: TJSONData): TDate;{$IFDEF JDO_INLINE}inline;{$ENDIF}
 function DateTimeOf(AData: TJSONData): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function TimeOfDef(AData: TJSONData; const ADefValue: TTime): TTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateOfDef(AData: TJSONData; const ADefValue: TDate): TDate;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateTimeOfDef(AData: TJSONData; const ADefValue: TDateTime): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function TimeOf(AData: TJSONData; const ADefValue: TTime): TTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function DateOf(AData: TJSONData; const ADefValue: TDate): TDate;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function DateTimeOf(AData: TJSONData; const ADefValue: TDateTime): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
 
 implementation
 
@@ -45,7 +45,7 @@ begin
   Result := AData.AsFloat;
 end;
 
-function TimeOfDef(AData: TJSONData; const ADefValue: TTime): TTime;
+function TimeOf(AData: TJSONData; const ADefValue: TTime): TTime;
 begin
   case AData.JSONType of
     jtNumber: Result := Frac(AData.AsFloat);
@@ -55,7 +55,7 @@ begin
   end;
 end;
 
-function DateOfDef(AData: TJSONData; const ADefValue: TDate): TDate;
+function DateOf(AData: TJSONData; const ADefValue: TDate): TDate;
 begin
   case AData.JSONType of
     jtNumber: Result := Trunc(AData.AsFloat);
@@ -65,7 +65,7 @@ begin
   end;
 end;
 
-function DateTimeOfDef(AData: TJSONData; const ADefValue: TDateTime): TDateTime;
+function DateTimeOf(AData: TJSONData; const ADefValue: TDateTime): TDateTime;
 begin
   case AData.JSONType of
     jtNumber: Result := AData.AsFloat;
