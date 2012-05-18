@@ -384,10 +384,10 @@ begin
       VParam.AsBoolean := (VData.AsString = 'on') or VData.AsBoolean;
     if VFieldType = FT_DATE then
     begin
-      if VData.JSONType = jtNumber then
-        VParam.AsDateTime := VData.AsFloat
+      if FDateAsString then
+        VParam.AsDateTime := StrToDateTime(VData.AsString)
       else
-        VParam.AsDateTime := StrToDateTime(VData.AsString);
+        VParam.AsDateTime := VData.AsFloat;
     end;
     if VFieldType = FT_FLOAT then
       VParam.AsFloat := VData.AsFloat;
@@ -566,7 +566,7 @@ begin
   SetDataBase(ADataBase);
   FPrimaryKey := DEFAULT_PRIMARY_KEY;
   FOrderBy := DEFAULT_PRIMARY_KEY;
-  FQuery.DateAsString := True;
+  FQuery.DateAsString := False;
   FFreeObjects := True;
   FTableName := ATableName;
 end;
