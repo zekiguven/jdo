@@ -19,16 +19,10 @@ unit JDO;
 interface
 
 uses
-  JDOConsts, Classes, SysUtils, SQLdb, DB, TypInfo, Contnrs, FPJSON, FGL;
+  JDOConsts, JDOClasses, Classes, SysUtils, SQLdb, DB, TypInfo, Contnrs, FPJSON,
+  FGL;
 
 type
-  EJDOException = class(Exception)
-  public
-    constructor Create(AInstance: TObject; const AMsg: string); overload;
-    constructor CreateFmt(AInstance: TObject; const AMsg: string;
-      const AArgs: array of const); overload;
-  end;
-
   EJDODataBase = class(EJDOException);
 
   EJDOQuery = class(EJDOException);
@@ -229,19 +223,6 @@ type
   TJDOQuickQueryClass = class of TJDOQuickQuery;
 
 implementation
-
-{ EJDOException }
-
-constructor EJDOException.Create(AInstance: TObject; const AMsg: string);
-begin
-  inherited CreateFmt(ERROR_MASK, [AInstance.ClassName, AMsg]);
-end;
-
-constructor EJDOException.CreateFmt(AInstance: TObject; const AMsg: string;
-  const AArgs: array of const);
-begin
-  inherited CreateFmt(Format(ERROR_MASK, [AInstance.ClassName, AMsg]), AArgs);
-end;
 
 { TJDOSQLTransaction }
 
