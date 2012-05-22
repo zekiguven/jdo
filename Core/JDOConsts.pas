@@ -19,19 +19,20 @@ unit JDOConsts;
 interface
 
 const
-  AK = '*';
-  CO = ':';
-  CS = ', ';
-  DT = '.';
-  BS = '[ ';
-  BE = ' ]';
-  EQ = ' = ';
   ES = '';
-  PE = ')';
-  PS = '(';
-  PO = '#';
-  SP = ' ';
-  SC = ';';
+  SP = #32;
+  PT = #37; // %
+  AK = #42; // *
+  CO = #58; // :
+  CS = #44; // ,
+  DT = #46; // .
+  BS = #91; // [
+  BE = #93; // ]
+  EQ = #61; // =
+  PE = #41; // )
+  PS = #40; // (
+  PO = #35; // #
+  SC = #59; // ;
   DEFAULT_PRIMARY_KEY = 'id';
   CONNECTOR_TYPE = 'connectortype';
   SQL_SELECT_TOKEN = 'select ';

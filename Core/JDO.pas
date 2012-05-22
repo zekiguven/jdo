@@ -735,7 +735,7 @@ procedure TJDOQuery.Like(const AValue, AKey: string;
   const AOptions: TJDOLikeOptions);
 begin
   if loPartialKey in AOptions then
-    FLikeValue := AnsiQuotedStr(AValue, '%')
+    FLikeValue := AnsiQuotedStr(AValue, PT)
   else
     FLikeValue := AValue;
   FLikeKey := AKey;
@@ -979,15 +979,15 @@ function TJDOQuery.AsJSON: TJSONStringType;
 var
   I, C: Integer;
 begin
+  Result := BS;
   C := FItems.Count;
-  Result := ES;
   for I := 0 to Pred(C) do
   begin
     Result += TJSONObject(FItems[I]).AsJSON;
     if Succ(I) < C then
       Result += CS;
   end;
-  Result := BS + Result + BE;
+  Result += BE;
 end;
 
 function TJDOQuery.AsJSONArray: TJSONArray;
