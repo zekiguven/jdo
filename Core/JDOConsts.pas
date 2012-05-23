@@ -62,7 +62,7 @@ var
   SEmptyConnectorTypeError: string = '"ConnectorType" must not be empty.';
   SConnectorUnitWasNotDeclaredError: string = 'The unit of "%s" was not declared in uses clause or it is an invalid ConnectorType.';
   SConfigFileNotFoundError: string = 'Config file not found: %s';
-  SInvalidPropInConfigFile: string = 'Invalid property in "%s" file: %s';
+  SNilTargetError: string = '"Target" must not be nil.';
 
 implementation
 
