@@ -24,9 +24,9 @@ uses
 type
   EJDOException = class(Exception)
   public
-    constructor Create(AInstance: TObject; const AMsg: string); overload;
+    constructor Create(AInstance: TObject; const AMsg: string);
     constructor CreateFmt(AInstance: TObject; const AMsg: string;
-      const AArgs: array of const); overload;
+      const AArgs: array of const);
   end;
 
 implementation

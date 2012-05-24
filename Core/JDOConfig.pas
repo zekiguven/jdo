@@ -95,7 +95,7 @@ var
   VPropName, VToken: ShortString;
 begin
   if not Assigned(FTarget) then
-    raise EJDOConfig.Create(SNilTargetError);
+    raise EJDOConfig.Create(Self, SNilTargetError);
   for I := 0 to Pred(FConfigFile.Count) do
   begin
     VPropName := FConfigFile.Names[I];
