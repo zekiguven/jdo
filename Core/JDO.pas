@@ -206,19 +206,6 @@ type
 
   TJDOQueryClass = class of TJDOQuery;
 
-  TJDOQuickQuery = class(TJDOQuery)
-  public
-    function Insert(AJSONObject: TJSONObject): Boolean; override;
-    function Insert(AJSONArray: TJSONArray): Boolean; override;
-    function Update(AJSONObject: TJSONObject): Boolean; override;
-    function Update(AJSONArray: TJSONArray): Boolean; override;
-    function Delete(AJSONObject: TJSONObject): Boolean; override;
-    function Delete(AJSONArray: TJSONArray): Boolean; override;
-    function Open(const AAdditionalSQL: string = ES): Boolean; override;
-  end;
-
-  TJDOQuickQueryClass = class of TJDOQuickQuery;
-
 implementation
 
 { TJDOSQLTransaction }
@@ -1030,92 +1017,6 @@ end;
 function TJDOQuery.Param(const AParamName: string): TParam;
 begin
   Result := FQuery.Params.ParamByName(AParamName);
-end;
-
-{ TJDOQuickQuery }
-
-function TJDOQuickQuery.Insert(AJSONObject: TJSONObject): Boolean;
-begin
-  FDataBase.StartTrans;
-  try
-    Result := inherited Insert(AJSONObject);
-    FDataBase.Commit;
-  except
-    FDataBase.Rollback;
-    raise;
-  end;
-end;
-
-function TJDOQuickQuery.Insert(AJSONArray: TJSONArray): Boolean;
-begin
-  FDataBase.StartTrans;
-  try
-    Result := inherited Insert(AJSONArray);
-    FDataBase.Commit;
-  except
-    FDataBase.Rollback;
-    raise;
-  end;
-end;
-
-function TJDOQuickQuery.Update(AJSONObject: TJSONObject): Boolean;
-begin
-  FDataBase.StartTrans;
-  try
-    Result := inherited Update(AJSONObject);
-    FDataBase.Commit;
-  except
-    FDataBase.Rollback;
-    raise;
-  end;
-end;
-
-function TJDOQuickQuery.Update(AJSONArray: TJSONArray): Boolean;
-begin
-  FDataBase.StartTrans;
-  try
-    Result := inherited Update(AJSONArray);
-    FDataBase.Commit;
-  except
-    FDataBase.Rollback;
-    raise;
-  end;
-end;
-
-function TJDOQuickQuery.Delete(AJSONObject: TJSONObject): Boolean;
-begin
-  FDataBase.StartTrans;
-  try
-    Result := inherited Delete(AJSONObject);
-    FDataBase.Commit;
-  except
-    FDataBase.Rollback;
-    raise;
-  end;
-end;
-
-function TJDOQuickQuery.Delete(AJSONArray: TJSONArray): Boolean;
-begin
-  FDataBase.StartTrans;
-  try
-    Result := inherited Delete(AJSONArray);
-    FDataBase.Commit;
-  except
-    FDataBase.Rollback;
-    raise;
-  end;
-end;
-
-function TJDOQuickQuery.Open(const AAdditionalSQL: string): Boolean;
-begin
-  FDataBase.StartTrans;
-  try
-    Result := inherited Open(AAdditionalSQL);
-    FDataBase.Commit;
-  except
-    FDataBase.Rollback;
-    raise;
-  end;
 end;
 
 end.
