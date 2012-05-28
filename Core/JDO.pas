@@ -27,6 +27,8 @@ type
 
   EJDOQuery = class(EJDOException);
 
+  EJDOSQL = class(EJDOException);
+
   TJDOFieldTypes = (ftNull, ftStr, ftBool, ftDate, ftFloat, ftInt);
 
   TJDOSQLOperation = (soNone, soSelect, soInsert, soUpdate, soDelete);
@@ -36,10 +38,45 @@ type
   TJDONotifyTypes = (ntNone, ntInsert, ntUpdate, ntDelete, ntOpen, ntClose,
     ntFirst, ntLast, ntClear);
 
+  TJDOPutTypes = (ptBegin, ptMiddle, ptEnd);
+
   TJDONotifyEvent = procedure(const ANotifyType: TJDONotifyTypes) of object;
 
   TJDOAddingItemsEvent = procedure(AItem: TJSONObject;
     const AItemNo: Integer) of object;
+
+  TJDOSQL = class
+  private
+    FPutBegin: string;
+    FPutMiddle: string;
+    FPutEnd: string;
+    FFieldDefs: TFieldDefs;
+    FKey: string;
+    FOrderBy: string;
+    FOrdered: Boolean;
+    FScript: TStrings;
+    FStatementType: TStatementType;
+    FTableAlias: string;
+    FTableName: string;
+    FWhere: string;
+  public
+    constructor Create(AScript: TStrings; AFieldDefs: TFieldDefs);
+    function FormatCols(const AToken: string;
+      const ASkipKey, APairs: Boolean): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+    procedure Compose(const AStatementType: TStatementType);
+    procedure Clear;
+    procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle);
+    property Key: string read FKey write FKey;
+    property OrderBy: string read FOrderBy write FOrderBy;
+    property Ordered: Boolean read FOrdered write FOrdered;
+    property Where: string read FWhere write FWhere;
+    property Script: TStrings read FScript;
+    property StatementType: TStatementType read FStatementType;
+    property TableAlias: string read FTableAlias write FTableAlias;
+    property TableName: string read FTableName write FTableName;
+  end;
+
+  TJDOSQLClass = class of TJDOSQL;
 
   TJDOSQLConnection = class(TSQLConnection)
   end;
@@ -207,6 +244,119 @@ type
   TJDOQueryClass = class of TJDOQuery;
 
 implementation
+
+constructor TJDOSQL.Create(AScript: TStrings; AFieldDefs: TFieldDefs);
+begin
+  FScript := AScript;
+  FFieldDefs := AFieldDefs;
+  FOrdered := True;
+end;
+
+function TJDOSQL.FormatCols(const AToken: string;
+  const ASkipKey, APairs: Boolean): string;
+var
+  FN: string;
+  I, C: Integer;
+begin
+  Result := ES;
+  C := FFieldDefs.Count;
+  if C = 0 then
+  begin
+    Result := AK;
+    Exit;
+  end;
+  for I := 0 to Pred(C) do
+  begin
+    FN := FFieldDefs[I].Name;
+    if ASkipKey and (CompareText(FN, FKey) = 0) then
+      Continue;
+    if APairs then
+      Result += FN;
+    Result += AToken + FN;
+    if Succ(I) < C then
+      Result += CS;
+  end;
+end;
+
+procedure TJDOSQL.Compose(const AStatementType: TStatementType);
+var
+  VCols: string;
+begin
+  if FTableName = ES then
+    raise EJDOSQL.Create(Self, '"TableName" must be not empty.');
+  if FScript.Count > 0 then
+    Exit;
+  case AStatementType of
+    stSelect:
+      begin
+        if FPutBegin <> ES then
+          VCols := FPutBegin
+        else
+          if FTableAlias <> ES then
+            VCols := FormatCols(FTableAlias + DT, False, False)
+          else
+            VCols := FormatCols(ES, False, False);
+        FScript.Add(SQL_SELECT_TOKEN + VCols + SP + SQL_FROM_TOKEN +
+          FTableName + SP + FTableAlias);
+        if FPutMiddle <> ES then
+          FScript.Add(FPutMiddle)
+        else
+          if FWhere <> ES then
+            FScript.Add(SQL_WHERE_TOKEN + FWhere);
+        if FPutEnd <> ES then
+          FScript.Add(FPutEnd)
+        else
+          if FOrdered and (FOrderBy <> ES) then
+            if FTableAlias <> ES then
+              FScript.Add(SQL_ORDER_BY_TOKEN + FTableAlias + DT + FOrderBy)
+            else
+              FScript.Add(SQL_ORDER_BY_TOKEN + FOrderBy);
+      end;
+    stInsert:
+      begin
+        if FFieldDefs.Count = 0 then
+          raise EJDOSQL.Create(Self, '"FieldDefs.Count" must be not 0.');
+        FScript.Add(SQL_INSERT_TOKEN + FTableName +
+          SP + PS + FormatCols(ES, False, False) + PE +
+          SQL_VALUES_TOKEN + PS + FormatCols(CO, False, False) + PE);
+      end;
+    stUpdate:
+      begin
+        if FFieldDefs.Count = 0 then
+          raise EJDOSQL.Create(Self, '"FieldDefs.Count" must be not 0.');
+        if Trim(FKey) = ES then
+          raise EJDOSQL.Create(Self, SEmptyKeyError);
+        FScript.Add(SQL_UPDATE_TOKEN + FTableName + SQL_SET_TOKEN +
+          FormatCols(SQL_EQ_PARAM_TOKEN, True, True) + SQL_WHERE_TOKEN + FKey +
+          SQL_EQ_PARAM_TOKEN + FKey);
+      end;
+    stDelete:
+      begin
+        if Trim(FKey) = ES then
+          raise EJDOSQL.Create(Self, SEmptyKeyError);
+        FScript.Add(SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FTableName +
+          SQL_WHERE_TOKEN + FKey + SQL_EQ_PARAM_TOKEN + FKey);
+      end;
+  end;
+end;
+
+procedure TJDOSQL.Clear;
+begin
+  FScript.Clear;
+  FStatementType := stNone;
+  FPutBegin := ES;
+  FPutMiddle := ES;
+  FPutEnd := ES;
+end;
+
+procedure TJDOSQL.Put(const ASQL: string; const AType: TJDOPutTypes);
+begin
+  case AType of
+    ptBegin: FPutBegin += ASQL + SP;
+    ptMiddle: FPutMiddle += ASQL + SP;
+    ptEnd: FPutEnd += ASQL + SP;
+  end;
+end;
 
 { TJDOSQLTransaction }
 
