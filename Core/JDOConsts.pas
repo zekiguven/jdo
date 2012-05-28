@@ -36,15 +36,15 @@ const
   DEFAULT_PRIMARY_KEY = 'id';
   CONNECTOR_TYPE = 'connectortype';
   SQL_SELECT_TOKEN = 'select ';
-  SQL_FROM_TOKEN = ' from ';
+  SQL_FROM_TOKEN = 'from ';
   SQL_WHERE_TOKEN = ' where ';
-  SQL_ORDER_BY_TOKEN = ' order by ';
+  SQL_ORDER_BY_TOKEN = 'order by ';
   SQL_INSERT_TOKEN = 'insert into ';
   SQL_VALUES_TOKEN = ' values ';
   SQL_UPDATE_TOKEN = 'update ';
   SQL_SET_TOKEN = ' set ';
-  SQL_DELETE_TOKEN = 'delete';
-  SQL_EQ_PARAM_TOKEN = ' = :';
+  SQL_DELETE_TOKEN = 'delete ';
+  SQL_EQ_PARAM_TOKEN = '=:';
   SQL_LOWER_TOKEN = 'lower';
   SQL_LIKE_TOKEN = ' like (:';
   FT_NULL = 'null';
@@ -58,6 +58,7 @@ const
 
 var
   SEmptyPrimaryKeyError: string = '"PrimaryKey" must not be empty.';
+  SEmptyKeyError: string = '"Key" must not be empty.';
   SJSONObjectToParamsError: string = '"AJSONFiels.Count" (%d) may not be different from the "AJSONObject.Count" (%d).';
   SEmptyConnectorTypeError: string = '"ConnectorType" must not be empty.';
   SConnectorUnitWasNotDeclaredError: string = 'The unit of "%s" was not declared in uses clause or it is an invalid ConnectorType.';
