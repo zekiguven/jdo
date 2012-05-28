@@ -19,8 +19,7 @@ unit JDO;
 interface
 
 uses
-  JDOConsts, JDOClasses, JDOConfig, Classes, SysUtils, SQLdb, DB, Contnrs,
-  FPJSON, FGL;
+  JDOConsts, JDOClasses, JDOConfig, Classes, SysUtils, SQLdb, DB, FPJSON, FGL;
 
 type
   EJDODataBase = class(EJDOException);
@@ -98,7 +97,6 @@ type
     function Open: Boolean;
     function Execute: Boolean;
     function FieldType(const ADataType: TFieldType): ShortString;
-    function FieldTypeEnum(const ADataType: TFieldType): TJDOFieldTypes;
     procedure ReadFields(AJSONFiels, AJSONObject: TJSONObject);
     procedure WriteParams(AJSONFiels, AJSONObject: TJSONObject;
       const APrimaryKey: string = ES);
@@ -167,13 +165,13 @@ type
     FFreeObjects: Boolean;
     FIsCustomSQL: Boolean;
     FAdditionalSQL: TStrings;
+    FItems: TJSONArray;
     FLike: string;
     FLikeKey: string;
     FLikeValue: string;
     FLastSQLOperation: TJDOSQLOperation;
     FDataBase: TJDODataBase;
     FFields: TJSONObject;
-    FItems: TObjectList;
     FOnAddingItems: TJDOAddingItemsEvent;
     FOnNotify: TJDONotifyEvent;
     FOnPrepare: TNotifyEvent;
@@ -186,11 +184,9 @@ type
     function GetAdditionalSQL: TStrings;
     function GetDateAsString: Boolean;
     function GetIsPrepared: Boolean;
-    function GetItems(AIndex: Integer): TJSONObject;
     function GetSQL: TStrings;
     procedure SetDataBase(const AValue: TJDODataBase);
     procedure SetDateAsString(const AValue: Boolean);
-    procedure SetItems(AIndex: Integer; const AValue: TJSONObject);
   public
     constructor Create;
     constructor Create(ADataBase: TJDODataBase; const ATableName: string);
@@ -209,21 +205,17 @@ type
     function Delete(AJSONObject: TJSONObject): Boolean; virtual;
     function Delete(AJSONArray: TJSONArray): Boolean; virtual;
     function Open(const AAdditionalSQL: string = ES): Boolean; virtual;
-    function Count: Integer;
     procedure Clear;
     procedure Close;
     function First: TJSONObject;
     function Last: TJSONObject;
-    function AsJSON: TJSONStringType;
-    function AsJSONArray: TJSONArray;
     function Schema: TJSONStringType;
     function JSONSchema: TJSONObject;
     function Field(const AFieldName: string): TField;
     function Param(const AParamName: string): TParam;
     property DataBase: TJDODataBase read FDataBase write SetDataBase;
     property Query: TJDOSQLQuery read FQuery write FQuery;
-    property Items[AIndex: Integer]: TJSONObject read GetItems
-      write SetItems; default;
+    property Items: TJSONArray read FItems;
     property Fields: TJSONObject read FFields;
     property FreeObjects: Boolean read FFreeObjects write FFreeObjects;
     property TableName: string read FTableName write FTableName;
@@ -401,22 +393,6 @@ begin
     ftBoolean: Result := FT_BOOL;
     DB.ftFloat, ftCurrency, ftBCD, ftFMTBcd: Result := FT_FLOAT;
     DB.ftDate, ftTime, ftDateTime, ftTimeStamp: Result := FT_DATE;
-  end;
-end;
-
-function TJDOSQLQuery.FieldTypeEnum(const ADataType: TFieldType): TJDOFieldTypes;
-begin
-  case ADataType of
-    ftUnknown, ftCursor, ftADT, ftArray, ftReference,
-      ftDataSet, ftInterface, ftIDispatch: Result := ftNull;
-    ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob, ftOraClob,
-      ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes, ftGraphic, ftFmtMemo,
-      ftParadoxOle, ftDBaseOle, ftTypedBinary, ftVariant,
-      ftGuid: Result := ftStr;
-    ftSmallint, ftInteger, ftLargeint, ftWord, ftAutoInc: Result := ftInt;
-    ftBoolean: Result := ftBool;
-    DB.ftFloat, ftCurrency, ftBCD, ftFMTBcd: Result := ftFloat;
-    DB.ftDate, ftTime, ftDateTime, ftTimeStamp: Result := ftDate;
   end;
 end;
 
@@ -641,7 +617,7 @@ constructor TJDOQuery.Create(ADataBase: TJDODataBase;
   const ATableName: string);
 begin
   FQuery := TJDOSQLQuery.Create(nil);
-  FItems := TObjectList.Create(True);
+  FItems := TJSONArray.Create;
   FFields := TJSONObject.Create;
   SetDataBase(ADataBase);
   FPrimaryKey := DEFAULT_PRIMARY_KEY;
@@ -757,11 +733,6 @@ begin
     FOnPrepare(Self);
 end;
 
-function TJDOQuery.GetItems(AIndex: Integer): TJSONObject;
-begin
-  Result := FItems[AIndex] as TJSONObject;
-end;
-
 function TJDOQuery.GetAdditionalSQL: TStrings;
 begin
   if not Assigned(FAdditionalSQL) then
@@ -802,11 +773,6 @@ end;
 procedure TJDOQuery.SetDateAsString(const AValue: Boolean);
 begin
   FQuery.DateAsString := AValue;
-end;
-
-procedure TJDOQuery.SetItems(AIndex: Integer; const AValue: TJSONObject);
-begin
-  FItems[AIndex] := AValue;
 end;
 
 procedure TJDOQuery.AddField(const AFieldName: ShortString;
@@ -1034,11 +1000,6 @@ begin
     FOnNotify(ntOpen);
 end;
 
-function TJDOQuery.Count: Integer;
-begin
-  Result := FItems.Count;
-end;
-
 procedure TJDOQuery.Clear;
 begin
   FIsCustomSQL := False;
@@ -1062,42 +1023,25 @@ end;
 
 function TJDOQuery.First: TJSONObject;
 begin
-  Result := FItems.First as TJSONObject;
+  if FItems.Count > 0 then
+    Result := FItems[0] as TJSONObject
+  else
+    Result := nil;
   if Assigned(FOnNotify) then
     FOnNotify(ntFirst);
 end;
 
 function TJDOQuery.Last: TJSONObject;
+var
+  C: Integer;
 begin
-  Result := FItems.Last as TJSONObject;
+  C := FItems.Count;
+  if C > 0 then
+    Result := FItems[Pred(C)] as TJSONObject
+  else
+    Result := nil;
   if Assigned(FOnNotify) then
     FOnNotify(ntLast);
-end;
-
-function TJDOQuery.AsJSON: TJSONStringType;
-var
-  I, C: Integer;
-begin
-  Result := BS;
-  C := FItems.Count;
-  for I := 0 to Pred(C) do
-  begin
-    Result += TJSONObject(FItems[I]).AsJSON;
-    if Succ(I) < C then
-      Result += CS;
-  end;
-  Result += BE;
-end;
-
-function TJDOQuery.AsJSONArray: TJSONArray;
-var
-  I: Integer;
-  A: TJSONArray;
-begin
-  A := TJSONArray.Create;
-  for I := 0 to Pred(FItems.Count) do
-    A.Add((FItems[I] as TJSONObject).Clone);
-  Result := A;
 end;
 
 function TJDOQuery.Schema: TJSONStringType;
