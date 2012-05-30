@@ -1,5 +1,5 @@
 (*
-  JDO Config unit
+  JDOConfig implementation include
   Copyright (C) 2012-2014 Silvio Clecio, Luciano Souza.
 
   https://github.com/silvioprog/jdo
@@ -11,40 +11,6 @@
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
-
-unit JDOConfig;
-
-{$I jdo.inc}
-
-interface
-
-uses
-  JDOConsts, JDOClasses, SysUtils, Classes, TypInfo;
-
-type
-  EJDOConfig = class(EJDOException);
-
-  TJDOConfigurator = class
-  private
-    FConfigFile: TStrings;
-    FConfiguration: string;
-    FTarget: TPersistent;
-    function GetConfiguration: string;
-    function GetValues(AName: string): string;
-    procedure SetConfiguration(const AValue: string);
-  public
-    constructor Create(const AConfiguration: string);
-    destructor Destroy; override;
-    procedure Configure;
-    procedure Load;
-    property Target: TPersistent read FTarget write FTarget;
-    property Configuration: string read GetConfiguration write SetConfiguration;
-    property Values[AName: string]: string read GetValues; default;
-  end;
-
-implementation
-
-{ TJDOConfigurator }
 
 constructor TJDOConfigurator.Create(const AConfiguration: string);
 begin
@@ -83,8 +49,7 @@ begin
   else
   begin
     if not FileExists(FConfiguration) then
-      raise EJDOConfig.CreateFmt(Self, SConfigFileNotFoundError,
-        [FConfiguration]);
+      raise EJDOConfig.CreateFmt(Self, SCfgFileNotFoundError, [FConfiguration]);
     FConfigFile.LoadFromFile(FConfiguration);
   end;
 end;
@@ -95,7 +60,7 @@ var
   VPropName, VToken: ShortString;
 begin
   if not Assigned(FTarget) then
-    raise EJDOConfig.Create(Self, SNilTargetError);
+    raise EJDOConfig.Create(Self, STargetNilError);
   for I := 0 to Pred(FConfigFile.Count) do
   begin
     VPropName := FConfigFile.Names[I];
@@ -106,6 +71,3 @@ begin
       SetPropValue(FTarget, VPropName, FConfigFile.Values[VPropName]);
   end;
 end;
-
-end.
-

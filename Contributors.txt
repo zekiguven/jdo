@@ -2,6 +2,7 @@
 
 Silvio Clecio
 Luciano Souza
+Joao Morais
 Marcos Douglas
 
 #and special thanks to the Lazarus-BR group and FPC-Lazarus team.

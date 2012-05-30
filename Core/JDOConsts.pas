@@ -48,22 +48,24 @@ const
   SQL_LOWER_TOKEN = 'lower';
   SQL_LIKE_TOKEN = ' like (:';
   FT_NULL = 'null';
-  FT_STR = 'str';
-  FT_BOOL = 'bool';
+  FT_STRING = 'string';
+  FT_BOOLEAN = 'boolean';
   FT_DATE = 'date';
   FT_FLOAT = 'float';
   FT_INT = 'int';
   ERROR_MASK = '%s: %s';
   NullDate = 0;
 
-var
-  SEmptyPrimaryKeyError: string = '"PrimaryKey" must not be empty.';
-  SEmptyKeyError: string = '"Key" must not be empty.';
-  SJSONObjectToParamsError: string = '"AJSONFiels.Count" (%d) may not be different from the "AJSONObject.Count" (%d).';
-  SEmptyConnectorTypeError: string = '"ConnectorType" must not be empty.';
-  SConnectorUnitWasNotDeclaredError: string = 'The unit of "%s" was not declared in uses clause or it is an invalid ConnectorType.';
-  SConfigFileNotFoundError: string = 'Config file not found: %s';
-  SNilTargetError: string = '"Target" must not be nil.';
+  // Error msgs
+  SKeyEmptyError = '"Key" must not be empty.';
+  SConnTypeEmptyError = '"ConnectorType" must not be empty.';
+  SConnUnitWasNotDeclaredError = 'The unit of "%s" was not declared in uses clause or it is an invalid ConnectorType.';
+  SCfgFileNotFoundError = 'Config file not found: "%s"';
+  STargetNilError = '"Target" must not be nil.';
+  STableNameEmptyError = '"TableName" must be not empty.';
+  SFieldDefsNilError = '"FieldDefs" must be not nil.';
+  SParamNotFoundError = 'Param not found: "%s".';
+  SFieldDefNotFound = 'FieldDef not found: "%s".';
 
 implementation
 

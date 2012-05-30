@@ -1,3 +1,0 @@
-{$mode objfpc}{$H+}
-{$DEFINE JDO_INLINE}
-{.$DEFINE JDO_DELETE_WITH_VARIANTS}
