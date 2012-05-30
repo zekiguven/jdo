@@ -1,7 +1,11 @@
 JSON Data Objects (JDO) framework, Version 0.1.0
-Copyright (C) 2010-2012 Silvio Clecio, Luciano Souza.
+Copyright (C) 2010-2012 Silvio Clecio.
 
 https://github.com/silvioprog/jdo
+
+All contributors:
+Plase see the file Contributors.txt, included in this
+distribution.
 
 See the file LICENSE.txt, included in this distribution,
 for details about the copyright.
