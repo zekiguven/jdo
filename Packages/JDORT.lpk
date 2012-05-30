@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\Includes"/>
-        <OtherUnitFiles Value="..\Core"/>
+        <OtherUnitFiles Value="..\Units"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
@@ -22,15 +22,15 @@
     <Version Release="5"/>
     <Files Count="12">
       <Item1>
-        <Filename Value="..\Core\JDO.pas"/>
+        <Filename Value="..\Units\JDO.pas"/>
         <UnitName Value="JDO"/>
       </Item1>
       <Item2>
-        <Filename Value="..\Core\JDOConsts.pas"/>
+        <Filename Value="..\Units\JDOConsts.pas"/>
         <UnitName Value="JDOConsts"/>
       </Item2>
       <Item3>
-        <Filename Value="..\Core\JDOUtils.pas"/>
+        <Filename Value="..\Units\JDOUtils.pas"/>
         <UnitName Value="JDOUtils"/>
       </Item3>
       <Item4>
