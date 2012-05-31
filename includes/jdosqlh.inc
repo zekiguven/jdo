@@ -19,6 +19,8 @@
 
   TJDOPutTypes = (ptBegin, ptMiddle, ptEnd);
 
+  TJDOStatementType = (stUnknown, stSelect, stInsert, stUpdate, stDelete);
+
   TJDOSQL = class(TComponent)
   private
     FFieldDefs: TFieldDefs;
@@ -29,7 +31,7 @@
     FOrderBy: string;
     FOrdered: Boolean;
     FScript: TStrings;
-    FStatementType: TStatementType;
+    FStatementType: TJDOStatementType;
     FTableAlias: string;
     FTableName: string;
     FWhere: string;
@@ -43,14 +45,14 @@
       const ATableName: string = ES); overload;
     function FormatCols(const AToken: string;
       const ASkipKey, APairs: Boolean): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-    procedure Compose(const AStatementType: TStatementType);
+    procedure Compose(const AStatementType: TJDOStatementType);
     procedure Clear;
     procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle);
     property Key: string read FKey write FKey;
     property OrderBy: string read FOrderBy write FOrderBy;
     property Ordered: Boolean read FOrdered write FOrdered;
     property Where: string read FWhere write FWhere;
-    property StatementType: TStatementType read FStatementType;
+    property StatementType: TJDOStatementType read FStatementType;
     property TableAlias: string read FTableAlias write FTableAlias;
     property TableName: string read FTableName write FTableName;
   end;

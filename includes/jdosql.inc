@@ -73,7 +73,7 @@ begin
   end;
 end;
 
-procedure TJDOSQL.Compose(const AStatementType: TStatementType);
+procedure TJDOSQL.Compose(const AStatementType: TJDOStatementType);
 var
   VCols: string;
 begin
@@ -139,9 +139,9 @@ begin
   FPutBegin := ES;
   FPutMiddle := ES;
   FPutEnd := ES;
-  if FStatementType <> stNone then
+  if FStatementType <> stUnknown then
   begin
-    FStatementType := stNone;
+    FStatementType := stUnknown;
     FScript.Clear;
   end;
 end;
