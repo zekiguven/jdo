@@ -19,55 +19,55 @@
     </CompilerOptions>
     <Description Value="JSON Data Objects Runtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="5" Build="1"/>
+    <Version Release="5" Build="2"/>
     <Files Count="12">
       <Item1>
-        <Filename Value="..\units\jdo.pas"/>
-        <UnitName Value="jdo"/>
+        <Filename Value="..\includes\jdo.inc"/>
+        <Type Value="Include"/>
       </Item1>
       <Item2>
-        <Filename Value="..\units\jdoconsts.pas"/>
-        <UnitName Value="jdoconsts"/>
+        <Filename Value="..\includes\jdoconfig.inc"/>
+        <Type Value="Include"/>
       </Item2>
       <Item3>
-        <Filename Value="..\units\jdoutils.pas"/>
-        <UnitName Value="jdoutils"/>
+        <Filename Value="..\includes\jdoconfigh.inc"/>
+        <Type Value="Include"/>
       </Item3>
       <Item4>
-        <Filename Value="..\includes\jdo.inc"/>
+        <Filename Value="..\includes\jdodatabase.inc"/>
         <Type Value="Include"/>
       </Item4>
       <Item5>
-        <Filename Value="..\includes\jdoconfig.inc"/>
+        <Filename Value="..\includes\jdodatabaseh.inc"/>
         <Type Value="Include"/>
       </Item5>
       <Item6>
-        <Filename Value="..\includes\jdoconfigh.inc"/>
+        <Filename Value="..\includes\jdoquery.inc"/>
         <Type Value="Include"/>
       </Item6>
       <Item7>
-        <Filename Value="..\includes\jdodatabase.inc"/>
+        <Filename Value="..\includes\jdoqueryh.inc"/>
         <Type Value="Include"/>
       </Item7>
       <Item8>
-        <Filename Value="..\includes\jdodatabaseh.inc"/>
+        <Filename Value="..\includes\jdosql.inc"/>
         <Type Value="Include"/>
       </Item8>
       <Item9>
-        <Filename Value="..\includes\jdoquery.inc"/>
+        <Filename Value="..\includes\jdosqlh.inc"/>
         <Type Value="Include"/>
       </Item9>
       <Item10>
-        <Filename Value="..\includes\jdoqueryh.inc"/>
-        <Type Value="Include"/>
+        <Filename Value="..\units\jdo.pas"/>
+        <UnitName Value="jdo"/>
       </Item10>
       <Item11>
-        <Filename Value="..\includes\jdosql.inc"/>
-        <Type Value="Include"/>
+        <Filename Value="..\units\jdoconsts.pas"/>
+        <UnitName Value="jdoconsts"/>
       </Item11>
       <Item12>
-        <Filename Value="..\includes\jdosqlh.inc"/>
-        <Type Value="Include"/>
+        <Filename Value="..\units\jdoutils.pas"/>
+        <UnitName Value="jdoutils"/>
       </Item12>
     </Files>
     <RequiredPkgs Count="1">
