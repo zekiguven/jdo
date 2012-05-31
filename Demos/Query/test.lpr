@@ -16,7 +16,7 @@ begin
   // you can also use: db := TJDODataBase.Create('connectortype=sqlite3;databasename=db.sqlite3');
   db := TJDODataBase.Create('db.cfg');
 
-  // you can also use: q := TJDODataBase.Query;
+  // you can also use: q := db.Query;
   q := TJDOQuery.Create(db);
 
   a := TJSONArray.Create;
