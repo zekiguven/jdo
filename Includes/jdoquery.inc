@@ -124,7 +124,7 @@ begin
       begin
         VFieldDef := FieldDefs.Find(VName);
         if not Assigned(VFieldDef) then
-          raise EJDOQuery.CreateFmt(Self, SFieldDefNotFound, [VName]);
+          raise EJDOQuery.CreateFmt(Self, SFieldDefNotFoundError, [VName]);
         case VFieldDef.DataType of
           ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
             ftInterface, ftIDispatch: VParam.Clear;
