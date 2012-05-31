@@ -67,7 +67,6 @@ const
   STargetNilError = '"Target" must not be nil.';
   STableNameEmptyError = '"TableName" must be not empty.';
   SFieldDefsNilError = '"FieldDefs" must be not nil.';
-  SParamNotFoundError = 'Param not found: "%s".';
   SFieldDefNotFound = 'FieldDef not found: "%s".';
 
 implementation
