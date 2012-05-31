@@ -116,7 +116,7 @@ begin
       VName := VJSONObj.Names[J];
       VParam := Params.FindParam(VName);
       if not Assigned(VParam) then
-        raise EJDOQuery.CreateFmt(Self, SParamNotFoundError, [VName]);
+        Continue;
       VData := VJSONObj.Items[J];
       if VData.IsNull then
         VParam.Clear
