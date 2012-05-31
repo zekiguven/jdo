@@ -45,7 +45,6 @@ begin
     DisableControls;
     P := RecNo;
     First;
-    Result.Clear;
     while not EOF do
     begin
       VJSONObj := TJSONObject.Create;
@@ -63,8 +62,8 @@ begin
           ftSmallint, ftInteger, ftLargeint, ftWord,
             ftAutoInc: VFieldType := FT_INT;
           ftBoolean: VFieldType := FT_BOOLEAN;
-          DB.ftFloat, ftCurrency, ftBCD, ftFMTBcd: VFieldType := FT_FLOAT;
-          DB.ftDate, ftTime, ftDateTime, ftTimeStamp: VFieldType := FT_DATE;
+          ftFloat, ftCurrency, ftBCD, ftFMTBcd: VFieldType := FT_FLOAT;
+          ftDate, ftTime, ftDateTime, ftTimeStamp: VFieldType := FT_DATE;
         end;
         VFieldName := VField.FieldName;
         if (VFieldType = FT_NULL) or VField.IsNull then
@@ -127,8 +126,8 @@ begin
         if not Assigned(VFieldDef) then
           raise EJDOQuery.CreateFmt(Self, SFieldDefNotFound, [VName]);
         case VFieldDef.DataType of
-          ftUnknown, ftCursor, ftADT, ftArray, ftReference,ftDataSet, ftInterface,
-            ftIDispatch: VParam.Clear;
+          ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
+            ftInterface, ftIDispatch: VParam.Clear;
           ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob,
             ftOraClob, ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes,
             ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle, ftTypedBinary,
@@ -136,9 +135,8 @@ begin
           ftSmallint, ftInteger, ftLargeint, ftWord,
             ftAutoInc: VParam.AsInteger := VData.AsInteger;
           ftBoolean: VParam.AsBoolean := VData.AsBoolean;
-          DB.ftFloat, ftCurrency, ftBCD,
-            ftFMTBcd: VParam.AsFloat := VData.AsFloat;
-          DB.ftDate, ftTime, ftDateTime, ftTimeStamp:
+          ftFloat, ftCurrency, ftBCD, ftFMTBcd: VParam.AsFloat := VData.AsFloat;
+          ftDate, ftTime, ftDateTime, ftTimeStamp:
             if FDateAsString then
               VParam.AsDateTime := StrToDateTime(VData.AsString)
             else
