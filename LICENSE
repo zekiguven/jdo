@@ -1,9 +1,9 @@
-This is the file LICENSE.txt, it applies to the JSON Data Objects (JDO) framework,
+This is the file LICENSE, it applies to the JSON Data Objects (JDO) framework,
 distributed by Silvio Clecio (http://silvioprog.com.br) and members of
 FPC-Lazarus community.
 
 The source code of the JDO framework is distributed under the GNU
-Lesser General Public License (see the file LGPL.2.1.txt) with the
+Lesser General Public License (see the file LGPL.2.1) with the
 following modification:
 
 As a special exception, the copyright holders of this library give you
@@ -17,7 +17,7 @@ If you modify this library, you may extend this exception to your version
 of the library, but you are not obligated to do so. If you do not wish to
 do so, delete this exception statement from your version.
 
-If you didn't receive a copy of the file LGPL.2.1.txt, contact:
+If you didn't receive a copy of the file LGPL.2.1, contact:
 
       Free Software Foundation
       51 Franklin Street, Fifth Floor,
