@@ -67,7 +67,7 @@ const
   STargetNilError = '"Target" must not be nil.';
   STableNameEmptyError = '"TableName" must be not empty.';
   SFieldDefsNilError = '"FieldDefs" must be not nil.';
-  SFieldDefNotFoundError = 'FieldDef not found: "%s".';
+  SJSONParamNilError = '"AJSON" must be not nil.';
 
 implementation
 

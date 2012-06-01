@@ -3,6 +3,7 @@ program test;
 {$mode objfpc}{$H+}
 
 uses
+  heaptrc,
   JDO,
   FPJSON,
   SQLite3Conn,
@@ -38,12 +39,12 @@ begin
       a.Add(TJSONObject.Create(['dummy', 'Dummy string 1']));
       a.Add(TJSONObject.Create(['dummy', 'Dummy string 2']));
       q.SQL.Text := 'insert into t1 (dummy) values (:dummy)';
-      q.FromJSON(a);
+      q.FromJSONArray(a);
       WriteLn('Done.');
 
       WriteLn('Show inserted records ...');
       q.SQL.Text := 'select * from t1';
-      r := q.ToJSON;
+      r := q.ToJSONArray;
       q.Close;
       WriteLn(r.AsJSON);
       FreeAndNil(r);
@@ -54,12 +55,12 @@ begin
       a.Add(TJSONObject.Create(['id', 1, 'dummy', 'Dummy string 1 - Edited']));
       a.Add(TJSONObject.Create(['id', 2, 'dummy', 'Dummy string 2 - Edited']));
       q.SQL.Text := 'update t1 set dummy = :dummy where id = :id';
-      q.FromJSON(a);
+      q.FromJSONArray(a);
       WriteLn('Done.');
 
       WriteLn('Show edited records ...');
       q.SQL.Text := 'select * from t1';
-      r := q.ToJSON;
+      r := q.ToJSONArray;
       q.Close;
       WriteLn(r.AsJSON);
       FreeAndNil(r);
@@ -67,7 +68,7 @@ begin
 
       WriteLn('Deleting records ...');
       q.SQL.Text := 'delete from t1 where id = :id';
-      q.FromJSON(a);
+      q.FromJSONArray(a);
       WriteLn('Done.');
 
       db.Commit;
