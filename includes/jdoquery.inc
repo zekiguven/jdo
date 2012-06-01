@@ -30,12 +30,95 @@ begin
   end;
 end;
 
-function TJDOQuery.ToJSON: TJSONArray;
+procedure TJDOQuery.ReadJSONObject(AJSON: TJSONObject);
 var
+  I: Integer;
+  VName: string;
+  VParam: TParam;
+  VData: TJSONData;
+  VFieldDef: TFieldDef;
+begin
+  for I := 0 to Pred(AJSON.Count) do
+  begin
+    VName := AJSON.Names[I];
+    VParam := Params.FindParam(VName);
+    if not Assigned(VParam) then
+      Continue;
+    VData := AJSON.Items[I];
+    if VData.IsNull then
+      VParam.Clear
+    else
+    begin
+      VFieldDef := FieldDefs.Find(VName);
+      case VFieldDef.DataType of
+        ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
+          ftInterface, ftIDispatch: VParam.Clear;
+        ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob,
+          ftOraClob, ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes,
+          ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle, ftTypedBinary,
+          ftVariant,ftGuid: VParam.AsString := VData.AsString;
+        ftSmallint, ftInteger, ftLargeint, ftWord,
+          ftAutoInc: VParam.AsInteger := VData.AsInteger;
+        ftBoolean: VParam.AsBoolean := VData.AsBoolean;
+        ftFloat, ftCurrency, ftBCD, ftFMTBcd: VParam.AsFloat := VData.AsFloat;
+        ftDate, ftTime, ftDateTime, ftTimeStamp:
+          if FDateAsString then
+            VParam.AsDateTime := StrToDateTime(VData.AsString)
+          else
+            VParam.AsDateTime := VData.AsFloat;
+      end;
+    end;
+  end;
+end;
+
+function TJDOQuery.CreateJSONObject: TJSONObject;
+var
+  I: Integer;
   VField: TField;
-  I, P: Integer;
-  VJSONObj: TJSONObject;
   VFieldType, VFieldName: ShortString;
+begin
+  Result := TJSONObject.Create;
+  for I := 0 to Pred(Fields.Count) do
+  begin
+    VField := Fields[I];
+    case VField.DataType of
+      ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
+        ftInterface, ftIDispatch: VFieldType := FT_NULL;
+      ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob,
+        ftOraClob, ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes,
+        ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle, ftTypedBinary,
+        ftVariant, ftGuid: VFieldType := FT_STRING;
+      ftSmallint, ftInteger, ftLargeint, ftWord,
+        ftAutoInc: VFieldType := FT_INT;
+      ftBoolean: VFieldType := FT_BOOLEAN;
+      ftFloat, ftCurrency, ftBCD, ftFMTBcd: VFieldType := FT_FLOAT;
+      ftDate, ftTime, ftDateTime, ftTimeStamp: VFieldType := FT_DATE;
+    end;
+    VFieldName := VField.FieldName;
+    if (VFieldType = FT_NULL) or VField.IsNull then
+    begin
+      Result.Add(VFieldName);
+      Continue;
+    end;
+    if VFieldType = FT_STRING then
+      Result.Add(VFieldName, VField.AsString);
+    if VFieldType = FT_BOOLEAN then
+      Result.Add(VFieldName, VField.AsBoolean);
+    if VFieldType = FT_DATE then
+      if FDateAsString then
+        Result.Add(VFieldName, VField.AsString)
+      else
+        Result.Add(VFieldName, VField.AsFloat);
+    if VFieldType = FT_FLOAT then
+      Result.Add(VFieldName, VField.AsFloat);
+    if VFieldType = FT_INT then
+      Result.Add(VFieldName, VField.AsInteger);
+  end;
+end;
+
+function TJDOQuery.ToJSONArray: TJSONArray;
+var
+  P: Integer;
 begin
   Result := TJSONArray.Create;
   Open;
@@ -47,44 +130,7 @@ begin
     First;
     while not EOF do
     begin
-      VJSONObj := TJSONObject.Create;
-      Result.Add(VJSONObj);
-      for I := 0 to Pred(Fields.Count) do
-      begin
-        VField := Fields[I];
-        case VField.DataType of
-          ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
-            ftInterface, ftIDispatch: VFieldType := FT_NULL;
-          ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob,
-            ftOraClob, ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes,
-            ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle, ftTypedBinary,
-            ftVariant, ftGuid: VFieldType := FT_STRING;
-          ftSmallint, ftInteger, ftLargeint, ftWord,
-            ftAutoInc: VFieldType := FT_INT;
-          ftBoolean: VFieldType := FT_BOOLEAN;
-          ftFloat, ftCurrency, ftBCD, ftFMTBcd: VFieldType := FT_FLOAT;
-          ftDate, ftTime, ftDateTime, ftTimeStamp: VFieldType := FT_DATE;
-        end;
-        VFieldName := VField.FieldName;
-        if (VFieldType = FT_NULL) or VField.IsNull then
-        begin
-          VJSONObj.Add(VFieldName);
-          Continue;
-        end;
-        if VFieldType = FT_STRING then
-          VJSONObj.Add(VFieldName, VField.AsString);
-        if VFieldType = FT_BOOLEAN then
-          VJSONObj.Add(VFieldName, VField.AsBoolean);
-        if VFieldType = FT_DATE then
-          if FDateAsString then
-            VJSONObj.Add(VFieldName, VField.AsString)
-          else
-            VJSONObj.Add(VFieldName, VField.AsFloat);
-        if VFieldType = FT_FLOAT then
-          VJSONObj.Add(VFieldName, VField.AsFloat);
-        if VFieldType = FT_INT then
-          VJSONObj.Add(VFieldName, VField.AsInteger);
-      end;
+      Result.Add(CreateJSONObject);
       Next;
     end;
   finally
@@ -93,59 +139,42 @@ begin
   end;
 end;
 
-procedure TJDOQuery.FromJSON(AJSON: TJSONArray);
+function TJDOQuery.ToJSONObject: TJSONObject;
+begin
+  Open;
+  if RecordCount <> 0 then
+    Result := CreateJSONObject
+  else
+    Result := TJSONObject.Create;
+end;
+
+procedure TJDOQuery.FromJSONArray(AJSON: TJSONArray);
 var
-  I, J: Integer;
-  VName: string;
-  VParam: TParam;
-  VData: TJSONData;
-  VFieldDef: TFieldDef;
-  VJSONObj: TJSONObject;
+  I: Integer;
 begin
   if not Assigned(FieldDefs) then
     raise EJDOQuery.Create(Self, SFieldDefsNilError);
   if not Assigned(AJSON) then
-    raise EJDOQuery.Create(Self, '"AJSON" must be not nil.');
+    raise EJDOQuery.Create(Self, SJSONParamNilError);
   if AJSON.JSONType <> jtArray then
     raise EJDOQuery.Create(Self, '"AJSON.JSONType" must be "jtArray".');
   for I := 0 to Pred(AJSON.Count) do
   begin
-    VJSONObj := AJSON[I] as TJSONObject;
-    for J := 0 to Pred(VJSONObj.Count) do
-    begin
-      VName := VJSONObj.Names[J];
-      VParam := Params.FindParam(VName);
-      if not Assigned(VParam) then
-        Continue;
-      VData := VJSONObj.Items[J];
-      if VData.IsNull then
-        VParam.Clear
-      else
-      begin
-        VFieldDef := FieldDefs.Find(VName);
-        if not Assigned(VFieldDef) then
-          raise EJDOQuery.CreateFmt(Self, SFieldDefNotFoundError, [VName]);
-        case VFieldDef.DataType of
-          ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
-            ftInterface, ftIDispatch: VParam.Clear;
-          ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob,
-            ftOraClob, ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes,
-            ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle, ftTypedBinary,
-            ftVariant,ftGuid: VParam.AsString := VData.AsString;
-          ftSmallint, ftInteger, ftLargeint, ftWord,
-            ftAutoInc: VParam.AsInteger := VData.AsInteger;
-          ftBoolean: VParam.AsBoolean := VData.AsBoolean;
-          ftFloat, ftCurrency, ftBCD, ftFMTBcd: VParam.AsFloat := VData.AsFloat;
-          ftDate, ftTime, ftDateTime, ftTimeStamp:
-            if FDateAsString then
-              VParam.AsDateTime := StrToDateTime(VData.AsString)
-            else
-              VParam.AsDateTime := VData.AsFloat;
-        end;
-      end;
-    end;
+    ReadJSONObject(AJSON[I] as TJSONObject);
     ExecSQL;
   end;
+end;
+
+procedure TJDOQuery.FromJSONObject(AJSON: TJSONObject);
+begin
+  if not Assigned(FieldDefs) then
+    raise EJDOQuery.Create(Self, SFieldDefsNilError);
+  if not Assigned(AJSON) then
+    raise EJDOQuery.Create(Self, SJSONParamNilError);
+  if AJSON.JSONType <> jtObject then
+    raise EJDOQuery.Create(Self, '"AJSON.JSONType" must be "jtObject".');
+  ReadJSONObject(AJSON);
+  ExecSQL;
 end;
 
 function TJDOQuery.Execute: Boolean;

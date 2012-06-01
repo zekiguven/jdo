@@ -20,10 +20,15 @@
   TJDOQuery = class(TSQLQuery)
   private
     FDateAsString: Boolean;
+  protected
+    procedure ReadJSONObject(AJSON: TJSONObject);
+    function CreateJSONObject: TJSONObject;
   public
     constructor Create(AOwner: TComponent); override;
-    function ToJSON: TJSONArray;
-    procedure FromJSON(AJSON: TJSONArray);
+    function ToJSONArray: TJSONArray;
+    function ToJSONObject: TJSONObject;
+    procedure FromJSONArray(AJSON: TJSONArray);
+    procedure FromJSONObject(AJSON: TJSONObject);
     function Execute: Boolean;
     function Open: Boolean;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
