@@ -19,7 +19,7 @@
     </CompilerOptions>
     <Description Value="JSON Data Objects Runtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="5" Build="3"/>
+    <Version Release="5" Build="4"/>
     <Files Count="12">
       <Item1>
         <Filename Value="..\includes\jdo.inc"/>
