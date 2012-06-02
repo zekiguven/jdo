@@ -35,6 +35,11 @@ begin
   Create(nil, ASQL, AFieldDefs, ATableName);
 end;
 
+function TJDOSQL.IsComposed: Boolean;
+begin
+  Result := FStatementType <> stUnknown;
+end;
+
 procedure TJDOSQL.CheckTableName;
 begin
   if FTableName = ES then
@@ -57,20 +62,26 @@ begin
   C := FFieldDefs.Count;
   if C = 0 then
   begin
-    Result := AK;
-    Exit;
-  end;
-  for I := 0 to Pred(C) do
-  begin
-    VFieldName := FFieldDefs[I].Name;
-    if ASkipKey and (CompareText(VFieldName, FKey) = 0) then
-      Continue;
-    if APairs then
-      Result += VFieldName;
-    Result += AToken + VFieldName;
-    if Succ(I) < C then
-      Result += CS;
-  end;
+    if FTableAlias <> ES then
+      Result := FTableAlias + DT + AK
+    else
+      Result := AK
+  end
+  else
+    for I := 0 to Pred(C) do
+    begin
+      VFieldName := FFieldDefs[I].Name;
+      if ASkipKey and (CompareText(VFieldName, FKey) = 0) then
+        Continue;
+      if APairs then
+        Result += VFieldName;
+      if (FTableAlias <> ES) and (AToken = ES) and (not APairs) then
+        Result += FTableAlias + DT + VFieldName
+      else
+        Result += AToken + VFieldName;
+      if Succ(I) < C then
+        Result += CS;
+    end;
 end;
 
 procedure TJDOSQL.Compose(const AStatementType: TJDOStatementType);
@@ -88,10 +99,7 @@ begin
         if FPutBegin <> ES then
           VCols := FPutBegin
         else
-          if FTableAlias <> ES then
-            VCols := FormatCols(FTableAlias + DT, False, False)
-          else
-            VCols := FormatCols(ES, False, False);
+          VCols := FormatCols(ES, False, False);
         FScript.Add(SQL_SELECT_TOKEN + VCols + SP + SQL_FROM_TOKEN +
           FTableName + SP + FTableAlias);
         if FPutMiddle <> ES then
@@ -134,16 +142,19 @@ begin
   FStatementType := AStatementType;
 end;
 
-procedure TJDOSQL.Clear;
+procedure TJDOSQL.Reset;
 begin
   FPutBegin := ES;
   FPutMiddle := ES;
   FPutEnd := ES;
   if FStatementType <> stUnknown then
-  begin
     FStatementType := stUnknown;
-    FScript.Clear;
-  end;
+end;
+
+procedure TJDOSQL.Clear;
+begin
+  Reset;
+  FScript.Clear;
 end;
 
 procedure TJDOSQL.Put(const ASQL: string; const AType: TJDOPutTypes);
