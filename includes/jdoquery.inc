@@ -153,9 +153,9 @@ var
   I: Integer;
 begin
   if not Assigned(FieldDefs) then
-    raise EJDOQuery.Create(Self, SFieldDefsNilError);
+    raise EJDOQuery.Create(Self, SNilFieldDefsError);
   if not Assigned(AJSON) then
-    raise EJDOQuery.Create(Self, SJSONParamNilError);
+    raise EJDOQuery.Create(Self, SNilJSONParamError);
   if AJSON.JSONType <> jtArray then
     raise EJDOQuery.Create(Self, '"AJSON.JSONType" must be "jtArray".');
   for I := 0 to Pred(AJSON.Count) do
@@ -168,9 +168,9 @@ end;
 procedure TJDOQuery.FromJSONObject(AJSON: TJSONObject);
 begin
   if not Assigned(FieldDefs) then
-    raise EJDOQuery.Create(Self, SFieldDefsNilError);
+    raise EJDOQuery.Create(Self, SNilFieldDefsError);
   if not Assigned(AJSON) then
-    raise EJDOQuery.Create(Self, SJSONParamNilError);
+    raise EJDOQuery.Create(Self, SNilJSONParamError);
   if AJSON.JSONType <> jtObject then
     raise EJDOQuery.Create(Self, '"AJSON.JSONType" must be "jtObject".');
   ReadJSONObject(AJSON);

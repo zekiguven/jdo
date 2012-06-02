@@ -48,7 +48,7 @@ var
 begin
   VConnType := FConfig[CONNECTOR_TYPE];
   if Trim(VConnType) = ES then
-    raise EJDODataBase.Create(Self, SConnTypeEmptyError);
+    raise EJDODataBase.Create(Self, SEmptyConnTypeError);
   VConnDef := GetConnectionDef(VConnType);
   if Assigned(VConnDef) then
     FConnection := TSQLConnectionClass(VConnDef.ConnectionClass).Create(Self)

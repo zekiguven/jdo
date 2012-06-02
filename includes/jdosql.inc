@@ -43,13 +43,13 @@ end;
 procedure TJDOSQL.CheckTableName;
 begin
   if FTableName = ES then
-    raise EJDOSQL.Create(Self, STableNameEmptyError);
+    raise EJDOSQL.Create(Self, SEmptyTableNameError);
 end;
 
 procedure TJDOSQL.CheckKey;
 begin
   if Trim(Key) = ES then
-    raise EJDOSQL.Create(Self, SKeyEmptyError);
+    raise EJDOSQL.Create(Self, SEmptyKeyError);
 end;
 
 function TJDOSQL.FormatCols(const AToken: string;

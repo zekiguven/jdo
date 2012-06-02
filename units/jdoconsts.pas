@@ -60,14 +60,14 @@ const
   NullDate = 0;
 
   // Error msgs
-  SKeyEmptyError = '"Key" must not be empty.';
-  SConnTypeEmptyError = '"ConnectorType" must not be empty.';
-  SConnUnitWasNotDeclaredError = 'The unit of "%s" was not declared in uses clause or it is an invalid ConnectorType.';
-  SCfgFileNotFoundError = 'Config file not found: "%s"';
-  STargetNilError = '"Target" must not be nil.';
-  STableNameEmptyError = '"TableName" must be not empty.';
-  SFieldDefsNilError = '"FieldDefs" must be not nil.';
-  SJSONParamNilError = '"AJSON" must be not nil.';
+  SEmptyKeyError = 'The "Key" must not be empty.';
+  SEmptyConnTypeError = 'The "ConnectorType" must not be empty.';
+  SConnUnitWasNotDeclaredError = 'The unit for "%s" was not declared in uses clause or it''s an invalid ConnectorType.';
+  SCfgFileNotFoundError = 'The config file was not found: "%s"';
+  SNilTargetError = 'The "Target" must not be nil.';
+  SEmptyTableNameError = 'The "TableName" must not be empty.';
+  SNilFieldDefsError = '"FieldDefs" must not be nil.';
+  SNilJSONParamError = '"AJSON" must not be nil.';
 
 implementation
 
