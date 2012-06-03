@@ -41,6 +41,7 @@ const
   SQL_SELECT_TOKEN = 'select ';
   SQL_FROM_TOKEN = ' from ';
   SQL_WHERE_TOKEN = ' where ';
+  SQL_NOTHING_WHERE_TOKEN = SQL_WHERE_TOKEN + '1=2';
   SQL_ORDER_BY_TOKEN = ' order by ';
   SQL_INSERT_TOKEN = 'insert into ';
   SQL_VALUES_TOKEN = ' values ';
@@ -69,6 +70,8 @@ const
   SEmptyTableNameError = 'The "TableName" must not be empty.';
   SNilFieldDefsError = '"FieldDefs" must not be nil.';
   SNilJSONParamError = '"AJSON" must not be nil.';
+  SEmptyTableError = 'Empty table.';
+  SEmptyObjectError = 'Empty object.';
 
 implementation
 

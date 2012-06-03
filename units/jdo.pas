@@ -33,9 +33,10 @@ type
   end;
 
 {$i jdoconfigh.inc}
-{$i jdoqueryh.inc}
 {$i jdosqlh.inc}
+{$i jdoqueryh.inc}
 {$i jdodatabaseh.inc}
+{$i jdotableh.inc}
 
 implementation
 
@@ -51,9 +52,10 @@ begin
 end;
 
 {$i jdoconfig.inc}
-{$i jdoquery.inc}
 {$i jdosql.inc}
+{$i jdoquery.inc}
 {$i jdodatabase.inc}
+{$i jdotable.inc}
 
 end.
 
