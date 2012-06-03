@@ -23,6 +23,7 @@
 
   TJDOSQL = class(TComponent)
   private
+    FLike: string;
     FFieldDefs: TFieldDefs;
     FPutBegin: string;
     FPutMiddle: string;
@@ -50,6 +51,7 @@
     procedure Reset;
     procedure Clear;
     procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle);
+    procedure Like(const AKey: string; const ACaseInsensitive: Boolean = False);
     property Composed: Boolean read IsComposed;
     property Key: string read FKey write FKey;
     property OrderBy: string read FOrderBy write FOrderBy;

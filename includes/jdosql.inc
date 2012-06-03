@@ -87,6 +87,7 @@ end;
 procedure TJDOSQL.Compose(const AStatementType: TJDOStatementType);
 var
   VCols: string;
+  VIsWhere: Boolean;
 begin
   if AStatementType <> FStatementType then
     FScript.Clear
@@ -105,8 +106,16 @@ begin
         if FPutMiddle <> ES then
           FScript.Add(FPutMiddle)
         else
-          if FWhere <> ES then
+        begin
+          VIsWhere := FWhere <> ES;
+          if VIsWhere then
             FScript.Add(SQL_WHERE_TOKEN + FWhere);
+          if FLike <> ES then
+            if VIsWhere then
+              FScript.Add(SQL_AND_TOKEN + FLike)
+            else
+              FScript.Add(SQL_WHERE_TOKEN + FLike);
+        end;
         if FPutEnd <> ES then
           FScript.Add(FPutEnd)
         else
@@ -164,4 +173,12 @@ begin
     ptMiddle: FPutMiddle += ASQL + SP;
     ptEnd: FPutEnd += ASQL + SP;
   end;
+end;
+
+procedure TJDOSQL.Like(const AKey: string; const ACaseInsensitive: Boolean);
+begin
+  if ACaseInsensitive then
+    FLike := SQL_LOWER_TOKEN + PS + AKey + PE + SQL_LIKE_TOKEN + AKey + PE
+  else
+    FLike := AKey + SQL_LIKE_TOKEN + AKey + PE;
 end;
