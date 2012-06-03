@@ -37,7 +37,7 @@ end;
 
 function TJDOSQL.IsComposed: Boolean;
 begin
-  Result := FStatementType <> stUnknown;
+  Result := (FStatementType <> stUnknown) or (FScript.Count > 0);
 end;
 
 procedure TJDOSQL.CheckTableName;
