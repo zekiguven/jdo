@@ -50,6 +50,7 @@ const
   SQL_EQ_PARAM_TOKEN = '=:';
   SQL_LOWER_TOKEN = 'lower';
   SQL_LIKE_TOKEN = ' like (:';
+  SQL_AND_TOKEN = ' and ';
   FT_NULL = 'null';
   FT_STRING = 'string';
   FT_BOOLEAN = 'boolean';
