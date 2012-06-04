@@ -25,6 +25,7 @@
   protected
     procedure ReadJSONObject(AJSON: TJSONObject);
     function CreateJSONObject: TJSONObject;
+    class function GetJSONFieldType(const AFieldType: TFieldType): ShortString;
   public
     constructor Create(AOwner: TComponent); override;
     function ToJSONArray: TJSONArray;
@@ -33,6 +34,8 @@
     procedure FromJSONObject(AJSON: TJSONObject);
     function Execute: Boolean;
     function Open: Boolean;
+    function Schema: TJSONObject;
+    function JSONSchema: TJSONStringType;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
     property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;

@@ -81,19 +81,7 @@ begin
   for I := 0 to Pred(Fields.Count) do
   begin
     VField := Fields[I];
-    case VField.DataType of
-      ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
-        ftInterface, ftIDispatch: VFieldType := FT_NULL;
-      ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob,
-        ftOraClob, ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes,
-        ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle, ftTypedBinary,
-        ftVariant, ftGuid: VFieldType := FT_STRING;
-      ftSmallint, ftInteger, ftLargeint, ftWord,
-        ftAutoInc: VFieldType := FT_INT;
-      ftBoolean: VFieldType := FT_BOOLEAN;
-      ftFloat, ftCurrency, ftBCD, ftFMTBcd: VFieldType := FT_FLOAT;
-      ftDate, ftTime, ftDateTime, ftTimeStamp: VFieldType := FT_DATE;
-    end;
+    VFieldType := GetJSONFieldType(VField.DataType);
     VFieldName := VField.FieldName;
     if (VFieldType = FT_NULL) or VField.IsNull then
     begin
@@ -113,6 +101,24 @@ begin
       Result.Add(VFieldName, VField.AsFloat);
     if VFieldType = FT_INT then
       Result.Add(VFieldName, VField.AsInteger);
+  end;
+end;
+
+class function TJDOCustomQuery.GetJSONFieldType(
+  const AFieldType: TFieldType): ShortString;
+begin
+  case AFieldType of
+    ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
+      ftInterface, ftIDispatch: Result := FT_NULL;
+    ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob,
+      ftOraClob, ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes,
+      ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle, ftTypedBinary,
+      ftVariant, ftGuid: Result := FT_STRING;
+    ftSmallint, ftInteger, ftLargeint, ftWord,
+      ftAutoInc: Result := FT_INT;
+    ftBoolean: Result := FT_BOOLEAN;
+    ftFloat, ftCurrency, ftBCD, ftFMTBcd: Result := FT_FLOAT;
+    ftDate, ftTime, ftDateTime, ftTimeStamp: Result := FT_DATE;
   end;
 end;
 
@@ -191,4 +197,63 @@ begin
   Result := RecordCount > 0;
   if Assigned(FOnOpen) then
     FOnOpen(Self);
+end;
+
+function TJDOCustomQuery.Schema: TJSONObject;
+var
+  I: Integer;
+  VArray: TJSONArray;
+  VObject: TJSONObject;
+  VFieldDef: TFieldDef;
+  VFieldType: ShortString;
+begin
+  Result := TJSONObject.Create;
+  VArray := TJSONArray.Create;
+  Result.Add('fields', VArray);
+  for I := 0 to Pred(FieldDefs.Count) do
+  begin
+    VFieldDef := FieldDefs[I];
+    VObject := TJSONObject.Create(['name', VFieldDef.name]);
+    VArray.Add(VObject);
+    VFieldType := GetJSONFieldType(VFieldDef.DataType);
+    VObject.Strings['type'] := VFieldType;
+    if VFieldType = FT_STRING then
+      VObject.Integers['maxlen'] := VFieldDef.Size;
+    if VFieldDef.Required then
+      VObject.Booleans['required'] := True;
+    if VFieldDef.Precision <> -1 then
+      VObject.Integers['precision'] := VFieldDef.Precision;
+  end;
+end;
+
+function TJDOCustomQuery.JSONSchema: TJSONStringType;
+var
+  I, C: Integer;
+  VFieldDef: TFieldDef;
+  VFieldType: ShortString;
+begin
+  Result := ES;
+  C := FieldDefs.Count;
+  if C = 0 then
+  begin
+    Result := '{}';
+    Exit;
+  end;
+  for I := 0 to Pred(C) do
+  begin
+    VFieldDef := FieldDefs[I];
+    VFieldType := GetJSONFieldType(VFieldDef.DataType);
+    Result += '{ "name": "' + VFieldDef.Name + '"';
+    Result += ', "type": "' + VFieldType + '"';
+    if VFieldType = FT_STRING then
+      Result += ', "maxlen": ' + IntToStr(VFieldDef.Size);
+    if VFieldDef.Required then
+      Result += ', "required": true';
+    if VFieldDef.Precision <> -1 then
+      Result += ', "precision": ' + IntToStr(VFieldDef.Precision);
+    if Succ(I) < C then
+      Result += ' }, '
+    else
+      Result += ' }';
+  end;
 end;
