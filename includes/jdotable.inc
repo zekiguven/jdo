@@ -103,6 +103,7 @@ end;
 procedure TJDOTable.SetName(const AValue: string);
 begin
   FSQL.TableName := AValue;
+  FSQL.Reset;
 end;
 
 procedure TJDOTable.SetKey;
