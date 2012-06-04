@@ -43,6 +43,25 @@ begin
   inherited Destroy;
 end;
 
+procedure TJDODataBase.Connect;
+begin
+  FConnection.Open;
+  if Assigned(FOnConnect) then
+    FOnConnect(Self);
+end;
+
+procedure TJDODataBase.Disconnect;
+begin
+  FConnection.Close;
+  if Assigned(FOnDisconnect) then
+    FOnDisconnect(Self);
+end;
+
+function TJDODataBase.InTransaction: Boolean;
+begin
+  Result := FTransaction.Active;
+end;
+
 procedure TJDODataBase.InternalCreateConnection;
 var
   VConnType: ShortString;
@@ -76,6 +95,31 @@ begin
   FTables.Add(Result);
 end;
 
+function TJDODataBase.GetConnected: Boolean;
+begin
+  Result := FConnection.Connected;
+end;
+
+function TJDODataBase.GetDatabaseName: string;
+begin
+  Result := FConnection.DatabaseName;
+end;
+
+function TJDODataBase.GetHostName: string;
+begin
+  Result := FConnection.HostName;
+end;
+
+function TJDODataBase.GetPassword: string;
+begin
+  Result := FConnection.Password;
+end;
+
+function TJDODataBase.GetUserName: string;
+begin
+  Result := FConnection.UserName;
+end;
+
 procedure TJDODataBase.InternalCreateTransaction;
 begin
   FTransaction := TSQLTransaction.Create(Self);
@@ -85,6 +129,26 @@ end;
 procedure TJDODataBase.InternalCreateQuery;
 begin
   FQuery := TJDOQuery.Create(Self);
+end;
+
+procedure TJDODataBase.SetDatabaseName(const AValue: string);
+begin
+  FConnection.DatabaseName := AValue;
+end;
+
+procedure TJDODataBase.SetHostName(const AValue: string);
+begin
+  FConnection.HostName := AValue;
+end;
+
+procedure TJDODataBase.SetPassword(const AValue: string);
+begin
+  FConnection.Password := AValue;
+end;
+
+procedure TJDODataBase.SetUserName(const AValue: string);
+begin
+  FConnection.UserName := AValue;
 end;
 
 procedure TJDODataBase.StartTrans(const ANativeError: Boolean);
@@ -111,9 +175,23 @@ begin
     FOnCommit(Self);
 end;
 
+procedure TJDODataBase.CommitRetaining;
+begin
+  FTransaction.CommitRetaining;
+  if Assigned(FOnCommitRetaining) then
+    FOnCommitRetaining(Self);
+end;
+
 procedure TJDODataBase.Rollback;
 begin
   FTransaction.Rollback;
   if Assigned(FOnRollback) then
     FOnRollback(Self);
+end;
+
+procedure TJDODataBase.RollbackRetaining;
+begin
+  FTransaction.RollbackRetaining;
+  if Assigned(FOnRollbackRetaining) then
+    FOnRollbackRetaining(Self);
 end;
