@@ -19,6 +19,7 @@
 
   TJDODataBase = class(TComponent)
   private
+    FTables: TFPObjectList;
     FConfig: TJDOConfigurator;
     FConnection: TSQLConnection;
     FOnCommit: TNotifyEvent;
@@ -27,6 +28,7 @@
     FOnStartTrans: TNotifyEvent;
     FQuery: TJDOQuery;
     FTransaction: TSQLTransaction;
+    function GetTables(AName: string): TJDOTable;
     procedure InternalCreateConnection;
     procedure InternalCreateTransaction;
     procedure InternalCreateQuery;
@@ -43,6 +45,7 @@
     property Connection: TSQLConnection read FConnection;
     property Transaction: TSQLTransaction read FTransaction;
     property Query: TJDOQuery read FQuery;
+    property Tables[AName: string]: TJDOTable read GetTables;
     property OnStartTrans: TNotifyEvent read FOnStartTrans write FOnStartTrans;
     property OnRestartTrans: TNotifyEvent read FOnRestartTrans write FOnRestartTrans;
     property OnCommit: TNotifyEvent read FOnCommit write FOnCommit;

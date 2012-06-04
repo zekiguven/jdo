@@ -20,6 +20,7 @@ constructor TJDODataBase.Create(AOwner: TComponent;
 begin
   inherited Create(AOwner);
   FConfig := TJDOConfigurator.Create(AConfiguration);
+  FTables := TFPObjectList.Create;
   InternalCreateConnection;
   InternalCreateTransaction;
   InternalCreateQuery;
@@ -37,6 +38,7 @@ end;
 
 destructor TJDODataBase.Destroy;
 begin
+  FTables.Free;
   FConfig.Free;
   inherited Destroy;
 end;
@@ -54,6 +56,24 @@ begin
     FConnection := TSQLConnectionClass(VConnDef.ConnectionClass).Create(Self)
   else
     raise EJDODataBase.CreateFmt(Self, SConnUnitWasNotDeclaredError, [VConnType]);
+end;
+
+function TJDODataBase.GetTables(AName: string): TJDOTable;
+var
+  I: Integer;
+  VTable: TJDOTable;
+begin
+  for I := 0 to Pred(FTables.Count) do
+  begin
+    VTable := FTables[I] as TJDOTable;
+    if SameText(VTable.Name, AName) then
+    begin
+      Result := VTable;
+      Exit;
+    end;
+  end;
+  Result := TJDOTable.Create(Self, AName);
+  FTables.Add(Result);
 end;
 
 procedure TJDODataBase.InternalCreateTransaction;
