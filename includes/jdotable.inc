@@ -152,14 +152,14 @@ begin
           FSQL.Compose(stUpdate);
         end;
       mtDelete:
+        if VIsItems then
         begin
           SetKey;
-          if VIsItems then
-            FSQL.Compose(stDelete)
-          else
-            FSQL.Script.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN +
-              FSQL.TableName;
-        end;
+          FSQL.Compose(stDelete);
+        end
+        else
+          FSQL.Script.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN +
+            FSQL.TableName;
     end;
   if VIsItems then
     FQuery.FromJSONArray(Self)
