@@ -75,7 +75,10 @@ end;
 
 procedure TJDOTable.Reset;
 begin
-  FSQL.Reset;
+  Clear;
+  FQuery.Close;
+  FSQL.Clear;
+  FQuery.FieldDefs.Clear;
 end;
 
 procedure TJDOTable.SetDataBase(const AValue: TJDOCustomDataBase);
@@ -99,14 +102,14 @@ begin
   if FMode <> AValue then
   begin
     FMode := AValue;
-    FSQL.Reset;
+    Reset;
   end;
 end;
 
 procedure TJDOTable.SetName(const AValue: string);
 begin
   FSQL.TableName := AValue;
-  FSQL.Reset;
+  Reset;
 end;
 
 procedure TJDOTable.SetKey;
