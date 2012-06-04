@@ -20,6 +20,8 @@
   TJDOQuery = class(TSQLQuery)
   private
     FDateAsString: Boolean;
+    FOnExecute: TNotifyEvent;
+    FOnOpen: TNotifyEvent;
   protected
     procedure ReadJSONObject(AJSON: TJSONObject);
     function CreateJSONObject: TJSONObject;
@@ -32,6 +34,8 @@
     function Execute: Boolean;
     function Open: Boolean;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
+    property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
+    property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
   end;
 
   TJDOQueryClass = class of TJDOQuery;

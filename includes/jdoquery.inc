@@ -181,10 +181,14 @@ function TJDOQuery.Execute: Boolean;
 begin
   ExecSQL;
   Result := RowsAffected > 0;
+  if Assigned(FOnExecute) then
+    FOnExecute(Self);
 end;
 
 function TJDOQuery.Open: Boolean;
 begin
   inherited Open;
   Result := RecordCount > 0;
+  if Assigned(FOnOpen) then
+    FOnOpen(Self);
 end;
