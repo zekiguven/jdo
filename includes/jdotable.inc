@@ -39,6 +39,8 @@ begin
     FDataBase.Transaction.StartTransaction;
   try
     FDataBase.Transaction.Commit;
+    if Assigned(FOnApply) then
+      FOnApply(Self);
   except
     FDataBase.Transaction.Rollback;
     raise;
@@ -152,6 +154,8 @@ begin
     FQuery.FromJSONArray(Self)
   else
     FQuery.ExecSQL;
+  if Assigned(FOnPost) then
+    FOnPost(Self);
   if FPersisted then
     Apply;
 end;
@@ -180,6 +184,8 @@ begin
       FQuery.RecNo := P;
       FQuery.EnableControls;
     end;
+  if Assigned(FOnOpen) then
+    FOnOpen(Self);
   if FPersisted then
     Apply;
 end;

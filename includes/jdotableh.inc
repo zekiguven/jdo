@@ -27,6 +27,9 @@
     FColumns: TFieldDefs;
     FDataBase: TJDODataBase;
     FMode: TJDOModeTypes;
+    FOnApply: TNotifyEvent;
+    FOnOpen: TNotifyEvent;
+    FOnPost: TNotifyEvent;
     FPersisted: Boolean;
     FQuery: TJDOQuery;
     FSQL: TJDOSQL;
@@ -69,6 +72,9 @@
     property Persisted: Boolean read FPersisted write FPersisted;
     property Query: TJDOQuery read FQuery;
     property SQL: TJDOSQL read FSQL;
+    property OnApply: TNotifyEvent read FOnApply write FOnApply;
+    property OnPost: TNotifyEvent read FOnPost write FOnPost;
+    property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
   end;
 
   TJDOTableClass = class of TJDOTable;
