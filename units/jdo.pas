@@ -22,7 +22,7 @@ unit JDO;
 interface
 
 uses
-  JDOConsts, Classes, SysUtils, SQLdb, DB, FPJSON, TypInfo;
+  JDOConsts, Classes, SysUtils, SQLdb, DB, FPJSON, Contnrs, TypInfo;
 
 type
   EJDOException = class(Exception)
@@ -35,6 +35,9 @@ type
 {$i jdoconfigh.inc}
 {$i jdosqlh.inc}
 {$i jdoqueryh.inc}
+
+  TJDOTable = class;
+
 {$i jdodatabaseh.inc}
 {$i jdotableh.inc}
 
