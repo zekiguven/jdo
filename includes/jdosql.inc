@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-constructor TJDOSQL.Create(AOwner: TComponent; ASQL: TStrings;
+constructor TJDOCustomSQL.Create(AOwner: TComponent; ASQL: TStrings;
   AFieldDefs: TFieldDefs; const ATableName: string);
 begin
   inherited Create(AOwner);
@@ -29,30 +29,30 @@ begin
   FTableName := ATableName;
 end;
 
-constructor TJDOSQL.Create(ASQL: TStrings; AFieldDefs: TFieldDefs;
+constructor TJDOCustomSQL.Create(ASQL: TStrings; AFieldDefs: TFieldDefs;
   const ATableName: string);
 begin
   Create(nil, ASQL, AFieldDefs, ATableName);
 end;
 
-function TJDOSQL.IsComposed: Boolean;
+function TJDOCustomSQL.IsComposed: Boolean;
 begin
   Result := (FStatementType <> stUnknown) or (FScript.Count > 0);
 end;
 
-procedure TJDOSQL.CheckTableName;
+procedure TJDOCustomSQL.CheckTableName;
 begin
   if FTableName = ES then
     raise EJDOSQL.Create(Self, SEmptyTableNameError);
 end;
 
-procedure TJDOSQL.CheckKey;
+procedure TJDOCustomSQL.CheckKey;
 begin
   if Trim(Key) = ES then
     raise EJDOSQL.Create(Self, SEmptyKeyError);
 end;
 
-function TJDOSQL.FormatCols(const AToken: string;
+function TJDOCustomSQL.FormatCols(const AToken: string;
   const ASkipKey, APairs: Boolean): string;
 var
   VFieldName: string;
@@ -84,7 +84,7 @@ begin
     end;
 end;
 
-procedure TJDOSQL.Compose(const AStatementType: TJDOStatementType);
+procedure TJDOCustomSQL.Compose(const AStatementType: TJDOStatementType);
 var
   VCols: string;
   VIsWhere: Boolean;
@@ -153,7 +153,7 @@ begin
     FOnCompose(AStatementType);
 end;
 
-procedure TJDOSQL.Reset;
+procedure TJDOCustomSQL.Reset;
 begin
   FPutBegin := ES;
   FPutMiddle := ES;
@@ -162,13 +162,13 @@ begin
     FStatementType := stUnknown;
 end;
 
-procedure TJDOSQL.Clear;
+procedure TJDOCustomSQL.Clear;
 begin
   Reset;
   FScript.Clear;
 end;
 
-procedure TJDOSQL.Put(const ASQL: string; const AType: TJDOPutTypes);
+procedure TJDOCustomSQL.Put(const ASQL: string; const AType: TJDOPutTypes);
 begin
   case AType of
     ptBegin: FPutBegin += ASQL + SP;
@@ -177,7 +177,7 @@ begin
   end;
 end;
 
-procedure TJDOSQL.Like(const AKey: string; const ACaseInsensitive: Boolean);
+procedure TJDOCustomSQL.Like(const AKey: string; const ACaseInsensitive: Boolean);
 begin
   if ACaseInsensitive then
     FLike := SQL_LOWER_TOKEN + PS + AKey + PE + SQL_LIKE_TOKEN + AKey + PE

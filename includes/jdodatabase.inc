@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-constructor TJDODataBase.Create(AOwner: TComponent;
+constructor TJDOCustomDataBase.Create(AOwner: TComponent;
   const AConfiguration: string; const AConnect: Boolean);
 begin
   inherited Create(AOwner);
@@ -30,39 +30,39 @@ begin
     FConnection.Open;
 end;
 
-constructor TJDODataBase.Create(const AConfiguration: string;
+constructor TJDOCustomDataBase.Create(const AConfiguration: string;
   const AConnect: Boolean);
 begin
   Create(nil, AConfiguration, AConnect);
 end;
 
-destructor TJDODataBase.Destroy;
+destructor TJDOCustomDataBase.Destroy;
 begin
   FTables.Free;
   FConfig.Free;
   inherited Destroy;
 end;
 
-procedure TJDODataBase.Connect;
+procedure TJDOCustomDataBase.Connect;
 begin
   FConnection.Open;
   if Assigned(FOnConnect) then
     FOnConnect(Self);
 end;
 
-procedure TJDODataBase.Disconnect;
+procedure TJDOCustomDataBase.Disconnect;
 begin
   FConnection.Close;
   if Assigned(FOnDisconnect) then
     FOnDisconnect(Self);
 end;
 
-function TJDODataBase.InTransaction: Boolean;
+function TJDOCustomDataBase.InTransaction: Boolean;
 begin
   Result := FTransaction.Active;
 end;
 
-procedure TJDODataBase.InternalCreateConnection;
+procedure TJDOCustomDataBase.InternalCreateConnection;
 var
   VConnType: ShortString;
   VConnDef: TConnectionDef;
@@ -77,7 +77,7 @@ begin
     raise EJDODataBase.CreateFmt(Self, SConnUnitWasNotDeclaredError, [VConnType]);
 end;
 
-function TJDODataBase.GetTables(AName: string): TJDOTable;
+function TJDOCustomDataBase.GetTables(AName: string): TJDOTable;
 var
   I: Integer;
   VTable: TJDOTable;
@@ -95,63 +95,63 @@ begin
   FTables.Add(Result);
 end;
 
-function TJDODataBase.GetConnected: Boolean;
+function TJDOCustomDataBase.GetConnected: Boolean;
 begin
   Result := FConnection.Connected;
 end;
 
-function TJDODataBase.GetDatabaseName: string;
+function TJDOCustomDataBase.GetDatabaseName: string;
 begin
   Result := FConnection.DatabaseName;
 end;
 
-function TJDODataBase.GetHostName: string;
+function TJDOCustomDataBase.GetHostName: string;
 begin
   Result := FConnection.HostName;
 end;
 
-function TJDODataBase.GetPassword: string;
+function TJDOCustomDataBase.GetPassword: string;
 begin
   Result := FConnection.Password;
 end;
 
-function TJDODataBase.GetUserName: string;
+function TJDOCustomDataBase.GetUserName: string;
 begin
   Result := FConnection.UserName;
 end;
 
-procedure TJDODataBase.InternalCreateTransaction;
+procedure TJDOCustomDataBase.InternalCreateTransaction;
 begin
   FTransaction := TSQLTransaction.Create(Self);
   FTransaction.DataBase := FConnection;
 end;
 
-procedure TJDODataBase.InternalCreateQuery;
+procedure TJDOCustomDataBase.InternalCreateQuery;
 begin
-  FQuery := TJDOQuery.Create(Self);
+  FQuery := TJDOCustomQuery.Create(Self);
 end;
 
-procedure TJDODataBase.SetDatabaseName(const AValue: string);
+procedure TJDOCustomDataBase.SetDatabaseName(const AValue: string);
 begin
   FConnection.DatabaseName := AValue;
 end;
 
-procedure TJDODataBase.SetHostName(const AValue: string);
+procedure TJDOCustomDataBase.SetHostName(const AValue: string);
 begin
   FConnection.HostName := AValue;
 end;
 
-procedure TJDODataBase.SetPassword(const AValue: string);
+procedure TJDOCustomDataBase.SetPassword(const AValue: string);
 begin
   FConnection.Password := AValue;
 end;
 
-procedure TJDODataBase.SetUserName(const AValue: string);
+procedure TJDOCustomDataBase.SetUserName(const AValue: string);
 begin
   FConnection.UserName := AValue;
 end;
 
-procedure TJDODataBase.StartTrans(const ANativeError: Boolean);
+procedure TJDOCustomDataBase.StartTrans(const ANativeError: Boolean);
 begin
   if (not ANativeError) and FTransaction.Active then
     Exit;
@@ -160,7 +160,7 @@ begin
     FOnStartTrans(Self);
 end;
 
-procedure TJDODataBase.RestartTrans;
+procedure TJDOCustomDataBase.RestartTrans;
 begin
   if FTransaction.Active then
     FTransaction.Rollback;
@@ -168,28 +168,28 @@ begin
     FOnRestartTrans(Self);
 end;
 
-procedure TJDODataBase.Commit;
+procedure TJDOCustomDataBase.Commit;
 begin
   FTransaction.Commit;
   if Assigned(FOnCommit) then
     FOnCommit(Self);
 end;
 
-procedure TJDODataBase.CommitRetaining;
+procedure TJDOCustomDataBase.CommitRetaining;
 begin
   FTransaction.CommitRetaining;
   if Assigned(FOnCommitRetaining) then
     FOnCommitRetaining(Self);
 end;
 
-procedure TJDODataBase.Rollback;
+procedure TJDOCustomDataBase.Rollback;
 begin
   FTransaction.Rollback;
   if Assigned(FOnRollback) then
     FOnRollback(Self);
 end;
 
-procedure TJDODataBase.RollbackRetaining;
+procedure TJDOCustomDataBase.RollbackRetaining;
 begin
   FTransaction.RollbackRetaining;
   if Assigned(FOnRollbackRetaining) then

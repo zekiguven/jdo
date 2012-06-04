@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-constructor TJDOQuery.Create(AOwner: TComponent);
+constructor TJDOCustomQuery.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   if AOwner is TSQLConnection then
@@ -23,14 +23,14 @@ begin
     SetDatabase(AOwner as TSQLConnection);
     Transaction := TSQLConnection(AOwner).Transaction;
   end;
-  if AOwner is TJDODataBase then
+  if AOwner is TJDOCustomDataBase then
   begin
-    SetDatabase((AOwner as TJDODataBase).Connection);
-    Transaction := TJDODataBase(AOwner).Transaction;
+    SetDatabase((AOwner as TJDOCustomDataBase).Connection);
+    Transaction := TJDOCustomDataBase(AOwner).Transaction;
   end;
 end;
 
-procedure TJDOQuery.ReadJSONObject(AJSON: TJSONObject);
+procedure TJDOCustomQuery.ReadJSONObject(AJSON: TJSONObject);
 var
   I: Integer;
   VName: string;
@@ -71,7 +71,7 @@ begin
   end;
 end;
 
-function TJDOQuery.CreateJSONObject: TJSONObject;
+function TJDOCustomQuery.CreateJSONObject: TJSONObject;
 var
   I: Integer;
   VField: TField;
@@ -116,7 +116,7 @@ begin
   end;
 end;
 
-function TJDOQuery.ToJSONArray: TJSONArray;
+function TJDOCustomQuery.ToJSONArray: TJSONArray;
 var
   P: Integer;
 begin
@@ -139,7 +139,7 @@ begin
   end;
 end;
 
-function TJDOQuery.ToJSONObject: TJSONObject;
+function TJDOCustomQuery.ToJSONObject: TJSONObject;
 begin
   Open;
   if RecordCount <> 0 then
@@ -148,7 +148,7 @@ begin
     Result := TJSONObject.Create;
 end;
 
-procedure TJDOQuery.FromJSONArray(AJSON: TJSONArray);
+procedure TJDOCustomQuery.FromJSONArray(AJSON: TJSONArray);
 var
   I: Integer;
 begin
@@ -165,7 +165,7 @@ begin
   end;
 end;
 
-procedure TJDOQuery.FromJSONObject(AJSON: TJSONObject);
+procedure TJDOCustomQuery.FromJSONObject(AJSON: TJSONObject);
 begin
   if not Assigned(FieldDefs) then
     raise EJDOQuery.Create(Self, SNilFieldDefsError);
@@ -177,7 +177,7 @@ begin
   ExecSQL;
 end;
 
-function TJDOQuery.Execute: Boolean;
+function TJDOCustomQuery.Execute: Boolean;
 begin
   ExecSQL;
   Result := RowsAffected > 0;
@@ -185,7 +185,7 @@ begin
     FOnExecute(Self);
 end;
 
-function TJDOQuery.Open: Boolean;
+function TJDOCustomQuery.Open: Boolean;
 begin
   inherited Open;
   Result := RecordCount > 0;

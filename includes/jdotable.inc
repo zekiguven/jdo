@@ -15,12 +15,13 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-constructor TJDOTable.Create(ADataBase: TJDODataBase; const ATableName: string);
+constructor TJDOTable.Create(ADataBase: TJDOCustomDataBase;
+  const ATableName: string);
 begin
   inherited Create;
-  FQuery := TJDOQuery.Create(nil);
+  FQuery := TJDOCustomQuery.Create(nil);
   FColumns := FQuery.FieldDefs;
-  FSQL := TJDOSQL.Create(FQuery.SQL, FColumns, ATableName);
+  FSQL := TJDOCustomSQL.Create(FQuery.SQL, FColumns, ATableName);
   SetDataBase(ADataBase);
   FAutoSetup := True;
   FPersisted := True;
@@ -77,13 +78,13 @@ begin
   FSQL.Reset;
 end;
 
-procedure TJDOTable.SetDataBase(const AValue: TJDODataBase);
+procedure TJDOTable.SetDataBase(const AValue: TJDOCustomDataBase);
 begin
   FDataBase := AValue;
   FQuery.DataBase := AValue.Connection;
 end;
 
-function TJDOTable.GetDataBase: TJDODataBase;
+function TJDOTable.GetDataBase: TJDOCustomDataBase;
 begin
   Result := FDataBase;
 end;

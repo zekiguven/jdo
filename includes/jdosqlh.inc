@@ -23,7 +23,7 @@
 
   TJDOComposeEvent = procedure(const AStatementType: TJDOStatementType) of object;
 
-  TJDOSQL = class(TComponent)
+  TJDOCustomSQL = class(TComponent)
   private
     FLike: string;
     FFieldDefs: TFieldDefs;
@@ -65,6 +65,21 @@
     property TableAlias: string read FTableAlias write FTableAlias;
     property TableName: string read FTableName write FTableName;
     property OnCompose: TJDOComposeEvent read FOnCompose write FOnCompose;
+  end;
+
+  TJDOCustomSQLClass = class of TJDOCustomSQL;
+
+  TJDOSQL = class(TJDOCustomSQL)
+  published
+    property Composed;
+    property Key;
+    property OrderBy;
+    property Ordered;
+    property Where;
+    property Script;
+    property TableAlias;
+    property TableName;
+    property OnCompose;
   end;
 
   TJDOSQLClass = class of TJDOSQL;

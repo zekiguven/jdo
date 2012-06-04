@@ -17,7 +17,7 @@
 
   EJDODataBase = class(EJDOException);
 
-  TJDODataBase = class(TComponent)
+  TJDOCustomDataBase = class(TComponent)
   private
     FOnCommitRetaining: TNotifyEvent;
     FOnConnect: TNotifyEvent;
@@ -30,7 +30,7 @@
     FOnRestartTrans: TNotifyEvent;
     FOnRollback: TNotifyEvent;
     FOnStartTrans: TNotifyEvent;
-    FQuery: TJDOQuery;
+    FQuery: TJDOCustomQuery;
     FTransaction: TSQLTransaction;
     function GetConnected: Boolean;
     function GetDatabaseName: string;
@@ -62,7 +62,7 @@
     procedure RollbackRetaining;
     property Connection: TSQLConnection read FConnection;
     property Transaction: TSQLTransaction read FTransaction;
-    property Query: TJDOQuery read FQuery;
+    property Query: TJDOCustomQuery read FQuery;
     property Tables[AName: string]: TJDOTable read GetTables;
     property Connected: Boolean read GetConnected;
     property DatabaseName: string read GetDatabaseName write SetDatabaseName;
@@ -79,6 +79,27 @@
     property OnRollback: TNotifyEvent read FOnRollback write FOnRollback;
     property OnRollbackRetaining: TNotifyEvent read FOnRollbackRetaining
       write FOnRollbackRetaining;
+  end;
+
+  TJDOCustomDataBaseClass = class of TJDOCustomDataBase;
+
+  TJDODataBase = class(TJDOCustomDataBase)
+  published
+    property Connection;
+    property Transaction;
+    property Query;
+    property DatabaseName;
+    property HostName;
+    property UserName;
+    property Password;
+    property OnConnect;
+    property OnDisconnect;
+    property OnStartTrans;
+    property OnRestartTrans;
+    property OnCommit;
+    property OnCommitRetaining;
+    property OnRollback;
+    property OnRollbackRetaining;
   end;
 
   TJDODataBaseClass = class of TJDODataBase;

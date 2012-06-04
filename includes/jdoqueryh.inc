@@ -17,7 +17,7 @@
 
   EJDOQuery = class(EJDOException);
 
-  TJDOQuery = class(TSQLQuery)
+  TJDOCustomQuery = class(TSQLQuery)
   private
     FDateAsString: Boolean;
     FOnExecute: TNotifyEvent;
@@ -36,6 +36,15 @@
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
     property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
+  end;
+
+  TJDOCustomQueryClass = class of TJDOCustomQuery;
+
+  TJDOQuery = class(TJDOCustomQuery)
+  published
+    property DateAsString;
+    property OnExecute;
+    property OnOpen;
   end;
 
   TJDOQueryClass = class of TJDOQuery;

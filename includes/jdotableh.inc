@@ -25,25 +25,25 @@
   private
     FAutoSetup: Boolean;
     FColumns: TFieldDefs;
-    FDataBase: TJDODataBase;
+    FDataBase: TJDOCustomDataBase;
     FMode: TJDOModeTypes;
     FOnApply: TNotifyEvent;
     FOnOpen: TNotifyEvent;
     FOnPost: TNotifyEvent;
     FPersisted: Boolean;
-    FQuery: TJDOQuery;
-    FSQL: TJDOSQL;
-    function GetDataBase: TJDODataBase;
+    FQuery: TJDOCustomQuery;
+    FSQL: TJDOCustomSQL;
+    function GetDataBase: TJDOCustomDataBase;
     function GetDateAsString: Boolean;
     function GetName: string;
-    procedure SetDataBase(const AValue: TJDODataBase);
+    procedure SetDataBase(const AValue: TJDOCustomDataBase);
     procedure SetDateAsString(const AValue: Boolean);
     procedure SetMode(const AValue: TJDOModeTypes);
     procedure SetName(const AValue: string);
   protected
     procedure SetKey;
   public
-    constructor Create(ADataBase: TJDODataBase; const ATableName: string);
+    constructor Create(ADataBase: TJDOCustomDataBase; const ATableName: string);
     destructor Destroy; override;
     procedure Apply;
     procedure Post;
@@ -66,12 +66,12 @@
     property AutoSetup: Boolean read FAutoSetup write FAutoSetup;
     property Columns: TFieldDefs read FColumns;
     property DateAsString: Boolean read GetDateAsString write SetDateAsString;
-    property DataBase: TJDODataBase read GetDataBase write SetDataBase;
+    property DataBase: TJDOCustomDataBase read GetDataBase write SetDataBase;
     property Mode: TJDOModeTypes read FMode write SetMode;
     property Name: string read GetName write SetName;
     property Persisted: Boolean read FPersisted write FPersisted;
-    property Query: TJDOQuery read FQuery;
-    property SQL: TJDOSQL read FSQL;
+    property Query: TJDOCustomQuery read FQuery;
+    property SQL: TJDOCustomSQL read FSQL;
     property OnApply: TNotifyEvent read FOnApply write FOnApply;
     property OnPost: TNotifyEvent read FOnPost write FOnPost;
     property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
