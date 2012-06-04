@@ -149,6 +149,8 @@ begin
       end;
   end;
   FStatementType := AStatementType;
+  if Assigned(FOnCompose) then
+    FOnCompose(AStatementType);
 end;
 
 procedure TJDOSQL.Reset;

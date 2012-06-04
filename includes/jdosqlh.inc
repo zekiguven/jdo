@@ -21,10 +21,13 @@
 
   TJDOStatementType = (stUnknown, stSelect, stInsert, stUpdate, stDelete);
 
+  TJDOComposeEvent = procedure(const AStatementType: TJDOStatementType) of object;
+
   TJDOSQL = class(TComponent)
   private
     FLike: string;
     FFieldDefs: TFieldDefs;
+    FOnCompose: TJDOComposeEvent;
     FPutBegin: string;
     FPutMiddle: string;
     FPutEnd: string;
@@ -61,6 +64,7 @@
     property StatementType: TJDOStatementType read FStatementType;
     property TableAlias: string read FTableAlias write FTableAlias;
     property TableName: string read FTableName write FTableName;
+    property OnCompose: TJDOComposeEvent read FOnCompose write FOnCompose;
   end;
 
   TJDOSQLClass = class of TJDOSQL;
