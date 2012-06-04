@@ -134,9 +134,12 @@ begin
 end;
 
 procedure TJDOTable.Post;
+var
+  VIsItems: Boolean;
 begin
   if FAutoSetup and (FColumns.Count = 0) then
     Setup;
+  VIsItems := Count > 0;
   if not FSQL.IsComposed then
     case FMode of
       mtInsert: FSQL.Compose(stInsert);
@@ -148,10 +151,14 @@ begin
       mtDelete:
         begin
           SetKey;
-          FSQL.Compose(stDelete);
+          if VIsItems then
+            FSQL.Compose(stDelete)
+          else
+            FSQL.Script.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN +
+              FSQL.TableName;
         end;
     end;
-  if Count > 0 then
+  if VIsItems then
     FQuery.FromJSONArray(Self)
   else
     FQuery.ExecSQL;
