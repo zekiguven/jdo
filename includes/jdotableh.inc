@@ -49,6 +49,7 @@
     procedure Post;
     procedure Setup;
     procedure Reset;
+    procedure Close;
     function Open: Boolean;
     procedure Like(const AValue: string; const AKey: ShortString;
       const AOptions: TJDOLikeOptions = []);

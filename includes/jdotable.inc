@@ -80,10 +80,15 @@ end;
 
 procedure TJDOTable.Reset;
 begin
-  Clear;
-  FQuery.Close;
+  Close;
   FSQL.Clear;
   FQuery.FieldDefs.Clear;
+end;
+
+procedure TJDOTable.Close;
+begin
+  FQuery.Close;
+  Clear;
 end;
 
 procedure TJDOTable.SetDataBase(const AValue: TJDOCustomDataBase);
