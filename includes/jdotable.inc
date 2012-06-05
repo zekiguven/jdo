@@ -48,6 +48,11 @@ begin
   end;
 end;
 
+procedure TJDOTable.Undo;
+begin
+  FDataBase.Transaction.Rollback;
+end;
+
 procedure TJDOTable.Setup;
 var
   I, C: Integer;

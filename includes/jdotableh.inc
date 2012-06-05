@@ -46,6 +46,7 @@
     constructor Create(ADataBase: TJDOCustomDataBase; const ATableName: string);
     destructor Destroy; override;
     procedure Apply;
+    procedure Undo;
     procedure Post;
     procedure Setup;
     procedure Reset;
