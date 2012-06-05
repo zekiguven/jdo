@@ -71,6 +71,7 @@ begin
       VCols += CS;
     VCols += VItem.Names[I];
   end;
+  FQuery.Close;
   FQuery.SQL.Text := SQL_SELECT_TOKEN + VCols + SQL_FROM_TOKEN +
     FSQL.TableName + SQL_NOTHING_WHERE_TOKEN;
   FQuery.Open;
