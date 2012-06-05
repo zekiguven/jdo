@@ -67,9 +67,9 @@ begin
     raise EJDOTable.Create(Self, SEmptyObjectError);
   for I := 0 to Pred(C) do
   begin
-    VCols += VItem.Names[I];
-    if Succ(I) < C then
+    if I > 0 then
       VCols += CS;
+    VCols += VItem.Names[I];
   end;
   FQuery.SQL.Text := SQL_SELECT_TOKEN + VCols + SQL_FROM_TOKEN +
     FSQL.TableName + SQL_NOTHING_WHERE_TOKEN;

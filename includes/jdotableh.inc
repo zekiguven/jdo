@@ -40,11 +40,10 @@
     procedure SetDateAsString(const AValue: Boolean);
     procedure SetMode(const AValue: TJDOModeTypes);
     procedure SetName(const AValue: string);
-  protected
-    procedure SetKey;
   public
     constructor Create(ADataBase: TJDOCustomDataBase; const ATableName: string);
     destructor Destroy; override;
+    procedure SetKey;
     procedure Apply;
     procedure Undo;
     procedure Post;
