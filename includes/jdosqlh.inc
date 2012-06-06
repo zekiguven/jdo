@@ -27,11 +27,11 @@
   private
     FLike: string;
     FFieldDefs: TFieldDefs;
+    FIndexDefs: TServerIndexDefs;
     FOnCompose: TJDOComposeEvent;
     FPutBegin: string;
     FPutMiddle: string;
     FPutEnd: string;
-    FKey: string;
     FOrderBy: string;
     FOrdered: Boolean;
     FScript: TStrings;
@@ -39,24 +39,27 @@
     FTableAlias: string;
     FTableName: string;
     FWhere: string;
+    procedure InternalCheckFieldDefs(const ACount: Integer);
+    procedure InternalCheckIndexDefs(const ACount: Integer);
   protected
     function IsComposed: Boolean;
     procedure CheckTableName;
-    procedure CheckKey;
+    procedure PrepareCols(const AStatementType: TJDOStatementType;
+      out ACols, AValues: string);
   public
     constructor Create(AOwner: TComponent; ASQL: TStrings;
-      AFieldDefs: TFieldDefs; const ATableName: string = ES); overload;
-    constructor Create(ASQL: TStrings; AFieldDefs: TFieldDefs;
+      AFieldDefs: TFieldDefs; AIndexDefs: TServerIndexDefs;
       const ATableName: string = ES); overload;
-    function FormatCols(const AToken: string;
-      const ASkipKey, APairs: Boolean): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+    constructor Create(ASQL: TStrings; AFieldDefs: TFieldDefs;
+      AIndexDefs: TServerIndexDefs; const ATableName: string = ES); overload;
     procedure Compose(const AStatementType: TJDOStatementType);
     procedure Reset;
     procedure Clear;
     procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle);
     procedure Like(const AKey: string; const ACaseInsensitive: Boolean = False);
     property Composed: Boolean read IsComposed;
-    property Key: string read FKey write FKey;
+    property FieldDefs: TFieldDefs read FFieldDefs;
+    property IndexDefs: TServerIndexDefs read FIndexDefs;
     property OrderBy: string read FOrderBy write FOrderBy;
     property Ordered: Boolean read FOrdered write FOrdered;
     property Where: string read FWhere write FWhere;
@@ -72,7 +75,6 @@
   TJDOSQL = class(TJDOCustomSQL)
   published
     property Composed;
-    property Key;
     property OrderBy;
     property Ordered;
     property Where;

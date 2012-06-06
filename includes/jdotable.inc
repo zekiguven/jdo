@@ -21,8 +21,11 @@ begin
   inherited Create;
   FQuery := TJDOCustomQuery.Create(nil);
   FColumns := FQuery.FieldDefs;
-  FSQL := TJDOCustomSQL.Create(FQuery.SQL, FColumns, ATableName);
+  FSQL := TJDOCustomSQL.Create(FQuery.SQL, FColumns,
+    FQuery.ServerIndexDefs, ATableName);
   SetDataBase(ADataBase);
+  FQuery.UsePrimaryKeyAsKey := False;
+  FQuery.AutoCalcFields := False;
   FAutoSetup := True;
   FPersisted := True;
 end;
@@ -75,6 +78,7 @@ begin
   FQuery.SQL.Text := SQL_SELECT_TOKEN + VCols + SQL_FROM_TOKEN +
     FSQL.TableName + SQL_NOTHING_WHERE_TOKEN;
   FQuery.Open;
+  FQuery.ServerIndexDefs.Update;
   FQuery.Close;
   FQuery.SQL.Clear;
 end;
@@ -123,20 +127,6 @@ begin
   Reset;
 end;
 
-procedure TJDOTable.SetKey;
-var
-  I: Integer;
-  VIndexDef: TIndexDef;
-begin
-  if FSQL.Key = ES then
-    for I := 0 to Pred(FQuery.ServerIndexDefs.Count) do
-    begin
-      VIndexDef := FQuery.ServerIndexDefs[I];
-      if ixPrimary in VIndexDef.Options then
-        FSQL.Key := VIndexDef.Fields;
-    end;
-end;
-
 function TJDOTable.GetDateAsString: Boolean;
 begin
   Result := FQuery.DateAsString;
@@ -157,20 +147,12 @@ begin
   if not FSQL.IsComposed then
     case FMode of
       mtInsert: FSQL.Compose(stInsert);
-      mtUpdate:
-        begin
-          SetKey;
-          FSQL.Compose(stUpdate);
-        end;
+      mtUpdate: FSQL.Compose(stUpdate);
       mtDelete:
         if VIsItems then
-        begin
-          SetKey;
-          FSQL.Compose(stDelete);
-        end
+          FSQL.Compose(stDelete)
         else
-          FSQL.Script.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN +
-            FSQL.TableName;
+          FSQL.Script.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FSQL.TableName;
     end;
   if VIsItems then
     FQuery.FromJSONArray(Self)

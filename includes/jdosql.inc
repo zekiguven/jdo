@@ -16,7 +16,8 @@
 *)
 
 constructor TJDOCustomSQL.Create(AOwner: TComponent; ASQL: TStrings;
-  AFieldDefs: TFieldDefs; const ATableName: string);
+  AFieldDefs: TFieldDefs; AIndexDefs: TServerIndexDefs;
+  const ATableName: string);
 begin
   inherited Create(AOwner);
   if not Assigned(ASQL) then
@@ -24,15 +25,16 @@ begin
   if not Assigned(AFieldDefs) then
     raise EJDOSQL.Create(Self, '"AFieldDefs" must be not nil.');
   FFieldDefs := AFieldDefs;
+  FIndexDefs := AIndexDefs;
   FScript := ASQL;
   FOrdered := True;
   FTableName := ATableName;
 end;
 
 constructor TJDOCustomSQL.Create(ASQL: TStrings; AFieldDefs: TFieldDefs;
-  const ATableName: string);
+  AIndexDefs: TServerIndexDefs; const ATableName: string);
 begin
-  Create(nil, ASQL, AFieldDefs, ATableName);
+  Create(nil, ASQL, AFieldDefs, AIndexDefs, ATableName);
 end;
 
 function TJDOCustomSQL.IsComposed: Boolean;
@@ -46,109 +48,155 @@ begin
     raise EJDOSQL.Create(Self, SEmptyTableNameError);
 end;
 
-procedure TJDOCustomSQL.CheckKey;
+procedure TJDOCustomSQL.InternalCheckFieldDefs(const ACount: Integer);
 begin
-  if Trim(Key) = ES then
-    raise EJDOSQL.Create(Self, SEmptyKeyError);
+  if ACount = 0 then
+    raise EJDOSQL.Create(Self, SEmptyFieldDefsCountError);
 end;
 
-function TJDOCustomSQL.FormatCols(const AToken: string;
-  const ASkipKey, APairs: Boolean): string;
-var
-  VFieldName: string;
-  I, C: Integer;
+procedure TJDOCustomSQL.InternalCheckIndexDefs(const ACount: Integer);
 begin
-  Result := ES;
+  if ACount = 0 then
+    raise EJDOSQL.Create(Self, SEmptyIndexDefsCountError);
+end;
+
+procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
+  out ACols, AValues: string);
+var
+  I, C: Integer;
+  VValue: string;
+  VValues: TStrings;
+  VIndexDef: TIndexDef;
+  VFieldName: ShortString;
+begin
+  ACols := ES;
+  AValues := ES;
   C := FFieldDefs.Count;
-  if C = 0 then
-  begin
-    if FTableAlias <> ES then
-      Result := FTableAlias + DT + AK
-    else
-      Result := AK
-  end
-  else
-    for I := 0 to Pred(C) do
-    begin
-      VFieldName := FFieldDefs[I].Name;
-      if ASkipKey and (CompareText(VFieldName, FKey) = 0) then
-        Continue;
-      if APairs then
-        Result += VFieldName;
-      if (FTableAlias <> ES) and (AToken = ES) and (not APairs) then
-        Result += FTableAlias + DT + VFieldName
+  case AStatementType of
+    stSelect:
+      if C = 0 then
+        if FTableAlias <> ES then
+          ACols := FTableAlias + DT + AK
+        else
+          ACols := AK
       else
-        Result += AToken + VFieldName;
-      if Succ(I) < C then
-        Result += CS;
-    end;
+        for I := 0 to Pred(C) do
+        begin
+          if I > 0 then
+            ACols += CS;
+          ACols += FFieldDefs[I].Name;
+        end;
+    stInsert:
+      for I := 0 to Pred(C) do
+      begin
+        if I > 0 then
+        begin
+          ACols += CS;
+          AValues += CS;
+        end;
+        VFieldName := FFieldDefs[I].Name;
+        ACols += VFieldName;
+        AValues += CO + VFieldName;
+      end;
+    stUpdate, stDelete:
+      begin
+        InternalCheckFieldDefs(C);
+        C := FIndexDefs.Count;
+        InternalCheckIndexDefs(C);
+        VValues := TStringList.Create;
+        try
+          VValues.Delimiter := SC;
+          for I := 0 to Pred(C) do
+          begin
+            VIndexDef := FIndexDefs[I];
+            if ixPrimary in VIndexDef.Options then
+            begin
+              VValues.DelimitedText := VIndexDef.Fields;
+              Break;
+            end;
+            raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
+          end;
+          for I := 0 to Pred(FFieldDefs.Count) do
+          begin
+            VFieldName := FFieldDefs[I].Name;
+            if VValues.IndexOf(VFieldName) = -1 then
+              ACols += VFieldName + SQL_EQ_PARAM_TOKEN + VFieldName + CS;
+          end;
+          SetLength(ACols, Length(ACols) - 1);
+          for I := 0 to Pred(VValues.Count) do
+          begin
+            VValue := VValues.ValueFromIndex[I];
+            AValues += VValue + SQL_EQ_PARAM_TOKEN + VValue + SQL_AND_TOKEN;
+          end;
+          SetLength(AValues, Length(AValues) - Length(SQL_AND_TOKEN));
+        finally
+          VValues.Free;
+        end;
+      end;
+  end;
 end;
 
 procedure TJDOCustomSQL.Compose(const AStatementType: TJDOStatementType);
 var
-  VCols: string;
   VIsWhere: Boolean;
+  VCols, VValues: string;
 begin
   if AStatementType <> FStatementType then
-    FScript.Clear
-  else
-    Exit;
-  case AStatementType of
-    stSelect:
-      begin
-        CheckTableName;
-        if FPutBegin <> ES then
-          VCols := FPutBegin
-        else
-          VCols := FormatCols(ES, False, False);
-        FScript.Add(SQL_SELECT_TOKEN + VCols + SP + SQL_FROM_TOKEN +
-          FTableName + SP + FTableAlias);
-        if FPutMiddle <> ES then
-          FScript.Add(FPutMiddle)
-        else
+  begin
+    CheckTableName;
+    FScript.Clear;
+    case AStatementType of
+      stSelect:
         begin
-          VIsWhere := FWhere <> ES;
-          if VIsWhere then
-            FScript.Add(SQL_WHERE_TOKEN + FWhere);
-          if FLike <> ES then
+          if FPutBegin <> ES then
+            VCols := FPutBegin
+          else
+            PrepareCols(stSelect, VCols, VValues);
+          FScript.Add(SQL_SELECT_TOKEN + VCols + SP + SQL_FROM_TOKEN +
+            FTableName + SP + FTableAlias);
+          if FPutMiddle <> ES then
+            FScript.Add(FPutMiddle)
+          else
+          begin
+            VIsWhere := FWhere <> ES;
             if VIsWhere then
-              FScript.Add(SQL_AND_TOKEN + FLike)
-            else
-              FScript.Add(SQL_WHERE_TOKEN + FLike);
+              FScript.Add(SQL_WHERE_TOKEN + FWhere);
+            if FLike <> ES then
+              if VIsWhere then
+                FScript.Add(SQL_AND_TOKEN + FLike)
+              else
+                FScript.Add(SQL_WHERE_TOKEN + FLike);
+          end;
+          if FPutEnd <> ES then
+            FScript.Add(FPutEnd)
+          else
+            if FOrdered and (FOrderBy <> ES) then
+              if FTableAlias <> ES then
+                FScript.Add(SQL_ORDER_BY_TOKEN + FTableAlias + DT + FOrderBy)
+              else
+                FScript.Add(SQL_ORDER_BY_TOKEN + FOrderBy);
         end;
-        if FPutEnd <> ES then
-          FScript.Add(FPutEnd)
-        else
-          if FOrdered and (FOrderBy <> ES) then
-            if FTableAlias <> ES then
-              FScript.Add(SQL_ORDER_BY_TOKEN + FTableAlias + DT + FOrderBy)
-            else
-              FScript.Add(SQL_ORDER_BY_TOKEN + FOrderBy);
-      end;
-    stInsert:
-      begin
-        CheckTableName;
-        FScript.Add(SQL_INSERT_TOKEN + FTableName +
-          SP + PS + FormatCols(ES, False, False) + PE +
-          SQL_VALUES_TOKEN + PS + FormatCols(CO, False, False) + PE);
-      end;
-    stUpdate:
-      begin
-        CheckTableName;
-        CheckKey;
-        FScript.Add(SQL_UPDATE_TOKEN + FTableName + SQL_SET_TOKEN +
-          FormatCols(SQL_EQ_PARAM_TOKEN, True, True) + SQL_WHERE_TOKEN + FKey +
-          SQL_EQ_PARAM_TOKEN + FKey);
-      end;
-    stDelete:
-      begin
-        CheckTableName;
-        CheckKey;
-        FScript.Add(SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FTableName +
-          SQL_WHERE_TOKEN + FKey + SQL_EQ_PARAM_TOKEN + FKey);
-      end;
+      stInsert:
+        begin
+          PrepareCols(stInsert, VCols, VValues);
+          FScript.Add(SQL_INSERT_TOKEN + FTableName + SP + PS + VCols + PE +
+            SQL_VALUES_TOKEN + PS + VValues + PE);
+        end;
+      stUpdate:
+        begin
+          PrepareCols(stUpdate, VCols, VValues);
+          FScript.Add(SQL_UPDATE_TOKEN + FTableName + SQL_SET_TOKEN + VCols +
+            SQL_WHERE_TOKEN + VValues);
+        end;
+      stDelete:
+        begin
+          PrepareCols(stDelete, VCols, VValues);
+          FScript.Add(SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FTableName +
+            SQL_WHERE_TOKEN + VValues);
+        end;
+    end;
+    FStatementType := AStatementType;
   end;
-  FStatementType := AStatementType;
   if Assigned(FOnCompose) then
     FOnCompose(AStatementType);
 end;
