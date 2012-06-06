@@ -22,6 +22,8 @@ begin
   inherited Create(AOwner);
   if not Assigned(ASQL) then
     raise EJDOSQL.Create(Self, '"ASQL" must be not nil.');
+  if not Assigned(AIndexDefs) then
+    raise EJDOSQL.Create(Self, '"AIndexDefs" must be not nil.');
   if not Assigned(AFieldDefs) then
     raise EJDOSQL.Create(Self, '"AFieldDefs" must be not nil.');
   FFieldDefs := AFieldDefs;
