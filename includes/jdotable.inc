@@ -61,12 +61,16 @@ end;
 procedure TJDOTable.Setup;
 var
   I, C: Integer;
+  VData: TJSONData;
   VCols: string = ES;
   VItem: TJSONObject;
 begin
   if Count = 0 then
     raise EJDOTable.Create(Self, SEmptyTableError);
-  VItem := Objects[0];
+  VData := Items[0];
+  if VData.JSONType <> jtObject then
+    raise EJDOQuery.Create(Self, 'Setup: "JSONType" must be "jtObject".');
+  VItem := VData as TJSONObject;
   C := VItem.Count;
   if C = 0 then
     raise EJDOTable.Create(Self, SEmptyObjectError);
