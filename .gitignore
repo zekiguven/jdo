@@ -7,4 +7,5 @@
 *.exe
 *.dll
 *.bat
+*.dbg
 jdort.pas

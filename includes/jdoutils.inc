@@ -1,5 +1,5 @@
 (*
-  JDOUtils unit
+  JDOUtils implementation include
   Copyright (C) 2012-2014 Silvio Clecio.
 
   https://github.com/silvioprog/jdo
@@ -14,24 +14,6 @@
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
-
-unit JDOUtils;
-
-{$I jdo.inc}
-
-interface
-
-uses
-  SysUtils, FPJSON;
-
-function TimeOf(AData: TJSONData): TTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateOf(AData: TJSONData): TDate;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateTimeOf(AData: TJSONData): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function TimeOf(AData: TJSONData; const ADefValue: TTime): TTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateOf(AData: TJSONData; const ADefValue: TDate): TDate;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateTimeOf(AData: TJSONData; const ADefValue: TDateTime): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-
-implementation
 
 function TimeOf(AData: TJSONData): TTime;
 begin
@@ -77,6 +59,3 @@ begin
     Result := ADefValue;
   end;
 end;
-
-end.
-

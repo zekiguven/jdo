@@ -1,5 +1,5 @@
 (*
-  JSON Data Objects, consts unit
+  JDOConsts interface include
   Copyright (C) 2012-2014 Silvio Clecio.
 
   https://github.com/silvioprog/jdo
@@ -14,12 +14,6 @@
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
-
-unit JDOConsts;
-
-{$I jdo.inc}
-
-interface
 
 const
   ES = '';
@@ -71,8 +65,3 @@ const
   SEmptyTableError = 'Empty table.';
   SEmptyObjectError = 'Empty object.';
   SPrimaryKeyNotFound = 'Primary key not found.';
-
-implementation
-
-end.
-
