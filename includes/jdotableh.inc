@@ -28,8 +28,10 @@
     FDataBase: TJDOCustomDataBase;
     FMode: TJDOModeTypes;
     FOnApply: TNotifyEvent;
+    FOnClose: TNotifyEvent;
     FOnOpen: TNotifyEvent;
     FOnPost: TNotifyEvent;
+    FOnUndo: TNotifyEvent;
     FPersisted: Boolean;
     FQuery: TJDOCustomQuery;
     FSQL: TJDOCustomSQL;
@@ -73,8 +75,10 @@
     property Query: TJDOCustomQuery read FQuery;
     property SQL: TJDOCustomSQL read FSQL;
     property OnApply: TNotifyEvent read FOnApply write FOnApply;
+    property OnClose: TNotifyEvent read FOnClose write FOnClose;
     property OnPost: TNotifyEvent read FOnPost write FOnPost;
     property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
+    property OnUndo: TNotifyEvent read FOnUndo write FOnUndo;
   end;
 
   TJDOTableClass = class of TJDOTable;

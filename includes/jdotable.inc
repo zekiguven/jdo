@@ -54,6 +54,8 @@ end;
 procedure TJDOTable.Undo;
 begin
   FDataBase.Transaction.Rollback;
+  if Assigned(FOnUndo) then
+    FOnUndo(FOnUndo);
 end;
 
 procedure TJDOTable.Setup;
@@ -94,6 +96,8 @@ procedure TJDOTable.Close;
 begin
   FQuery.Close;
   Clear;
+  if Assigned(FOnClose) then
+    FOnClose(Self);
 end;
 
 procedure TJDOTable.SetDataBase(const AValue: TJDOCustomDataBase);
