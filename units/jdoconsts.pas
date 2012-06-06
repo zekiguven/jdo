@@ -29,14 +29,11 @@ const
   CO = #58; // :
   CS = #44; // ,
   DT = #46; // .
-  BS = #91; // [
-  BE = #93; // ]
   EQ = #61; // =
   PE = #41; // )
   PS = #40; // (
   PO = #35; // #
   SC = #59; // ;
-  DEFAULT_PRIMARY_KEY = 'id';
   CONNECTOR_TYPE = 'connectortype';
   SQL_SELECT_TOKEN = 'select ';
   SQL_FROM_TOKEN = ' from ';
@@ -62,7 +59,8 @@ const
   NullDate = 0;
 
   // Error msgs
-  SEmptyKeyError = 'The "Key" must not be empty.';
+  SEmptyIndexDefsCountError = '"IndexDefs.Count" must not be "0".';
+  SEmptyFieldDefsCountError = '"FieldDefs.Count" must not be "0".';
   SEmptyConnTypeError = 'The "ConnectorType" must not be empty.';
   SConnUnitWasNotDeclaredError = 'The unit for "%s" was not declared in uses clause or it''s an invalid ConnectorType.';
   SCfgFileNotFoundError = 'The config file was not found: "%s"';
@@ -72,6 +70,7 @@ const
   SNilJSONParamError = '"AJSON" must not be nil.';
   SEmptyTableError = 'Empty table.';
   SEmptyObjectError = 'Empty object.';
+  SPrimaryKeyNotFound = 'Primary key not found.';
 
 implementation
 
