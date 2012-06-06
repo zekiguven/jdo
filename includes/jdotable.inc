@@ -55,7 +55,7 @@ procedure TJDOTable.Undo;
 begin
   FDataBase.Transaction.Rollback;
   if Assigned(FOnUndo) then
-    FOnUndo(FOnUndo);
+    FOnUndo(Self);
 end;
 
 procedure TJDOTable.Setup;
