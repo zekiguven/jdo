@@ -59,7 +59,12 @@ begin
     q.ApplyUpdates(-1);
     WriteLn('Done.');
 
-    db.Commit;
+    try
+      db.Commit;
+    except
+      db.Rollback;
+      raise;
+    end;
   finally
     a.Free;
     db.Free;
