@@ -21,3 +21,5 @@ function DateTimeOf(AData: TJSONData): TDateTime;{$IFDEF JDO_INLINE}inline;{$END
 function TimeOf(AData: TJSONData; const ADefValue: TTime): TTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
 function DateOf(AData: TJSONData; const ADefValue: TDate): TDate;{$IFDEF JDO_INLINE}inline;{$ENDIF}
 function DateTimeOf(AData: TJSONData; const ADefValue: TDateTime): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function NextIndexName(var AFields: string; const ADelimiter: Char = SC): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function IndexNamesCount(const AFields: string; const ADelimiter: Char = SC): Integer;{$IFDEF JDO_INLINE}inline;{$ENDIF}

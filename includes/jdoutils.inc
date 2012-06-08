@@ -59,3 +59,30 @@ begin
     Result := ADefValue;
   end;
 end;
+
+function NextIndexName(var AFields: string; const ADelimiter: Char): string;
+var
+  I: Integer;
+begin
+  I := Pos(ADelimiter, AFields);
+  if I = 0 then
+    I := Succ(Length(AFields));
+  Result := Copy(AFields, 1, Pred(I));
+  System.Delete(AFields, 1, I);
+end;
+
+function IndexNamesCount(const AFields: string; const ADelimiter: Char): Integer;
+var
+  I: Integer;
+  B: Boolean;
+begin
+  Result := 0;
+  for I := 1 to Length(AFields) do
+    if AFields[I] = ADelimiter then
+    begin
+      Inc(Result);
+      B := True;
+    end;
+  if B then
+    Inc(Result);
+end;
