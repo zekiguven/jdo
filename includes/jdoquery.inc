@@ -30,7 +30,8 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.ReadJSONObject(AJSON: TJSONObject);
+procedure TJDOCustomQuery.JSONToQuery(AJSON: TJSONObject;
+  AQuery: TSQLQuery; ADateAsString: Boolean);
 var
   I: Integer;
   VName: string;
@@ -41,7 +42,7 @@ begin
   for I := 0 to Pred(AJSON.Count) do
   begin
     VName := AJSON.Names[I];
-    VParam := Params.FindParam(VName);
+    VParam := AQuery.Params.FindParam(VName);
     if not Assigned(VParam) then
       Continue;
     VData := AJSON.Items[I];
@@ -49,7 +50,7 @@ begin
       VParam.Clear
     else
     begin
-      VFieldDef := FieldDefs.Find(VName);
+      VFieldDef := AQuery.FieldDefs.Find(VName);
       case VFieldDef.DataType of
         ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
           ftInterface, ftIDispatch: VParam.Clear;
@@ -62,7 +63,7 @@ begin
         ftBoolean: VParam.AsBoolean := VData.AsBoolean;
         ftFloat, ftCurrency, ftBCD, ftFMTBcd: VParam.AsFloat := VData.AsFloat;
         ftDate, ftTime, ftDateTime, ftTimeStamp:
-          if FDateAsString then
+          if ADateAsString then
             VParam.AsDateTime := StrToDateTime(VData.AsString)
           else
             VParam.AsDateTime := VData.AsFloat;
@@ -71,40 +72,94 @@ begin
   end;
 end;
 
-function TJDOCustomQuery.CreateJSONObject: TJSONObject;
+procedure TJDOCustomQuery.JSONToDataSet(AJSON: TJSONObject; ADataSet: TDataSet;
+  ADateAsString: Boolean);
+var
+  I: Integer;
+  VName: string;
+  VField: TField;
+  VData: TJSONData;
+begin
+  for I := 0 to Pred(AJSON.Count) do
+  begin
+    VName := AJSON.Names[I];
+    VField := ADataSet.Fields.FindField(VName);
+    if not Assigned(VField) then
+      Continue;
+    VData := AJSON.Items[I];
+    if VData.IsNull then
+      VField.Clear
+    else
+    begin
+      case VField.DataType of
+        ftUnknown, ftCursor, ftADT, ftArray, ftReference, ftDataSet,
+          ftInterface, ftIDispatch: VField.Clear;
+        ftString, ftBlob, ftMemo, ftFixedChar, ftWideString, ftOraBlob,
+          ftOraClob, ftFixedWideChar, ftWideMemo, ftBytes, ftVarBytes,
+          ftGraphic, ftFmtMemo, ftParadoxOle, ftDBaseOle, ftTypedBinary,
+          ftVariant,ftGuid: VField.AsString := VData.AsString;
+        ftSmallint, ftInteger, ftLargeint, ftWord,
+          ftAutoInc: VField.AsInteger := VData.AsInteger;
+        ftBoolean: VField.AsBoolean := VData.AsBoolean;
+        ftFloat, ftCurrency, ftBCD, ftFMTBcd: VField.AsFloat := VData.AsFloat;
+        ftDate, ftTime, ftDateTime, ftTimeStamp:
+          if ADateAsString then
+            VField.AsDateTime := StrToDateTime(VData.AsString)
+          else
+            VField.AsDateTime := VData.AsFloat;
+      end;
+    end;
+  end;
+end;
+
+procedure TJDOCustomQuery.DataSetToJSON(ADataSet: TDataSet;
+  AJSON: TJSONArray);
+var
+  VJSON: TJSONObject;
+begin
+  ADataSet.First;
+  while not ADataSet.EOF do
+  begin
+    VJSON := TJSONObject.Create;
+    DataSetToJSON(ADataSet, VJSON);
+    AJSON.Add(VJSON);
+    ADataSet.Next;
+  end;
+end;
+
+procedure TJDOCustomQuery.DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONObject);
 var
   I: Integer;
   VField: TField;
   VFieldType, VFieldName: ShortString;
 begin
-  Result := TJSONObject.Create;
-  for I := 0 to Pred(Fields.Count) do
+  for I := 0 to Pred(ADataSet.Fields.Count) do
   begin
-    VField := Fields[I];
-    VFieldType := GetJSONFieldType(VField.DataType);
+    VField := ADataSet.Fields[I];
+    VFieldType := GetJSONType(VField.DataType);
     VFieldName := VField.FieldName;
     if (VFieldType = FT_NULL) or VField.IsNull then
     begin
-      Result.Add(VFieldName);
+      AJSON.Add(VFieldName);
       Continue;
     end;
     if VFieldType = FT_STRING then
-      Result.Add(VFieldName, VField.AsString);
+      AJSON.Add(VFieldName, VField.AsString);
     if VFieldType = FT_BOOLEAN then
-      Result.Add(VFieldName, VField.AsBoolean);
+      AJSON.Add(VFieldName, VField.AsBoolean);
     if VFieldType = FT_DATE then
       if FDateAsString then
-        Result.Add(VFieldName, VField.AsString)
+        AJSON.Add(VFieldName, VField.AsString)
       else
-        Result.Add(VFieldName, VField.AsFloat);
+        AJSON.Add(VFieldName, VField.AsFloat);
     if VFieldType = FT_FLOAT then
-      Result.Add(VFieldName, VField.AsFloat);
+      AJSON.Add(VFieldName, VField.AsFloat);
     if VFieldType = FT_INT then
-      Result.Add(VFieldName, VField.AsInteger);
+      AJSON.Add(VFieldName, VField.AsInteger);
   end;
 end;
 
-class function TJDOCustomQuery.GetJSONFieldType(
+class function TJDOCustomQuery.GetJSONType(
   const AFieldType: TFieldType): ShortString;
 begin
   case AFieldType of
@@ -122,7 +177,7 @@ begin
   end;
 end;
 
-function TJDOCustomQuery.ToJSONArray: TJSONArray;
+function TJDOCustomQuery.GetJSONArray: TJSONArray;
 var
   P: Integer;
 begin
@@ -133,28 +188,22 @@ begin
   try
     DisableControls;
     P := RecNo;
-    First;
-    while not EOF do
-    begin
-      Result.Add(CreateJSONObject);
-      Next;
-    end;
+    DataSetToJSON(Self, Result);
   finally
     RecNo := P;
     EnableControls;
   end;
 end;
 
-function TJDOCustomQuery.ToJSONObject: TJSONObject;
+function TJDOCustomQuery.GetJSONObject: TJSONObject;
 begin
+  Result := TJSONObject.Create;
   Open;
   if RecordCount <> 0 then
-    Result := CreateJSONObject
-  else
-    Result := TJSONObject.Create;
+    DataSetToJSON(Self, Result);
 end;
 
-procedure TJDOCustomQuery.FromJSONArray(AJSON: TJSONArray);
+procedure TJDOCustomQuery.SetJSONArray(AJSON: TJSONArray);
 var
   I: Integer;
 begin
@@ -162,24 +211,20 @@ begin
     raise EJDOQuery.Create(Self, SNilFieldDefsError);
   if not Assigned(AJSON) then
     raise EJDOQuery.Create(Self, SNilJSONParamError);
-  if AJSON.JSONType <> jtArray then
-    raise EJDOQuery.Create(Self, '"AJSON.JSONType" must be "jtArray".');
   for I := 0 to Pred(AJSON.Count) do
   begin
-    ReadJSONObject(AJSON[I] as TJSONObject);
+    JSONToQuery(AJSON.Objects[I], Self, FDateAsString);
     ExecSQL;
   end;
 end;
 
-procedure TJDOCustomQuery.FromJSONObject(AJSON: TJSONObject);
+procedure TJDOCustomQuery.SetJSONObject(AJSON: TJSONObject);
 begin
   if not Assigned(FieldDefs) then
     raise EJDOQuery.Create(Self, SNilFieldDefsError);
   if not Assigned(AJSON) then
     raise EJDOQuery.Create(Self, SNilJSONParamError);
-  if AJSON.JSONType <> jtObject then
-    raise EJDOQuery.Create(Self, '"AJSON.JSONType" must be "jtObject".');
-  ReadJSONObject(AJSON);
+  JSONToQuery(AJSON, Self, FDateAsString);
   ExecSQL;
 end;
 
@@ -199,7 +244,8 @@ begin
     FOnOpen(Self);
 end;
 
-function TJDOCustomQuery.Schema: TJSONObject;
+procedure TJDOCustomQuery.QueryToSchema(AQuery: TSQLQuery;
+  ASchema: TJSONObject);
 var
   I: Integer;
   VArray: TJSONArray;
@@ -207,15 +253,14 @@ var
   VFieldDef: TFieldDef;
   VFieldType: ShortString;
 begin
-  Result := TJSONObject.Create;
   VArray := TJSONArray.Create;
-  Result.Add('fields', VArray);
-  for I := 0 to Pred(FieldDefs.Count) do
+  ASchema.Add('fields', VArray);
+  for I := 0 to Pred(AQuery.FieldDefs.Count) do
   begin
-    VFieldDef := FieldDefs[I];
+    VFieldDef := AQuery.FieldDefs[I];
     VObject := TJSONObject.Create(['name', VFieldDef.name]);
     VArray.Add(VObject);
-    VFieldType := GetJSONFieldType(VFieldDef.DataType);
+    VFieldType := GetJSONType(VFieldDef.DataType);
     VObject.Strings['type'] := VFieldType;
     if VFieldType = FT_STRING then
       VObject.Integers['maxlen'] := VFieldDef.Size;
@@ -226,34 +271,45 @@ begin
   end;
 end;
 
-function TJDOCustomQuery.JSONSchema: TJSONStringType;
+function TJDOCustomQuery.Schema: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  QueryToSchema(Self, Result);
+end;
+
+procedure TJDOCustomQuery.QueryToJSONSchema(AQuery: TSQLQuery;
+  out AJSONSchema: TJSONStringType);
 var
   I, C: Integer;
   VFieldDef: TFieldDef;
   VFieldType: ShortString;
 begin
-  Result := ES;
-  C := FieldDefs.Count;
+  C := AQuery.FieldDefs.Count;
   if C = 0 then
   begin
-    Result := '{}';
+    AJSONSchema := '{}';
     Exit;
   end;
   for I := 0 to Pred(C) do
   begin
-    VFieldDef := FieldDefs[I];
-    VFieldType := GetJSONFieldType(VFieldDef.DataType);
-    Result += '{ "name": "' + VFieldDef.Name + '"';
-    Result += ', "type": "' + VFieldType + '"';
+    VFieldDef := AQuery.FieldDefs[I];
+    VFieldType := GetJSONType(VFieldDef.DataType);
+    AJSONSchema += '{ "name": "' + VFieldDef.Name + '"';
+    AJSONSchema += ', "type": "' + VFieldType + '"';
     if VFieldType = FT_STRING then
-      Result += ', "maxlen": ' + IntToStr(VFieldDef.Size);
+      AJSONSchema += ', "maxlen": ' + IntToStr(VFieldDef.Size);
     if VFieldDef.Required then
-      Result += ', "required": true';
+      AJSONSchema += ', "required": true';
     if VFieldDef.Precision <> -1 then
-      Result += ', "precision": ' + IntToStr(VFieldDef.Precision);
+      AJSONSchema += ', "precision": ' + IntToStr(VFieldDef.Precision);
     if Succ(I) < C then
-      Result += ' }, '
+      AJSONSchema += ' }, '
     else
-      Result += ' }';
+      AJSONSchema += ' }';
   end;
+end;
+
+function TJDOCustomQuery.JSONSchema: TJSONStringType;
+begin
+  QueryToJSONSchema(Self, Result);
 end;

@@ -22,19 +22,25 @@
     FDateAsString: Boolean;
     FOnExecute: TNotifyEvent;
     FOnOpen: TNotifyEvent;
-  protected
-    procedure ReadJSONObject(AJSON: TJSONObject);
-    function CreateJSONObject: TJSONObject;
-    class function GetJSONFieldType(const AFieldType: TFieldType): ShortString;
   public
     constructor Create(AOwner: TComponent); override;
-    function ToJSONArray: TJSONArray;
-    function ToJSONObject: TJSONObject;
-    procedure FromJSONArray(AJSON: TJSONArray);
-    procedure FromJSONObject(AJSON: TJSONObject);
+    class function GetJSONType(const AFieldType: TFieldType): ShortString;
+    procedure JSONToQuery(AJSON: TJSONObject; AQuery: TSQLQuery;
+      ADateAsString: Boolean);
+    procedure JSONToDataSet(AJSON: TJSONObject; ADataSet: TDataSet;
+      ADateAsString: Boolean);
+    procedure DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONArray);
+    procedure DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONObject);
+    function GetJSONArray: TJSONArray;
+    function GetJSONObject: TJSONObject;
+    procedure SetJSONArray(AJSON: TJSONArray);
+    procedure SetJSONObject(AJSON: TJSONObject);
     function Execute: Boolean;
     function Open: Boolean;
+    procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject);
     function Schema: TJSONObject;
+    procedure QueryToJSONSchema(AQuery: TSQLQuery;
+      out AJSONSchema: TJSONStringType);
     function JSONSchema: TJSONStringType;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
