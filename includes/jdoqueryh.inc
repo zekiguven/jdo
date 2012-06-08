@@ -40,6 +40,12 @@
     function GetJSONObject: TJSONObject;
     procedure SetJSONArray(AJSON: TJSONArray);
     procedure SetJSONObject(AJSON: TJSONObject);
+    procedure LoadJSONFromStream(AStream: TStream);
+    procedure LoadJSONFromFile(const AFileName: TFileName);
+    procedure LoadJSONFromString(const AString: TJSONStringType);
+    procedure SaveJSONToStream(AStream: TStream);
+    procedure SaveJSONToFile(const AFileName: TFileName);
+    function SaveJSONToString: TJSONStringType;
     function Execute: Boolean;
     function Open: Boolean;
     procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject);
@@ -56,6 +62,7 @@
     procedure Delete(AJSON: TJSONArray); overload;
     procedure Delete(AJSON: TJSONObject); overload;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
+    property JSON: TJSONStringType read SaveJSONToString write LoadJSONFromString;
     property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
     property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
   end;

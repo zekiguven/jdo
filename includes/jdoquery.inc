@@ -283,6 +283,84 @@ begin
     FOnOpen(Self);
 end;
 
+procedure TJDOCustomQuery.LoadJSONFromStream(AStream: TStream);
+var
+  VArray: TJSONArray;
+  VParser: TJSONParser;
+begin
+  VParser := TJSONParser.Create(AStream);
+  try
+    VArray := VParser.Parse as TJSONArray;
+    Append(VArray);
+  finally
+    VArray.Free;
+    VParser.Free;
+  end;
+end;
+
+procedure TJDOCustomQuery.LoadJSONFromFile(const AFileName: TFileName);
+var
+  VFile: TFileStream;
+begin
+  VFile := TFileStream.Create(AFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    LoadJSONFromStream(VFile);
+  finally
+    VFile.Free;
+  end;
+end;
+
+procedure TJDOCustomQuery.LoadJSONFromString(const AString: TJSONStringType);
+var
+  VString: TStringStream;
+begin
+  VString := TStringStream.Create(AString);
+  try
+    LoadJSONFromStream(VString);
+  finally
+    VString.Free;
+  end;
+end;
+
+procedure TJDOCustomQuery.SaveJSONToStream(AStream: TStream);
+var
+  VArray: TJSONArray;
+  VJSON: TJSONStringType;
+begin
+  VArray := GetJSONArray;
+  try
+    VJSON := VArray.AsJSON;
+    AStream.Write(Pointer(VJSON)^, Length(VJSON));
+  finally
+    VArray.Free;
+  end;
+end;
+
+procedure TJDOCustomQuery.SaveJSONToFile(const AFileName: TFileName);
+var
+  VFile: TFileStream;
+begin
+  VFile := TFileStream.Create(AFileName, fmCreate);
+  try
+    SaveJSONToStream(VFile);
+  finally
+    VFile.Free;
+  end;
+end;
+
+function TJDOCustomQuery.SaveJSONToString: TJSONStringType;
+var
+  VString: TStringStream;
+begin
+  VString := TStringStream.Create(ES);
+  try
+    SaveJSONToStream(VString);
+    Result := VString.DataString;
+  finally
+    VString.Free;
+  end;
+end;
+
 procedure TJDOCustomQuery.QueryToSchema(AQuery: TSQLQuery;
   ASchema: TJSONObject);
 var
