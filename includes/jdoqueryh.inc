@@ -22,9 +22,14 @@
     FDateAsString: Boolean;
     FOnExecute: TNotifyEvent;
     FOnOpen: TNotifyEvent;
+  protected
+    procedure InternalCheckFieldDefs;
+    procedure InternalCheckJSONParam(AJSON: TJSONData);
   public
     constructor Create(AOwner: TComponent); override;
     class function GetJSONType(const AFieldType: TFieldType): ShortString;
+    function GetPrimaryKey: TIndexDef;
+    function GetJSONValuesFromPrimaryKey(const AJSON: TJSONObject): Variant;
     procedure JSONToQuery(AJSON: TJSONObject; AQuery: TSQLQuery;
       ADateAsString: Boolean);
     procedure JSONToDataSet(AJSON: TJSONObject; ADataSet: TDataSet;
@@ -42,6 +47,12 @@
     procedure QueryToJSONSchema(AQuery: TSQLQuery;
       out AJSONSchema: TJSONStringType);
     function JSONSchema: TJSONStringType;
+    { TODO: Append }
+    procedure Insert(AJSON: TJSONArray);
+    procedure Insert(AJSON: TJSONObject);
+    procedure Edit(AJSON: TJSONArray);
+    procedure Edit(AJSON: TJSONObject);
+    { TODO: Delete }
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
     property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;

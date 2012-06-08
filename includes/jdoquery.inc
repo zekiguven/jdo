@@ -30,6 +30,18 @@ begin
   end;
 end;
 
+procedure TJDOCustomQuery.InternalCheckFieldDefs;
+begin
+  if not Assigned(FieldDefs) then
+    raise EJDOQuery.Create(Self, SNilFieldDefsError);
+end;
+
+procedure TJDOCustomQuery.InternalCheckJSONParam(AJSON: TJSONData);
+begin
+  if not Assigned(AJSON) then
+    raise EJDOQuery.Create(Self, SNilJSONParamError);
+end;
+
 procedure TJDOCustomQuery.JSONToQuery(AJSON: TJSONObject;
   AQuery: TSQLQuery; ADateAsString: Boolean);
 var
@@ -177,6 +189,59 @@ begin
   end;
 end;
 
+function TJDOCustomQuery.GetPrimaryKey: TIndexDef;
+var
+  I: Integer;
+begin
+  for I := 0 to Pred(ServerIndexDefs.Count) do
+  begin
+    Result := ServerIndexDefs[I];
+    if ixPrimary in Result.Options then
+      Break;
+    raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
+  end;
+end;
+
+function TJDOCustomQuery.GetJSONValuesFromPrimaryKey(
+  const AJSON: TJSONObject): Variant;
+
+  function NextName(var S: string): string;
+  var
+    I: Integer;
+  begin
+    I := Pos(SC, S);
+    if I = 0 then
+      I := Succ(Length(S));
+    Result := Copy(S, 1, Pred(I));
+    System.Delete(S, 1, I);
+  end;
+
+  function NamesCount(const S: string): Integer;
+  var
+    I: Integer;
+  begin
+    Result := 0;
+    for I := 1 to Length(S) do
+      if S[I] = SC then
+        Inc(Result);
+  end;
+
+var
+  I: Integer;
+  VNames, VName: string;
+begin
+  VNames := GetPrimaryKey.Fields;
+  Result := VarArrayCreate([0, NamesCount(VNames)], varVariant);
+  VName := NextName(VNames);
+  I := 0;
+  while VName <> ES do
+  begin
+    Result[I] := AJSON[VName].Value;
+    VName := NextName(VNames);
+    Inc(I);
+  end;
+end;
+
 function TJDOCustomQuery.GetJSONArray: TJSONArray;
 var
   P: Integer;
@@ -207,10 +272,8 @@ procedure TJDOCustomQuery.SetJSONArray(AJSON: TJSONArray);
 var
   I: Integer;
 begin
-  if not Assigned(FieldDefs) then
-    raise EJDOQuery.Create(Self, SNilFieldDefsError);
-  if not Assigned(AJSON) then
-    raise EJDOQuery.Create(Self, SNilJSONParamError);
+  InternalCheckFieldDefs;
+  InternalCheckJSONParam(AJSON);
   for I := 0 to Pred(AJSON.Count) do
   begin
     JSONToQuery(AJSON.Objects[I], Self, FDateAsString);
@@ -220,10 +283,8 @@ end;
 
 procedure TJDOCustomQuery.SetJSONObject(AJSON: TJSONObject);
 begin
-  if not Assigned(FieldDefs) then
-    raise EJDOQuery.Create(Self, SNilFieldDefsError);
-  if not Assigned(AJSON) then
-    raise EJDOQuery.Create(Self, SNilJSONParamError);
+  InternalCheckFieldDefs;
+  InternalCheckJSONParam(AJSON);
   JSONToQuery(AJSON, Self, FDateAsString);
   ExecSQL;
 end;
@@ -274,6 +335,7 @@ end;
 function TJDOCustomQuery.Schema: TJSONObject;
 begin
   Result := TJSONObject.Create;
+  InternalCheckFieldDefs;
   QueryToSchema(Self, Result);
 end;
 
@@ -311,5 +373,76 @@ end;
 
 function TJDOCustomQuery.JSONSchema: TJSONStringType;
 begin
+  InternalCheckFieldDefs;
   QueryToJSONSchema(Self, Result);
+end;
+
+procedure TJDOCustomQuery.Insert(AJSON: TJSONArray);
+var
+  I: Integer;
+begin
+  InternalCheckJSONParam(AJSON);
+  for I := 0 to Pred(AJSON.Count) do
+  begin
+    inherited Insert;
+    JSONToDataSet(AJSON.Objects[I], Self, FDateAsString);
+    Post;
+  end;
+end;
+
+procedure TJDOCustomQuery.Insert(AJSON: TJSONObject);
+begin
+  InternalCheckJSONParam(AJSON);
+  inherited Insert;
+  JSONToDataSet(AJSON, Self, FDateAsString);
+end;
+
+procedure TJDOCustomQuery.Edit(AJSON: TJSONArray);
+var
+  I, P: Integer;
+  VObject: TJSONObject;
+  VPrimaryKey: TIndexDef;
+begin
+  InternalCheckJSONParam(AJSON);
+  try
+    P := RecNo;
+    VPrimaryKey := GetPrimaryKey;
+    if Pos(SC, VPrimaryKey.Fields) <> 0 then
+    begin
+      for I := 0 to Pred(AJSON.Count) do
+      begin
+        VObject := AJSON.Objects[I];
+        if Locate(VPrimaryKey.Fields,
+          GetJSONValuesFromPrimaryKey(VObject), []) then
+        begin
+          inherited Edit;
+          JSONToDataSet(VObject, Self, FDateAsString);
+          Post;
+        end;
+      end;
+    end
+    else
+    begin
+      for I := 0 to Pred(AJSON.Count) do
+      begin
+        VObject := AJSON.Objects[I];
+        if Locate(VPrimaryKey.Fields,
+          VObject[VPrimaryKey.Fields].Value, []) then
+        begin
+          inherited Edit;
+          JSONToDataSet(VObject, Self, FDateAsString);
+          Post;
+        end;
+      end;
+    end;
+  finally
+    RecNo := P;
+  end;
+end;
+
+procedure TJDOCustomQuery.Edit(AJSON: TJSONObject);
+begin
+  InternalCheckJSONParam(AJSON);
+  inherited Edit;
+  JSONToDataSet(AJSON, Self, FDateAsString);
 end;
