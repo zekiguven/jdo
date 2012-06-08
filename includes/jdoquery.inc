@@ -204,47 +204,25 @@ end;
 
 function TJDOCustomQuery.GetJSONValuesFromPrimaryKey(
   const AJSON: TJSONObject): Variant;
-
-  function NextName(var S: string): string;
-  var
-    I: Integer;
-  begin
-    I := Pos(SC, S);
-    if I = 0 then
-      I := Succ(Length(S));
-    Result := Copy(S, 1, Pred(I));
-    System.Delete(S, 1, I);
-  end;
-
-  function NamesCount(const S: string): Integer;
-  var
-    I: Integer;
-  begin
-    Result := 0;
-    for I := 1 to Length(S) do
-      if S[I] = SC then
-        Inc(Result);
-  end;
-
 var
   I: Integer;
   VNames, VName: string;
 begin
   VNames := GetPrimaryKey.Fields;
-  Result := VarArrayCreate([0, NamesCount(VNames)], varVariant);
-  VName := NextName(VNames);
+  Result := VarArrayCreate([0, Pred(IndexNamesCount(VNames))], varVariant);
+  VName := NextIndexName(VNames);
   I := 0;
   while VName <> ES do
   begin
     Result[I] := AJSON[VName].Value;
-    VName := NextName(VNames);
+    VName := NextIndexName(VNames);
     Inc(I);
   end;
 end;
 
 function TJDOCustomQuery.GetJSONArray: TJSONArray;
 var
-  P: Integer;
+  VBookMark: TBookMark;
 begin
   Result := TJSONArray.Create;
   Open;
@@ -252,10 +230,10 @@ begin
     Exit;
   try
     DisableControls;
-    P := RecNo;
+    VBookMark := BookMark;
     DataSetToJSON(Self, Result);
   finally
-    RecNo := P;
+    BookMark := VBookMark;
     EnableControls;
   end;
 end;
