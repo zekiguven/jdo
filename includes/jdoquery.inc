@@ -495,7 +495,8 @@ begin
           inherited Delete;
       end;
   finally
-    BookMark := VBookMark;
+    if not IsEmpty then
+      BookMark := VBookMark;
   end;
 end;
 
@@ -517,6 +518,7 @@ begin
       if Locate(VPrimaryKey.Fields, AJSON[VPrimaryKey.Fields].Value, []) then
         inherited Delete;
   finally
-    BookMark := VBookMark;
+    if not IsEmpty then
+      BookMark := VBookMark;
   end;
 end;
