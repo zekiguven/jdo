@@ -22,7 +22,7 @@ unit JDO;
 interface
 
 uses
-  Classes, SysUtils, SQLdb, DB, FPJSON, Contnrs, TypInfo, Variants, JSONParser;
+  Classes, SysUtils, SQLdb, DB, FPJSON, TypInfo, Variants, JSONParser;
 
 {$i jdoconstsh.inc}
 
@@ -37,9 +37,6 @@ type
 {$i jdoconfigh.inc}
 {$i jdosqlh.inc}
 {$i jdoqueryh.inc}
-
-  TJDOTable = class;
-
 {$i jdodatabaseh.inc}
 {$i jdotableh.inc}
 {$i jdoutilsh.inc}

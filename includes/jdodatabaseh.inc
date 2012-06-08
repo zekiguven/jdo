@@ -23,7 +23,6 @@
     FOnConnect: TNotifyEvent;
     FOnDisconnect: TNotifyEvent;
     FOnRollbackRetaining: TNotifyEvent;
-    FTables: TFPObjectList;
     FConfig: TJDOConfigurator;
     FConnection: TSQLConnection;
     FOnCommit: TNotifyEvent;
@@ -36,7 +35,6 @@
     function GetDatabaseName: string;
     function GetHostName: string;
     function GetPassword: string;
-    function GetTables(AName: string): TJDOTable;
     function GetUserName: string;
     procedure InternalCreateConnection;
     procedure InternalCreateTransaction;
@@ -63,7 +61,6 @@
     property Connection: TSQLConnection read FConnection;
     property Transaction: TSQLTransaction read FTransaction;
     property Query: TJDOCustomQuery read FQuery;
-    property Tables[AName: string]: TJDOTable read GetTables;
     property Connected: Boolean read GetConnected;
     property DatabaseName: string read GetDatabaseName write SetDatabaseName;
     property HostName: string read GetHostName write SetHostName;
