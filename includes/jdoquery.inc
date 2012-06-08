@@ -377,6 +377,26 @@ begin
   QueryToJSONSchema(Self, Result);
 end;
 
+procedure TJDOCustomQuery.Append(AJSON: TJSONArray);
+var
+  I: Integer;
+begin
+  InternalCheckJSONParam(AJSON);
+  for I := 0 to Pred(AJSON.Count) do
+  begin
+    inherited Append;
+    JSONToDataSet(AJSON.Objects[I], Self, FDateAsString);
+    Post;
+  end;
+end;
+
+procedure TJDOCustomQuery.Append(AJSON: TJSONObject);
+begin
+  InternalCheckJSONParam(AJSON);
+  inherited Append;
+  JSONToDataSet(AJSON, Self, FDateAsString);
+end;
+
 procedure TJDOCustomQuery.Insert(AJSON: TJSONArray);
 var
   I: Integer;
