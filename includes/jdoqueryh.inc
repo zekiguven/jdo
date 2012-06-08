@@ -48,11 +48,12 @@
       out AJSONSchema: TJSONStringType);
     function JSONSchema: TJSONStringType;
     { TODO: Append }
-    procedure Insert(AJSON: TJSONArray);
-    procedure Insert(AJSON: TJSONObject);
-    procedure Edit(AJSON: TJSONArray);
-    procedure Edit(AJSON: TJSONObject);
-    { TODO: Delete }
+    procedure Insert(AJSON: TJSONArray); overload;
+    procedure Insert(AJSON: TJSONObject); overload;
+    procedure Edit(AJSON: TJSONArray); overload;
+    procedure Edit(AJSON: TJSONObject); overload;
+    procedure Delete(AJSON: TJSONArray); overload;
+    procedure Delete(AJSON: TJSONObject); overload;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
     property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;

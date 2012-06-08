@@ -399,14 +399,15 @@ end;
 
 procedure TJDOCustomQuery.Edit(AJSON: TJSONArray);
 var
-  I, P: Integer;
+  I: Integer;
+  VBookMark: TBookMark;
   VObject: TJSONObject;
   VPrimaryKey: TIndexDef;
 begin
   InternalCheckJSONParam(AJSON);
   try
-    P := RecNo;
     VPrimaryKey := GetPrimaryKey;
+    VBookMark := BookMark;
     if Pos(SC, VPrimaryKey.Fields) <> 0 then
     begin
       for I := 0 to Pred(AJSON.Count) do
@@ -422,7 +423,6 @@ begin
       end;
     end
     else
-    begin
       for I := 0 to Pred(AJSON.Count) do
       begin
         VObject := AJSON.Objects[I];
@@ -434,21 +434,20 @@ begin
           Post;
         end;
       end;
-    end;
   finally
-    RecNo := P;
+    BookMark := VBookMark;
   end;
 end;
 
 procedure TJDOCustomQuery.Edit(AJSON: TJSONObject);
 var
-  P: Integer;
+  VBookMark: TBookMark;
   VPrimaryKey: TIndexDef;
 begin
   InternalCheckJSONParam(AJSON);
   try
-    P := RecNo;
     VPrimaryKey := GetPrimaryKey;
+    VBookMark := BookMark;
     if Pos(SC, VPrimaryKey.Fields) <> 0 then
     begin
       if Locate(VPrimaryKey.Fields, GetJSONValuesFromPrimaryKey(AJSON), []) then
@@ -464,6 +463,62 @@ begin
         JSONToDataSet(AJSON, Self, FDateAsString);
       end;
   finally
-    RecNo := P;
+    BookMark := VBookMark;
+  end;
+end;
+
+procedure TJDOCustomQuery.Delete(AJSON: TJSONArray);
+var
+  I: Integer;
+  VBookMark: TBookMark;
+  VObject: TJSONObject;
+  VPrimaryKey: TIndexDef;
+begin
+  InternalCheckJSONParam(AJSON);
+  try
+    VPrimaryKey := GetPrimaryKey;
+    VBookMark := BookMark;
+    if Pos(SC, VPrimaryKey.Fields) <> 0 then
+    begin
+      for I := 0 to Pred(AJSON.Count) do
+      begin
+        VObject := AJSON.Objects[I];
+        if Locate(VPrimaryKey.Fields,
+          GetJSONValuesFromPrimaryKey(VObject), []) then
+          inherited Delete;
+      end;
+    end
+    else
+      for I := 0 to Pred(AJSON.Count) do
+      begin
+        VObject := AJSON.Objects[I];
+        if Locate(VPrimaryKey.Fields,
+          VObject[VPrimaryKey.Fields].Value, []) then
+          inherited Delete;
+      end;
+  finally
+    BookMark := VBookMark;
+  end;
+end;
+
+procedure TJDOCustomQuery.Delete(AJSON: TJSONObject);
+var
+  VBookMark: TBookMark;
+  VPrimaryKey: TIndexDef;
+begin
+  InternalCheckJSONParam(AJSON);
+  try
+    VPrimaryKey := GetPrimaryKey;
+    VBookMark := BookMark;
+    if Pos(SC, VPrimaryKey.Fields) <> 0 then
+    begin
+      if Locate(VPrimaryKey.Fields, GetJSONValuesFromPrimaryKey(AJSON), []) then
+        inherited Delete;
+    end
+    else
+      if Locate(VPrimaryKey.Fields, AJSON[VPrimaryKey.Fields].Value, []) then
+        inherited Delete;
+  finally
+    BookMark := VBookMark;
   end;
 end;
