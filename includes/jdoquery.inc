@@ -441,8 +441,29 @@ begin
 end;
 
 procedure TJDOCustomQuery.Edit(AJSON: TJSONObject);
+var
+  P: Integer;
+  VPrimaryKey: TIndexDef;
 begin
   InternalCheckJSONParam(AJSON);
-  inherited Edit;
-  JSONToDataSet(AJSON, Self, FDateAsString);
+  try
+    P := RecNo;
+    VPrimaryKey := GetPrimaryKey;
+    if Pos(SC, VPrimaryKey.Fields) <> 0 then
+    begin
+      if Locate(VPrimaryKey.Fields, GetJSONValuesFromPrimaryKey(AJSON), []) then
+      begin
+        inherited Edit;
+        JSONToDataSet(AJSON, Self, FDateAsString);
+      end;
+    end
+    else
+      if Locate(VPrimaryKey.Fields, AJSON[VPrimaryKey.Fields].Value, []) then
+      begin
+        inherited Edit;
+        JSONToDataSet(AJSON, Self, FDateAsString);
+      end;
+  finally
+    RecNo := P;
+  end;
 end;
