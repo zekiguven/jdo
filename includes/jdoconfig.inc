@@ -22,6 +22,12 @@ begin
   FConfigFile.Delimiter := SC;
 end;
 
+constructor TJDOCustomConfigurator.Create(AOwner: TComponent;
+  const AConfiguration: string);
+begin
+  Create(AOwner, AConfiguration);
+end;
+
 destructor TJDOCustomConfigurator.Destroy;
 begin
   Target := nil;

@@ -31,6 +31,8 @@
       Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent;
+      const AConfiguration: string); overload;
     destructor Destroy; override;
     procedure Configure;
     property Target: TComponent read FTarget write SetTarget;
