@@ -15,163 +15,87 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
+constructor TJDOCustomDataBase.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FConfig := TJDOConfigurator.Create(Self);
+  Transaction := TSQLTransaction.Create(Self);
+  FQuery := TJDOQuery.Create(Self);
+  FConfig.Target := Self;
+  FQuery.DataBase := Self;
+  FQuery.Transaction := Transaction;
+  Transaction.DataBase := Self;
+  Transaction.Name := 'Transaction';
+end;
+
 constructor TJDOCustomDataBase.Create(AOwner: TComponent;
   const AConfiguration: string; const AConnect: Boolean);
 begin
   inherited Create(AOwner);
-  FConfig := TJDOConfigurator.Create(AConfiguration);
-  InternalCreateConnection;
-  InternalCreateTransaction;
-  InternalCreateQuery;
-  FConfig.Target := FConnection;
-  FConfig.Configure;
-  if AConnect then
-    FConnection.Open;
+  FConfig.Configuration := AConfiguration;
+  Connected := AConnect;
 end;
 
-constructor TJDOCustomDataBase.Create(const AConfiguration: string;
-  const AConnect: Boolean);
+procedure TJDOCustomDataBase.Loaded;
 begin
-  Create(nil, AConfiguration, AConnect);
-end;
-
-destructor TJDOCustomDataBase.Destroy;
-begin
-  FConfig.Free;
-  inherited Destroy;
+  inherited Loaded;
+  if (Trim(ConnectorType) <> ES) and not
+    Assigned(GetConnectionDef(ConnectorType)) then
+    raise EJDODataBase.CreateFmt(Self,
+      SConnUnitWasNotDeclaredError, [ConnectorType]);;
 end;
 
 procedure TJDOCustomDataBase.Connect;
 begin
-  FConnection.Open;
-  if Assigned(FOnConnect) then
-    FOnConnect(Self);
+  Connected := True;
 end;
 
 procedure TJDOCustomDataBase.Disconnect;
 begin
-  FConnection.Close;
-  if Assigned(FOnDisconnect) then
-    FOnDisconnect(Self);
+  Connected := False;
+end;
+
+function TJDOCustomDataBase.GetConfiguration: string;
+begin
+  Result := FConfig.Configuration;
+end;
+
+procedure TJDOCustomDataBase.SetConfiguration(const AValue: string);
+begin
+  FConfig.Configuration := AValue;
 end;
 
 function TJDOCustomDataBase.InTransaction: Boolean;
 begin
-  Result := FTransaction.Active;
+  Result := Transaction.Active;
 end;
 
-procedure TJDOCustomDataBase.InternalCreateConnection;
-var
-  VConnType: ShortString;
-  VConnDef: TConnectionDef;
+procedure TJDOCustomDataBase.StartTransaction(const ANativeError: Boolean);
 begin
-  VConnType := FConfig[CONNECTOR_TYPE];
-  if Trim(VConnType) = ES then
-    raise EJDODataBase.Create(Self, SEmptyConnTypeError);
-  VConnDef := GetConnectionDef(VConnType);
-  if Assigned(VConnDef) then
-    FConnection := TSQLConnectionClass(VConnDef.ConnectionClass).Create(Self)
-  else
-    raise EJDODataBase.CreateFmt(Self, SConnUnitWasNotDeclaredError, [VConnType]);
-end;
-
-function TJDOCustomDataBase.GetConnected: Boolean;
-begin
-  Result := FConnection.Connected;
-end;
-
-function TJDOCustomDataBase.GetDatabaseName: string;
-begin
-  Result := FConnection.DatabaseName;
-end;
-
-function TJDOCustomDataBase.GetHostName: string;
-begin
-  Result := FConnection.HostName;
-end;
-
-function TJDOCustomDataBase.GetPassword: string;
-begin
-  Result := FConnection.Password;
-end;
-
-function TJDOCustomDataBase.GetUserName: string;
-begin
-  Result := FConnection.UserName;
-end;
-
-procedure TJDOCustomDataBase.InternalCreateTransaction;
-begin
-  FTransaction := TSQLTransaction.Create(Self);
-  FTransaction.DataBase := FConnection;
-end;
-
-procedure TJDOCustomDataBase.InternalCreateQuery;
-begin
-  FQuery := TJDOCustomQuery.Create(Self);
-end;
-
-procedure TJDOCustomDataBase.SetDatabaseName(const AValue: string);
-begin
-  FConnection.DatabaseName := AValue;
-end;
-
-procedure TJDOCustomDataBase.SetHostName(const AValue: string);
-begin
-  FConnection.HostName := AValue;
-end;
-
-procedure TJDOCustomDataBase.SetPassword(const AValue: string);
-begin
-  FConnection.Password := AValue;
-end;
-
-procedure TJDOCustomDataBase.SetUserName(const AValue: string);
-begin
-  FConnection.UserName := AValue;
-end;
-
-procedure TJDOCustomDataBase.StartTrans(const ANativeError: Boolean);
-begin
-  if (not ANativeError) and FTransaction.Active then
+  if (not ANativeError) and Transaction.Active then
     Exit;
-  FTransaction.StartTransaction;
-  if Assigned(FOnStartTrans) then
-    FOnStartTrans(Self);
+  Transaction.StartTransaction;
 end;
 
-procedure TJDOCustomDataBase.RestartTrans;
+procedure TJDOCustomDataBase.RestartTransaction;
 begin
-  if FTransaction.Active then
-    FTransaction.Rollback;
-  if Assigned(FOnRestartTrans) then
-    FOnRestartTrans(Self);
+  if Transaction.Active then
+    Transaction.Rollback;
+  Transaction.StartTransaction;
 end;
 
-procedure TJDOCustomDataBase.Commit;
+procedure TJDOCustomDataBase.Commit(const ARetaining: Boolean);
 begin
-  FTransaction.Commit;
-  if Assigned(FOnCommit) then
-    FOnCommit(Self);
+  if ARetaining then
+    Transaction.CommitRetaining
+  else
+    Transaction.Commit;
 end;
 
-procedure TJDOCustomDataBase.CommitRetaining;
+procedure TJDOCustomDataBase.Rollback(const ARetaining: Boolean);
 begin
-  FTransaction.CommitRetaining;
-  if Assigned(FOnCommitRetaining) then
-    FOnCommitRetaining(Self);
-end;
-
-procedure TJDOCustomDataBase.Rollback;
-begin
-  FTransaction.Rollback;
-  if Assigned(FOnRollback) then
-    FOnRollback(Self);
-end;
-
-procedure TJDOCustomDataBase.RollbackRetaining;
-begin
-  FTransaction.RollbackRetaining;
-  if Assigned(FOnRollbackRetaining) then
-    FOnRollbackRetaining(Self);
+  if ARetaining then
+    Transaction.RollbackRetaining
+  else
+    Transaction.Rollback;
 end;
