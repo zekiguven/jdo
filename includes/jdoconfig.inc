@@ -15,49 +15,70 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-constructor TJDOConfigurator.Create(const AConfiguration: string);
+constructor TJDOCustomConfigurator.Create(AOwner: TComponent);
 begin
+  inherited Create(AOwner);
   FConfigFile := TStringList.Create;
   FConfigFile.Delimiter := SC;
-  FConfiguration := AConfiguration;
-  Load;
 end;
 
-destructor TJDOConfigurator.Destroy;
+destructor TJDOCustomConfigurator.Destroy;
 begin
+  Target := nil;
   FConfigFile.Free;
   inherited Destroy;
 end;
 
-function TJDOConfigurator.GetConfiguration: string;
-begin
-  Result := FConfigFile.CommaText;
-end;
-
-function TJDOConfigurator.GetValues(AName: string): string;
+function TJDOCustomConfigurator.GetValues(AName: string): string;
 begin
   Result := FConfigFile.Values[AName];
 end;
 
-procedure TJDOConfigurator.SetConfiguration(const AValue: string);
+procedure TJDOCustomConfigurator.SetConfiguration(const AValue: string);
 begin
-  FConfiguration := AValue;
-  FConfigFile.CommaText := AValue;
-end;
-
-procedure TJDOConfigurator.Load;
-begin
-  if (Pos(SC, FConfiguration) <> 0) and (Pos(EQ, FConfiguration) <> 0) then
-    FConfigFile.DelimitedText := FConfiguration
-  else
+  if FConfiguration <> AValue then
   begin
-    if not FileExists(FConfiguration) then
-      raise EJDOConfig.CreateFmt(Self, SCfgFileNotFoundError, [FConfiguration]);
-    FConfigFile.LoadFromFile(FConfiguration);
+    FConfiguration := AValue;
+    if (Pos(SC, AValue) <> 0) or (Pos(EQ, AValue) <> 0) then
+      FConfigFile.DelimitedText := AValue
+    else
+    begin
+      if Trim(AValue) = ES then
+        Exit;
+      if not FileExists(AValue) then
+        raise EJDOConfig.CreateFmt(Self, SCfgFileNotFoundError, [AValue]);
+      FConfigFile.LoadFromFile(AValue);
+    end;
+    if not (csReading in ComponentState) then
+      Configure;
   end;
 end;
 
-procedure TJDOConfigurator.Configure;
+procedure TJDOCustomConfigurator.SetTarget(AValue: TComponent);
+begin
+  if AValue <> Self then
+  begin
+    FTarget := AValue;
+    if Assigned(FTarget) then
+      Configure;
+  end;
+end;
+
+procedure TJDOCustomConfigurator.Loaded;
+begin
+  inherited Loaded;
+  Configure;
+end;
+
+procedure TJDOCustomConfigurator.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FTarget) then
+    Target := nil;
+end;
+
+procedure TJDOCustomConfigurator.Configure;
 var
   I: Integer;
   VPropName, VToken: ShortString;

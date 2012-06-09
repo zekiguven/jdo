@@ -17,22 +17,33 @@
 
   EJDOConfig = class(EJDOException);
 
-  TJDOConfigurator = class
+  TJDOCustomConfigurator = class(TComponent)
   private
-    FConfigFile: TStrings;
     FConfiguration: string;
-    FTarget: TPersistent;
-    function GetConfiguration: string;
+    FConfigFile: TStrings;
+    FTarget: TComponent;
     function GetValues(AName: string): string;
     procedure SetConfiguration(const AValue: string);
+    procedure SetTarget(AValue: TComponent);
+  protected
+    procedure Loaded; override;
+    procedure Notification(AComponent: TComponent;
+      Operation: TOperation); override;
   public
-    constructor Create(const AConfiguration: string);
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Configure;
-    procedure Load;
-    property Target: TPersistent read FTarget write FTarget;
-    property Configuration: string read GetConfiguration write SetConfiguration;
+    property Target: TComponent read FTarget write SetTarget;
+    property Configuration: string read FConfiguration write SetConfiguration;
     property Values[AName: string]: string read GetValues; default;
+  end;
+
+  TJDOCustomConfiguratorClass = class of TJDOCustomConfigurator;
+
+  TJDOConfigurator = class(TJDOCustomConfigurator)
+  published
+    property Configuration;
+    property Target;
   end;
 
   TJDOConfiguratorClass = class of TJDOConfigurator;
