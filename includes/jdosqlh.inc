@@ -19,7 +19,7 @@
 
   TJDOPutTypes = (ptBegin, ptMiddle, ptEnd);
 
-  TJDOStatementType = TStatementType;
+  TJDOStatementType = (jstUnknown, jstSelect, jstInsert, jstUpdate, jstDelete);
 
   TJDOComposeEvent = procedure(const AStatementType: TJDOStatementType) of object;
 
@@ -54,7 +54,8 @@
     function Compose(const AStatementType: TJDOStatementType): Boolean;
     procedure Reset;
     procedure Clear;
-    procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle);
+    procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle;
+      const ALineBreak: ShortString = SP);
     procedure Like(const AKey: string; const ACaseInsensitive: Boolean = False);
     property OrderBy: string read FOrderBy write FOrderBy;
     property Ordered: Boolean read FOrdered write FOrdered default True;

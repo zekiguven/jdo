@@ -16,6 +16,9 @@
 *)
 
 const
+  CR = #13;
+  LF = #10;
+  CRLF = CR + LF;
   ES = '';
   SP = #32;
   PT = #37; // %
@@ -28,21 +31,20 @@ const
   PS = #40; // (
   PO = #35; // #
   SC = #59; // ;
-  CONNECTOR_TYPE = 'connectortype';
-  SQL_SELECT_TOKEN = 'select ';
-  SQL_FROM_TOKEN = ' from ';
-  SQL_WHERE_TOKEN = ' where ';
+  SQL_SELECT_TOKEN = 'select';
+  SQL_FROM_TOKEN = 'from';
+  SQL_WHERE_TOKEN = 'where';
   SQL_NOTHING_WHERE_TOKEN = SQL_WHERE_TOKEN + '1=2';
-  SQL_ORDER_BY_TOKEN = ' order by ';
-  SQL_INSERT_TOKEN = 'insert into ';
-  SQL_VALUES_TOKEN = ' values ';
-  SQL_UPDATE_TOKEN = 'update ';
-  SQL_SET_TOKEN = ' set ';
-  SQL_DELETE_TOKEN = 'delete ';
-  SQL_EQ_PARAM_TOKEN = '=:';
+  SQL_ORDER_BY_TOKEN = 'order by';
+  SQL_INSERT_TOKEN = 'insert into';
+  SQL_VALUES_TOKEN = 'values';
+  SQL_UPDATE_TOKEN = 'update';
+  SQL_SET_TOKEN = 'set';
+  SQL_DELETE_TOKEN = 'delete';
+  SQL_EQ_PARAM_TOKEN = ' = :';
   SQL_LOWER_TOKEN = 'lower';
-  SQL_LIKE_TOKEN = ' like (:';
-  SQL_AND_TOKEN = ' and ';
+  SQL_LIKE_TOKEN = 'like';
+  SQL_AND_TOKEN = 'and';
   FT_NULL = 'null';
   FT_STRING = 'string';
   FT_BOOLEAN = 'boolean';

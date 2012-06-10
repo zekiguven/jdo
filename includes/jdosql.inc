@@ -38,7 +38,7 @@ end;
 
 procedure TJDOCustomSQL.CheckTableName;
 begin
-  if FTableName = ES then
+  if Trim(FTableName) = ES then
     raise EJDOSQL.Create(Self, SEmptyTableNameError);
 end;
 
@@ -74,7 +74,7 @@ begin
   AValues := ES;
   C := FQuery.FieldDefs.Count;
   case AStatementType of
-    stSelect:
+    jstSelect:
       if C = 0 then
         if FTableAlias <> ES then
           ACols := FTableAlias + DT + AK
@@ -84,22 +84,26 @@ begin
         for I := 0 to Pred(C) do
         begin
           if I > 0 then
-            ACols += CS;
-          ACols += FQuery.FieldDefs[I].Name;
+            ACols += CS + SP;
+          VFieldName := FQuery.FieldDefs[I].Name;
+          if FTableAlias <> ES then
+            ACols += FTableAlias + DT + VFieldName
+          else
+            ACols += VFieldName;
         end;
-    stInsert:
+    jstInsert:
       for I := 0 to Pred(C) do
       begin
         if I > 0 then
         begin
-          ACols += CS;
-          AValues += CS;
+          ACols += CS + SP;
+          AValues += CS + SP;
         end;
         VFieldName := FQuery.FieldDefs[I].Name;
         ACols += VFieldName;
         AValues += CO + VFieldName;
       end;
-    stUpdate, stDelete:
+    jstUpdate, jstDelete:
       begin
         InternalCheckFieldDefs(C);
         C := FQuery.ServerIndexDefs.Count;
@@ -121,15 +125,16 @@ begin
           begin
             VFieldName := FQuery.FieldDefs[I].Name;
             if VValues.IndexOf(VFieldName) = -1 then
-              ACols += VFieldName + SQL_EQ_PARAM_TOKEN + VFieldName + CS;
+              ACols += VFieldName + SQL_EQ_PARAM_TOKEN + VFieldName + CS + SP;
           end;
-          SetLength(ACols, Length(ACols) - 1);
+          SetLength(ACols, Length(ACols) - Length(CS + SP));
           for I := 0 to Pred(VValues.Count) do
           begin
             VValue := VValues.ValueFromIndex[I];
-            AValues += VValue + SQL_EQ_PARAM_TOKEN + VValue + SQL_AND_TOKEN;
+            AValues += VValue + SQL_EQ_PARAM_TOKEN + VValue + SP +
+              SQL_AND_TOKEN + SP;
           end;
-          SetLength(AValues, Length(AValues) - Length(SQL_AND_TOKEN));
+          SetLength(AValues, Length(AValues) - Length(SP + SQL_AND_TOKEN + SP));
         finally
           VValues.Free;
         end;
@@ -156,54 +161,55 @@ begin
   if Result then
   begin
     case AStatementType of
-      stSelect:
+      jstSelect:
         begin
           FQuery.SQL.Clear;
           if FPutBegin <> ES then
             VCols := FPutBegin
           else
-            PrepareCols(stSelect, VCols, VValues);
-          FQuery.SQL.Add(SQL_SELECT_TOKEN + VCols + SP + SQL_FROM_TOKEN +
-            FTableName + SP + FTableAlias);
+            PrepareCols(jstSelect, VCols, VValues);
+          FQuery.SQL.Add(SQL_SELECT_TOKEN + SP + VCols + SP + SQL_FROM_TOKEN +
+            SP + FTableName + SP + FTableAlias);
           if FPutMiddle <> ES then
             FQuery.SQL.Add(FPutMiddle)
           else
           begin
             VIsWhere := FWhere <> ES;
             if VIsWhere then
-              FQuery.SQL.Add(SQL_WHERE_TOKEN + FWhere);
+              FQuery.SQL.Add(SQL_WHERE_TOKEN + SP + FWhere);
             if FLike <> ES then
               if VIsWhere then
-                FQuery.SQL.Add(SQL_AND_TOKEN + FLike)
+                FQuery.SQL.Add(SQL_AND_TOKEN + SP + FLike)
               else
-                FQuery.SQL.Add(SQL_WHERE_TOKEN + FLike);
+                FQuery.SQL.Add(SQL_WHERE_TOKEN + SP + FLike);
           end;
           if FPutEnd <> ES then
             FQuery.SQL.Add(FPutEnd)
           else
             if FOrdered and (FOrderBy <> ES) then
               if FTableAlias <> ES then
-                FQuery.SQL.Add(SQL_ORDER_BY_TOKEN + FTableAlias + DT + FOrderBy)
+                FQuery.SQL.Add(SQL_ORDER_BY_TOKEN + SP + FTableAlias +
+                  DT + FOrderBy)
               else
-                FQuery.SQL.Add(SQL_ORDER_BY_TOKEN + FOrderBy);
+                FQuery.SQL.Add(SQL_ORDER_BY_TOKEN + SP + FOrderBy);
         end;
-      stInsert:
+      jstInsert:
         begin
-          PrepareCols(stInsert, VCols, VValues);
-          FQuery.InsertSQL.Text := SQL_INSERT_TOKEN + FTableName + SP + PS +
-            VCols + PE + SQL_VALUES_TOKEN + PS + VValues + PE;
+          PrepareCols(jstInsert, VCols, VValues);
+          FQuery.InsertSQL.Text := SQL_INSERT_TOKEN + SP + FTableName + SP +
+            PS + VCols + PE + SP + SQL_VALUES_TOKEN + SP + PS + VValues + PE;
         end;
-      stUpdate:
+      jstUpdate:
         begin
-          PrepareCols(stUpdate, VCols, VValues);
-          FQuery.UpdateSQL.Text := SQL_UPDATE_TOKEN + FTableName +
-            SQL_SET_TOKEN + VCols + SQL_WHERE_TOKEN + VValues;
+          PrepareCols(jstUpdate, VCols, VValues);
+          FQuery.UpdateSQL.Text := SQL_UPDATE_TOKEN + SP + FTableName + SP +
+            SQL_SET_TOKEN + SP + VCols + SP + SQL_WHERE_TOKEN + SP + VValues;
         end;
-      stDelete:
+      jstDelete:
         begin
-          PrepareCols(stDelete, VCols, VValues);
-          FQuery.DeleteSQL.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN +
-            FTableName + SQL_WHERE_TOKEN + VValues;
+          PrepareCols(jstDelete, VCols, VValues);
+          FQuery.DeleteSQL.Text := SQL_DELETE_TOKEN + SP + SQL_FROM_TOKEN + SP +
+            FTableName + SP + SQL_WHERE_TOKEN + SP + VValues;
         end;
     end;
     FStatementType := AStatementType;
@@ -217,8 +223,8 @@ begin
   FPutBegin := ES;
   FPutMiddle := ES;
   FPutEnd := ES;
-  if FStatementType <> stUnknown then
-    FStatementType := stUnknown;
+  if FStatementType <> jstUnknown then
+    FStatementType := jstUnknown;
 end;
 
 procedure TJDOCustomSQL.Clear;
@@ -231,19 +237,36 @@ begin
   FQuery.DeleteSQL.Clear;
 end;
 
-procedure TJDOCustomSQL.Put(const ASQL: string; const AType: TJDOPutTypes);
+procedure TJDOCustomSQL.Put(const ASQL: string; const AType: TJDOPutTypes;
+  const ALineBreak: ShortString);
 begin
   case AType of
-    ptBegin: FPutBegin += ASQL + SP;
-    ptMiddle: FPutMiddle += ASQL + SP;
-    ptEnd: FPutEnd += ASQL + SP;
+    ptBegin:
+      begin
+        if FPutBegin <> ES then
+          FPutBegin += ALineBreak;
+        FPutBegin += ASQL;
+      end;
+    ptMiddle:
+      begin
+        if FPutMiddle <> ES then
+          FPutMiddle += ALineBreak;
+        FPutMiddle += ASQL;
+      end;
+    ptEnd:
+      begin
+        if FPutEnd <> ES then
+          FPutEnd += ALineBreak;
+        FPutEnd += ASQL;
+      end;
   end;
 end;
 
 procedure TJDOCustomSQL.Like(const AKey: string; const ACaseInsensitive: Boolean);
 begin
   if ACaseInsensitive then
-    FLike := SQL_LOWER_TOKEN + PS + AKey + PE + SQL_LIKE_TOKEN + AKey + PE
+    FLike := SQL_LOWER_TOKEN + PS + AKey + PE
   else
-    FLike := AKey + SQL_LIKE_TOKEN + AKey + PE;
+    FLike := AKey;
+  FLike += SP + SQL_LIKE_TOKEN + SP + PS + CO + AKey + PE;
 end;
