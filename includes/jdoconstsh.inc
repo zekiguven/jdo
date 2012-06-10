@@ -53,12 +53,13 @@ const
   NullDate = 0;
 
   // Error msgs
-  SEmptyIndexDefsCountError = '"IndexDefs.Count" must not be "0".';
+  SEmptyServerIndexDefsCountError = '"ServerIndexDefs.Count" must not be "0".';
   SEmptyFieldDefsCountError = '"FieldDefs.Count" must not be "0".';
   SEmptyConnTypeError = 'The "ConnectorType" must not be empty.';
   SConnUnitWasNotDeclaredError = 'The unit for "%s" was not declared in uses clause or it''s an invalid ConnectorType.';
   SCfgFileNotFoundError = 'The config file was not found: "%s"';
   SNilTargetError = 'The "Target" must not be nil.';
+  SNilQueryError = 'The "Query" must not be nil.';
   SEmptyTableNameError = 'The "TableName" must not be empty.';
   SNilFieldDefsError = '"FieldDefs" must not be nil.';
   SNilJSONParamError = '"AJSON" must not be nil.';
