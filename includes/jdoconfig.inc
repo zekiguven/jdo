@@ -81,7 +81,7 @@ procedure TJDOCustomConfigurator.Notification(AComponent: TComponent;
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FTarget) then
-    Target := nil;
+    FTarget := nil;
 end;
 
 procedure TJDOCustomConfigurator.Configure;
