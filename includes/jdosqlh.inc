@@ -19,54 +19,50 @@
 
   TJDOPutTypes = (ptBegin, ptMiddle, ptEnd);
 
-  TJDOStatementType = (stUnknown, stSelect, stInsert, stUpdate, stDelete);
+  TJDOStatementType = TStatementType;
 
   TJDOComposeEvent = procedure(const AStatementType: TJDOStatementType) of object;
 
   TJDOCustomSQL = class(TComponent)
   private
     FLike: string;
-    FFieldDefs: TFieldDefs;
-    FIndexDefs: TServerIndexDefs;
     FOnCompose: TJDOComposeEvent;
     FPutBegin: string;
     FPutMiddle: string;
     FPutEnd: string;
     FOrderBy: string;
     FOrdered: Boolean;
-    FScript: TStrings;
+    FQuery: TSQLQuery;
     FStatementType: TJDOStatementType;
     FTableAlias: string;
     FTableName: string;
     FWhere: string;
     procedure InternalCheckFieldDefs(const ACount: Integer);
-    procedure InternalCheckIndexDefs(const ACount: Integer);
+    procedure InternalCheckServerIndexDefs(const ACount: Integer);
   protected
-    function IsComposed: Boolean;
     procedure CheckTableName;
+    procedure CheckQuery;
     procedure PrepareCols(const AStatementType: TJDOStatementType;
       out ACols, AValues: string);
+    procedure Notification(AComponent: TComponent;
+      Operation: TOperation); override;
   public
-    constructor Create(AOwner: TComponent; ASQL: TStrings;
-      AFieldDefs: TFieldDefs; AIndexDefs: TServerIndexDefs;
+    constructor Create(AOwner: TComponent); override;
+    constructor Create(AQuery: TSQLQuery;
       const ATableName: string = ES); overload;
-    constructor Create(ASQL: TStrings; AFieldDefs: TFieldDefs;
-      AIndexDefs: TServerIndexDefs; const ATableName: string = ES); overload;
-    procedure Compose(const AStatementType: TJDOStatementType);
+    destructor Destroy; override;
+    function Compose(const AStatementType: TJDOStatementType): Boolean;
     procedure Reset;
     procedure Clear;
     procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle);
     procedure Like(const AKey: string; const ACaseInsensitive: Boolean = False);
-    property Composed: Boolean read IsComposed;
-    property FieldDefs: TFieldDefs read FFieldDefs;
-    property IndexDefs: TServerIndexDefs read FIndexDefs;
     property OrderBy: string read FOrderBy write FOrderBy;
-    property Ordered: Boolean read FOrdered write FOrdered;
+    property Ordered: Boolean read FOrdered write FOrdered default True;
     property Where: string read FWhere write FWhere;
-    property Script: TStrings read FScript;
     property StatementType: TJDOStatementType read FStatementType;
     property TableAlias: string read FTableAlias write FTableAlias;
     property TableName: string read FTableName write FTableName;
+    property Query: TSQLQuery read FQuery write FQuery;
     property OnCompose: TJDOComposeEvent read FOnCompose write FOnCompose;
   end;
 
@@ -74,13 +70,13 @@
 
   TJDOSQL = class(TJDOCustomSQL)
   published
-    property Composed;
     property OrderBy;
     property Ordered;
     property Where;
-    property Script;
+    property StatementType;
     property TableAlias;
     property TableName;
+    property Query;
     property OnCompose;
   end;
 

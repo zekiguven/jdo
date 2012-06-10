@@ -15,33 +15,24 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-constructor TJDOCustomSQL.Create(AOwner: TComponent; ASQL: TStrings;
-  AFieldDefs: TFieldDefs; AIndexDefs: TServerIndexDefs;
-  const ATableName: string);
+constructor TJDOCustomSQL.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  if not Assigned(ASQL) then
-    raise EJDOSQL.Create(Self, '"ASQL" must be not nil.');
-  if not Assigned(AIndexDefs) then
-    raise EJDOSQL.Create(Self, '"AIndexDefs" must be not nil.');
-  if not Assigned(AFieldDefs) then
-    raise EJDOSQL.Create(Self, '"AFieldDefs" must be not nil.');
-  FFieldDefs := AFieldDefs;
-  FIndexDefs := AIndexDefs;
-  FScript := ASQL;
   FOrdered := True;
+end;
+
+constructor TJDOCustomSQL.Create(AQuery: TSQLQuery; const ATableName: string);
+begin
+  inherited Create(AQuery);
+  CheckQuery;
+  FQuery := AQuery;
   FTableName := ATableName;
 end;
 
-constructor TJDOCustomSQL.Create(ASQL: TStrings; AFieldDefs: TFieldDefs;
-  AIndexDefs: TServerIndexDefs; const ATableName: string);
+destructor TJDOCustomSQL.Destroy;
 begin
-  Create(nil, ASQL, AFieldDefs, AIndexDefs, ATableName);
-end;
-
-function TJDOCustomSQL.IsComposed: Boolean;
-begin
-  Result := (FStatementType <> stUnknown) or (FScript.Count > 0);
+  Query := nil;
+  inherited Destroy;
 end;
 
 procedure TJDOCustomSQL.CheckTableName;
@@ -50,16 +41,22 @@ begin
     raise EJDOSQL.Create(Self, SEmptyTableNameError);
 end;
 
+procedure TJDOCustomSQL.CheckQuery;
+begin
+  if not Assigned(FQuery) then
+    raise EJDOSQL.Create(Self, SNilQueryError);
+end;
+
 procedure TJDOCustomSQL.InternalCheckFieldDefs(const ACount: Integer);
 begin
   if ACount = 0 then
     raise EJDOSQL.Create(Self, SEmptyFieldDefsCountError);
 end;
 
-procedure TJDOCustomSQL.InternalCheckIndexDefs(const ACount: Integer);
+procedure TJDOCustomSQL.InternalCheckServerIndexDefs(const ACount: Integer);
 begin
   if ACount = 0 then
-    raise EJDOSQL.Create(Self, SEmptyIndexDefsCountError);
+    raise EJDOSQL.Create(Self, SEmptyServerIndexDefsCountError);
 end;
 
 procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
@@ -71,9 +68,10 @@ var
   VIndexDef: TIndexDef;
   VFieldName: ShortString;
 begin
+  CheckQuery;
   ACols := ES;
   AValues := ES;
-  C := FFieldDefs.Count;
+  C := FQuery.FieldDefs.Count;
   case AStatementType of
     stSelect:
       if C = 0 then
@@ -86,7 +84,7 @@ begin
         begin
           if I > 0 then
             ACols += CS;
-          ACols += FFieldDefs[I].Name;
+          ACols += FQuery.FieldDefs[I].Name;
         end;
     stInsert:
       for I := 0 to Pred(C) do
@@ -96,21 +94,21 @@ begin
           ACols += CS;
           AValues += CS;
         end;
-        VFieldName := FFieldDefs[I].Name;
+        VFieldName := FQuery.FieldDefs[I].Name;
         ACols += VFieldName;
         AValues += CO + VFieldName;
       end;
     stUpdate, stDelete:
       begin
         InternalCheckFieldDefs(C);
-        C := FIndexDefs.Count;
-        InternalCheckIndexDefs(C);
+        C := FQuery.ServerIndexDefs.Count;
+        InternalCheckServerIndexDefs(C);
         VValues := TStringList.Create;
         try
           VValues.Delimiter := SC;
           for I := 0 to Pred(C) do
           begin
-            VIndexDef := FIndexDefs[I];
+            VIndexDef := FQuery.ServerIndexDefs[I];
             if ixPrimary in VIndexDef.Options then
             begin
               VValues.DelimitedText := VIndexDef.Fields;
@@ -118,9 +116,9 @@ begin
             end;
             raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
           end;
-          for I := 0 to Pred(FFieldDefs.Count) do
+          for I := 0 to Pred(FQuery.FieldDefs.Count) do
           begin
-            VFieldName := FFieldDefs[I].Name;
+            VFieldName := FQuery.FieldDefs[I].Name;
             if VValues.IndexOf(VFieldName) = -1 then
               ACols += VFieldName + SQL_EQ_PARAM_TOKEN + VFieldName + CS;
           end;
@@ -138,63 +136,73 @@ begin
   end;
 end;
 
-procedure TJDOCustomSQL.Compose(const AStatementType: TJDOStatementType);
+procedure TJDOCustomSQL.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FQuery) then
+    FQuery := nil;
+end;
+
+function TJDOCustomSQL.Compose(const AStatementType: TJDOStatementType): Boolean;
 var
   VIsWhere: Boolean;
   VCols, VValues: string;
 begin
-  if AStatementType <> FStatementType then
+  CheckQuery;
+  CheckTableName;
+  Result := AStatementType <> FStatementType;
+  if Result then
   begin
-    CheckTableName;
-    FScript.Clear;
     case AStatementType of
       stSelect:
         begin
+          FQuery.SQL.Clear;
           if FPutBegin <> ES then
             VCols := FPutBegin
           else
             PrepareCols(stSelect, VCols, VValues);
-          FScript.Add(SQL_SELECT_TOKEN + VCols + SP + SQL_FROM_TOKEN +
+          FQuery.SQL.Add(SQL_SELECT_TOKEN + VCols + SP + SQL_FROM_TOKEN +
             FTableName + SP + FTableAlias);
           if FPutMiddle <> ES then
-            FScript.Add(FPutMiddle)
+            FQuery.SQL.Add(FPutMiddle)
           else
           begin
             VIsWhere := FWhere <> ES;
             if VIsWhere then
-              FScript.Add(SQL_WHERE_TOKEN + FWhere);
+              FQuery.SQL.Add(SQL_WHERE_TOKEN + FWhere);
             if FLike <> ES then
               if VIsWhere then
-                FScript.Add(SQL_AND_TOKEN + FLike)
+                FQuery.SQL.Add(SQL_AND_TOKEN + FLike)
               else
-                FScript.Add(SQL_WHERE_TOKEN + FLike);
+                FQuery.SQL.Add(SQL_WHERE_TOKEN + FLike);
           end;
           if FPutEnd <> ES then
-            FScript.Add(FPutEnd)
+            FQuery.SQL.Add(FPutEnd)
           else
             if FOrdered and (FOrderBy <> ES) then
               if FTableAlias <> ES then
-                FScript.Add(SQL_ORDER_BY_TOKEN + FTableAlias + DT + FOrderBy)
+                FQuery.SQL.Add(SQL_ORDER_BY_TOKEN + FTableAlias + DT + FOrderBy)
               else
-                FScript.Add(SQL_ORDER_BY_TOKEN + FOrderBy);
+                FQuery.SQL.Add(SQL_ORDER_BY_TOKEN + FOrderBy);
         end;
       stInsert:
         begin
           PrepareCols(stInsert, VCols, VValues);
-          FScript.Add(SQL_INSERT_TOKEN + FTableName + SP + PS + VCols + PE +
-            SQL_VALUES_TOKEN + PS + VValues + PE);
+          FQuery.InsertSQL.Text := SQL_INSERT_TOKEN + FTableName + SP + PS +
+            VCols + PE + SQL_VALUES_TOKEN + PS + VValues + PE;
         end;
       stUpdate:
         begin
           PrepareCols(stUpdate, VCols, VValues);
-          FScript.Add(SQL_UPDATE_TOKEN + FTableName + SQL_SET_TOKEN + VCols +
-            SQL_WHERE_TOKEN + VValues);
+          FQuery.UpdateSQL.Text := SQL_UPDATE_TOKEN + FTableName +
+            SQL_SET_TOKEN + VCols + SQL_WHERE_TOKEN + VValues;
         end;
       stDelete:
         begin
           PrepareCols(stDelete, VCols, VValues);
-          FScript.Add(SQL_DELETE_TOKEN + SQL_FROM_TOKEN + FTableName +
-            SQL_WHERE_TOKEN + VValues);
+          FQuery.DeleteSQL.Text := SQL_DELETE_TOKEN + SQL_FROM_TOKEN +
+            FTableName + SQL_WHERE_TOKEN + VValues;
         end;
     end;
     FStatementType := AStatementType;
@@ -214,8 +222,12 @@ end;
 
 procedure TJDOCustomSQL.Clear;
 begin
+  CheckQuery;
   Reset;
-  FScript.Clear;
+  FQuery.SQL.Clear;
+  FQuery.InsertSQL.Clear;
+  FQuery.UpdateSQL.Clear;
+  FQuery.DeleteSQL.Clear;
 end;
 
 procedure TJDOCustomSQL.Put(const ASQL: string; const AType: TJDOPutTypes);
