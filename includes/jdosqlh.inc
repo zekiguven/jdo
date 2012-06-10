@@ -48,7 +48,7 @@
       Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
-    constructor Create(AQuery: TSQLQuery;
+    constructor Create(AOwner: TComponent; AQuery: TSQLQuery;
       const ATableName: string = ES); overload;
     destructor Destroy; override;
     function Compose(const AStatementType: TJDOStatementType): Boolean;

@@ -21,9 +21,10 @@ begin
   FOrdered := True;
 end;
 
-constructor TJDOCustomSQL.Create(AQuery: TSQLQuery; const ATableName: string);
+constructor TJDOCustomSQL.Create(AOwner: TComponent;
+  AQuery: TSQLQuery; const ATableName: string);
 begin
-  inherited Create(AQuery);
+  inherited Create(AOwner);
   CheckQuery;
   FQuery := AQuery;
   FTableName := ATableName;
