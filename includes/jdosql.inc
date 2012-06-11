@@ -63,7 +63,7 @@ end;
 procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
   out ACols, AValues: string);
 
-  procedure GetValues(out S: TStrings; out IDef: TIndexDef;
+  procedure GetValues(out S: TStrings; out IxDef: TIndexDef;
     const C: Integer); inline;
   var
     I: Integer;
@@ -72,10 +72,10 @@ procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
     S.Delimiter := SC;
     for I := 0 to Pred(C) do
     begin
-      IDef := FQuery.ServerIndexDefs[I];
-      if ixPrimary in IDef.Options then
+      IxDef := FQuery.ServerIndexDefs[I];
+      if ixPrimary in IxDef.Options then
       begin
-        S.DelimitedText := IDef.Fields;
+        S.DelimitedText := IxDef.Fields;
         Break;
       end;
       raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
@@ -121,8 +121,8 @@ begin
       jstInsert:
         if C > 0 then
         begin
-          GetValues(VValues, VIndexDef, C);
           try
+            GetValues(VValues, VIndexDef, C);
             for I := 0 to Pred(FQuery.FieldDefs.Count) do
             begin
               VFieldName := FQuery.FieldDefs[I].Name;
@@ -152,8 +152,8 @@ begin
       jstUpdate, jstDelete:
       begin
         InternalCheckServerIndexDefs(C);
-        GetValues(VValues, VIndexDef, C);
         try
+          GetValues(VValues, VIndexDef, C);
           for I := 0 to Pred(FQuery.FieldDefs.Count) do
           begin
             VFieldName := FQuery.FieldDefs[I].Name;
