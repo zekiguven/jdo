@@ -37,6 +37,8 @@ begin
     'Configuration', TFileNamePropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDODataBase,
     'Configuration', TFileNamePropertyEditor);
+  RegisterPropertyEditor(TypeInfo(TJDOStatementType), TJDOSQL,
+    'StatementType', THiddenPropertyEditor);
   RegisterPropertyEditor(TypeInfo(TSQLTransaction), TJDODataBase,
     'Transaction', THiddenPropertyEditor);
 end;
