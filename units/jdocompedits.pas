@@ -66,7 +66,7 @@ begin
         end;
         if Assigned(VHook) then
           VHook.Modified(Self);
-        ShowMessage('SQL statements are generated successfully!');
+        ShowMessage('SQL statements were generated successfully!');
       end;
   end;
 end;
