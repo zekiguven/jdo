@@ -62,9 +62,29 @@ end;
 
 procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
   out ACols, AValues: string);
+
+  procedure GetValues(out S: TStrings; out IDef: TIndexDef;
+    const C: Integer); inline;
+  var
+    I: Integer;
+  begin
+    S := TStringList.Create;
+    S.Delimiter := SC;
+    for I := 0 to Pred(C) do
+    begin
+      IDef := FQuery.ServerIndexDefs[I];
+      if ixPrimary in IDef.Options then
+      begin
+        S.DelimitedText := IDef.Fields;
+        Break;
+      end;
+      raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
+    end;
+  end;
+
 var
-  I, C: Integer;
   VValue: string;
+  I, C, L: Integer;
   VValues: TStrings;
   VIndexDef: TIndexDef;
   VFieldName: ShortString;
@@ -73,61 +93,73 @@ begin
   ACols := ES;
   AValues := ES;
   C := FQuery.FieldDefs.Count;
-  case AStatementType of
-    jstSelect:
-      if C = 0 then
-        if FTableAlias <> ES then
-          ACols := FTableAlias + DT + AK
-        else
-          ACols := AK
+  if AStatementType = jstSelect then
+  begin
+    if C = 0 then
+      if FTableAlias <> ES then
+        ACols := FTableAlias + DT + AK
       else
-        for I := 0 to Pred(C) do
-        begin
-          if I > 0 then
-            ACols += CS + SP;
-          VFieldName := FQuery.FieldDefs[I].Name;
-          if FTableAlias <> ES then
-            ACols += FTableAlias + DT + VFieldName
-          else
-            ACols += VFieldName;
-        end;
-    jstInsert:
+        ACols := AK
+    else
       for I := 0 to Pred(C) do
       begin
         if I > 0 then
-        begin
           ACols += CS + SP;
-          AValues += CS + SP;
-        end;
         VFieldName := FQuery.FieldDefs[I].Name;
-        ACols += VFieldName;
-        AValues += CO + VFieldName;
+        if FTableAlias <> ES then
+          ACols += FTableAlias + DT + VFieldName
+        else
+          ACols += VFieldName;
       end;
-    jstUpdate, jstDelete:
-      begin
-        InternalCheckFieldDefs(C);
-        C := FQuery.ServerIndexDefs.Count;
-        InternalCheckServerIndexDefs(C);
-        VValues := TStringList.Create;
-        try
-          VValues.Delimiter := SC;
+  end
+  else
+  begin
+    InternalCheckFieldDefs(C);
+    C := FQuery.ServerIndexDefs.Count;
+    L := Length(CS + SP);
+    case AStatementType of
+      jstInsert:
+        if C > 0 then
+        begin
+          GetValues(VValues, VIndexDef, C);
+          try
+            for I := 0 to Pred(FQuery.FieldDefs.Count) do
+            begin
+              VFieldName := FQuery.FieldDefs[I].Name;
+              if VValues.IndexOf(VFieldName) = -1 then
+              begin
+                ACols += VFieldName + CS + SP;
+                AValues +=  CO + VFieldName + CS + SP;
+              end;
+            end;
+            SetLength(AValues, Length(AValues) - L);
+          finally
+            VValues.Free;
+          end;
+        end
+        else
           for I := 0 to Pred(C) do
           begin
-            VIndexDef := FQuery.ServerIndexDefs[I];
-            if ixPrimary in VIndexDef.Options then
+            if I > 0 then
             begin
-              VValues.DelimitedText := VIndexDef.Fields;
-              Break;
+              ACols += CS + SP;
+              AValues += CS + SP;
             end;
-            raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
+            VFieldName := FQuery.FieldDefs[I].Name;
+            ACols += VFieldName;
+            AValues += CO + VFieldName;
           end;
+      jstUpdate, jstDelete:
+      begin
+        InternalCheckServerIndexDefs(C);
+        GetValues(VValues, VIndexDef, C);
+        try
           for I := 0 to Pred(FQuery.FieldDefs.Count) do
           begin
             VFieldName := FQuery.FieldDefs[I].Name;
             if VValues.IndexOf(VFieldName) = -1 then
               ACols += VFieldName + SQL_EQ_PARAM_TOKEN + VFieldName + CS + SP;
           end;
-          SetLength(ACols, Length(ACols) - Length(CS + SP));
           for I := 0 to Pred(VValues.Count) do
           begin
             VValue := VValues.ValueFromIndex[I];
@@ -139,6 +171,8 @@ begin
           VValues.Free;
         end;
       end;
+    end;
+    SetLength(ACols, Length(ACols) - L);
   end;
 end;
 
