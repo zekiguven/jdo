@@ -43,7 +43,7 @@
     procedure CheckTableName;
     procedure CheckQuery;
     procedure PrepareCols(const AStatementType: TJDOStatementType;
-      out ACols, AValues: string);
+      out ACols, AValues: string); virtual;
     procedure Notification(AComponent: TComponent;
       Operation: TOperation); override;
   public
@@ -51,7 +51,7 @@
     constructor Create(AOwner: TComponent; AQuery: TSQLQuery;
       const ATableName: string = ES); overload;
     destructor Destroy; override;
-    function Compose(const AStatementType: TJDOStatementType): Boolean;
+    function Compose(const AStatementType: TJDOStatementType): Boolean; virtual;
     procedure ComposeAll;
     procedure Reset;
     procedure Clear;
