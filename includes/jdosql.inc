@@ -60,6 +60,17 @@ begin
     raise EJDOSQL.Create(Self, SEmptyServerIndexDefsCountError);
 end;
 
+procedure TJDOCustomSQL.SetQuery(AValue: TSQLQuery);
+begin
+  if AValue = FQuery then
+    Exit;
+  if Assigned(FQuery) then
+    FQuery.RemoveFreeNotification(Self);
+  FQuery := AValue;
+  if Assigned(FQuery) then
+    FQuery.FreeNotification(Self);
+end;
+
 procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
   out ACols, AValues: string);
 

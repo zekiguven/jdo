@@ -39,6 +39,7 @@
     FWhere: string;
     procedure InternalCheckFieldDefs(const ACount: Integer);
     procedure InternalCheckServerIndexDefs(const ACount: Integer);
+    procedure SetQuery(AValue: TSQLQuery);
   protected
     procedure CheckTableName;
     procedure CheckQuery;
@@ -64,7 +65,7 @@
     property StatementType: TJDOStatementType read FStatementType;
     property TableAlias: string read FTableAlias write FTableAlias;
     property TableName: string read FTableName write FTableName;
-    property Query: TSQLQuery read FQuery write FQuery;
+    property Query: TSQLQuery read FQuery write SetQuery;
     property OnCompose: TJDOComposeEvent read FOnCompose write FOnCompose;
   end;
 
