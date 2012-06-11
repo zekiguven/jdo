@@ -23,11 +23,6 @@ begin
     SetDatabase(AOwner as TSQLConnection);
     Transaction := TSQLConnection(AOwner).Transaction;
   end;
-  if AOwner is TJDOCustomDataBase then
-  begin
-    SetDatabase((AOwner as TJDOCustomDataBase).Connection);
-    Transaction := TJDOCustomDataBase(AOwner).Transaction;
-  end;
 end;
 
 procedure TJDOCustomQuery.InternalCheckFieldDefs;
@@ -359,6 +354,46 @@ begin
   finally
     VString.Free;
   end;
+end;
+
+procedure TJDOCustomQuery.Apply(const ARetaining: Boolean);
+var
+  VTrans: TSQLTransaction;
+begin
+  VTrans := Transaction as TSQLTransaction;
+  if not VTrans.Active then
+    Exit;
+  try
+    if State <> dsBrowse then
+      Post;
+    ApplyUpdates(0);
+    if ARetaining then
+      VTrans.CommitRetaining
+    else
+      VTrans.Commit;
+  except
+    if ARetaining then
+      VTrans.RollbackRetaining
+    else
+      VTrans.Rollback;
+    raise;
+  end;
+end;
+
+procedure TJDOCustomQuery.Undo(const ARetaining: Boolean);
+var
+  VTrans: TSQLTransaction;
+begin
+  VTrans := Transaction as TSQLTransaction;
+  if not VTrans.Active then
+    Exit;
+  if State <> dsBrowse then
+    Cancel;
+  CancelUpdates;
+  if ARetaining then
+    VTrans.RollbackRetaining
+  else
+    VTrans.Rollback;
 end;
 
 procedure TJDOCustomQuery.QueryToSchema(AQuery: TSQLQuery;

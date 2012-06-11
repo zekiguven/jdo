@@ -46,6 +46,8 @@
     procedure SaveJSONToStream(AStream: TStream);
     procedure SaveJSONToFile(const AFileName: TFileName);
     function SaveJSONToString: TJSONStringType;
+    procedure Apply(const ARetaining: Boolean);
+    procedure Undo(const ARetaining: Boolean);
     function Execute: Boolean;
     function Open: Boolean;
     procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject);
