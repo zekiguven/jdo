@@ -38,6 +38,7 @@ procedure TJDOSQLComponentEditor.ExecuteVerb(AIndex: Integer);
 var
   VSQL: TJDOSQL;
   VHook: TPropertyEditorHook;
+  VIsConnected, VIsDataBase, VIsActive: Boolean;
 begin
   case AIndex of
     0: inherited;
@@ -53,15 +54,20 @@ begin
           if not Assigned(VSQL.Query) then
             Exit;
           try
+            VIsDataBase := Assigned(Query.DataBase);
+            if VIsDataBase then
+              VIsConnected := Query.DataBase.Connected;
+            VIsActive := Query.Active;
             Query.Close;
             Compose(jstSelect);
             Query.Open;
             Query.Close;
-            Compose(jstInsert);
-            Compose(jstUpdate);
-            Compose(jstDelete);
+            ComposeAll;
           finally
             Reset;
+            if VIsDataBase then
+              Query.DataBase.Connected := VIsConnected;
+            Query.Active := VIsActive;
           end;
         end;
         if Assigned(VHook) then
