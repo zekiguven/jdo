@@ -218,6 +218,15 @@ begin
     FOnCompose(AStatementType);
 end;
 
+procedure TJDOCustomSQL.ComposeAll;
+begin
+  FStatementType := jstUnknown;
+  Compose(jstSelect);
+  Compose(jstInsert);
+  Compose(jstUpdate);
+  Compose(jstDelete);
+end;
+
 procedure TJDOCustomSQL.Reset;
 begin
   FPutBegin := ES;

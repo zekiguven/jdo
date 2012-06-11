@@ -52,6 +52,7 @@
       const ATableName: string = ES); overload;
     destructor Destroy; override;
     function Compose(const AStatementType: TJDOStatementType): Boolean;
+    procedure ComposeAll;
     procedure Reset;
     procedure Clear;
     procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle;
