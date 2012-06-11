@@ -22,7 +22,7 @@ unit JDOReg;
 interface
 
 uses
-  JDO, JDOCompEdits, Classes, ComponentEditors, PropEdits, SQLdb;
+  JDO, JDOCompEdits, LResources, Classes, ComponentEditors, PropEdits, SQLdb;
 
 procedure Register;
 
@@ -40,5 +40,8 @@ begin
   RegisterPropertyEditor(TypeInfo(TSQLTransaction), TJDODataBase,
     'Transaction', THiddenPropertyEditor);
 end;
+
+initialization
+  {$i jdoreg.lrs}
 
 end.
