@@ -55,25 +55,29 @@ begin
         raise EJDOConfig.CreateFmt(Self, SCfgFileNotFoundError, [AValue]);
       FConfigFile.LoadFromFile(AValue);
     end;
-    if not (csReading in ComponentState) then
-      Configure;
+    Configure;
   end;
 end;
 
 procedure TJDOCustomConfigurator.SetTarget(AValue: TComponent);
 begin
-  if AValue <> Self then
+  if AValue = FTarget then
+    Exit;
+  if Assigned(FTarget) then
+    FTarget.RemoveFreeNotification(Self);
+  FTarget := AValue;
+  if Assigned(FTarget) then
   begin
-    FTarget := AValue;
-    if Assigned(FTarget) then
-      Configure;
+    FTarget.FreeNotification(Self);
+    Configure;
   end;
 end;
 
 procedure TJDOCustomConfigurator.Loaded;
 begin
   inherited Loaded;
-  Configure;
+  if not (csDesigning in ComponentState) then
+    Configure;
 end;
 
 procedure TJDOCustomConfigurator.Notification(AComponent: TComponent;
