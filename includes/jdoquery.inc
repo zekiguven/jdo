@@ -364,8 +364,6 @@ begin
   if not VTrans.Active then
     Exit;
   try
-    if State <> dsBrowse then
-      Post;
     ApplyUpdates(0);
     if ARetaining then
       VTrans.CommitRetaining
@@ -387,8 +385,6 @@ begin
   VTrans := Transaction as TSQLTransaction;
   if not VTrans.Active then
     Exit;
-  if State <> dsBrowse then
-    Cancel;
   CancelUpdates;
   if ARetaining then
     VTrans.RollbackRetaining
