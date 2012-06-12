@@ -23,7 +23,7 @@
     <Description Value="JSON Data Objects designtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
     <Version Release="1" Build="1"/>
-    <Files Count="2">
+    <Files Count="3">
       <Item1>
         <Filename Value="..\units\jdocompedits.pas"/>
         <UnitName Value="JDOCompEdits"/>
@@ -33,8 +33,12 @@
         <HasRegisterProc Value="True"/>
         <UnitName Value="JDOReg"/>
       </Item2>
+      <Item3>
+        <Filename Value="..\units\jdoreg.lrs"/>
+        <Type Value="LRS"/>
+      </Item3>
     </Files>
-    <Type Value="DesignTime"/>
+    <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="1">
       <Item1>
         <PackageName Value="IDEIntf"/>
