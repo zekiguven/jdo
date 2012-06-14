@@ -87,10 +87,10 @@ procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
       if ixPrimary in IxDef.Options then
       begin
         S.DelimitedText := IxDef.Fields;
-        Break;
+        Exit;
       end;
-      raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
     end;
+    raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
   end;
 
 var
