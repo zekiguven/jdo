@@ -25,6 +25,15 @@ uses
   JDO, ComponentEditors, PropEdits, Dialogs, Controls;
 
 type
+  TJDODataBaseComponentEditor = class(TDefaultComponentEditor)
+  private
+    procedure DoDialog;
+  public
+    procedure ExecuteVerb(AIndex: Integer); override;
+    function GetVerb(AIndex: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
   TJDOSQLComponentEditor = class(TDefaultComponentEditor)
   public
     procedure ExecuteVerb(AIndex: Integer); override;
@@ -33,6 +42,50 @@ type
   end;
 
 implementation
+
+procedure TJDODataBaseComponentEditor.DoDialog;
+var
+  VDB: TJDODataBase;
+  VDialog: TOpenDialog;
+  VHook: TPropertyEditorHook;
+begin
+  VDialog := TOpenDialog.Create(nil);
+  try
+    if not VDialog.Execute then
+      Exit;
+    GetHook(VHook);
+    VDB := GetComponent as TJDODataBase;
+    VDB.Configuration := VDialog.FileName;
+    if Assigned(VHook) then
+    begin
+      VHook.Modified(Self);
+      VHook.RefreshPropertyValues;
+    end;
+  finally
+    VDialog.Free;
+  end;
+end;
+
+procedure TJDODataBaseComponentEditor.ExecuteVerb(AIndex: Integer);
+begin
+  case AIndex of
+    0: inherited;
+    1: DoDialog;
+  end;
+end;
+
+function TJDODataBaseComponentEditor.GetVerb(AIndex: Integer): string;
+begin
+  case AIndex of
+    0: Result := inherited GetVerb(AIndex);
+    1: Result := 'Open configuration file ...';
+  end;
+end;
+
+function TJDODataBaseComponentEditor.GetVerbCount: Integer;
+begin
+  Result := 2;
+end;
 
 procedure TJDOSQLComponentEditor.ExecuteVerb(AIndex: Integer);
 var
