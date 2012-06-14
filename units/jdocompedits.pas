@@ -47,6 +47,7 @@ procedure TJDODataBaseComponentEditor.DoDialog;
 var
   VDB: TJDODataBase;
   VDialog: TOpenDialog;
+  VIsConnected: Boolean;
   VHook: TPropertyEditorHook;
 begin
   VDialog := TOpenDialog.Create(nil);
@@ -55,7 +56,9 @@ begin
       Exit;
     GetHook(VHook);
     VDB := GetComponent as TJDODataBase;
+    VIsConnected := VDB.Connected;
     VDB.Configuration := VDialog.FileName;
+    VDB.Connected := VIsConnected;
     if Assigned(VHook) then
     begin
       VHook.Modified(Self);
