@@ -61,7 +61,7 @@ end;
 
 procedure TJDOCustomConfigurator.SetTarget(AValue: TComponent);
 begin
-  if AValue = FTarget then
+  if (AValue = FTarget) or (AValue = Self) then
     Exit;
   if Assigned(FTarget) then
     FTarget.RemoveFreeNotification(Self);
