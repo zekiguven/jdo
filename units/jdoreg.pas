@@ -22,7 +22,8 @@ unit JDOReg;
 interface
 
 uses
-  JDO, JDOCompEdits, LResources, Classes, ComponentEditors, PropEdits, SQLdb;
+  JDO, JDOCompEdits, JDOPropEdits, LResources, Classes, ComponentEditors,
+  PropEdits, SQLdb;
 
 procedure Register;
 
@@ -30,13 +31,17 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('JDO', [TJDOConfigurator, TJDOSQL, TJDODataBase,
-    TJDOQuery]);
+  RegisterComponents('JDO', [TJDODataBase, TJDOQuery, TJDOSQL,
+    TJDOConfigurator]);
   RegisterComponentEditor(TJDOSQL, TJDOSQLComponentEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDOConfigurator,
     'Configuration', TFileNamePropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDODataBase,
     'Configuration', TFileNamePropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), TJDODataBase,
+    'ConnectorType', TJDOConnectorTypePropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), TJDODataBase,
+    'DatabaseName', TFileNamePropertyEditor);
   RegisterPropertyEditor(TypeInfo(TJDOStatementType), TJDOSQL,
     'StatementType', THiddenPropertyEditor);
   RegisterPropertyEditor(TypeInfo(TSQLTransaction), TJDODataBase,
