@@ -15,7 +15,7 @@ var
   q: TJDOQuery;
   a, r: TJSONArray;
 begin
-  db := TJDODataBase.Create('connectortype=sqlite3;databasename=db.sqlite3');
+  db := TJDODataBase.Create(nil, 'connectortype=sqlite3;databasename=db.sqlite3');
   q := TJDOQuery.Create(db);
   a := TJSONArray.Create;
   try
@@ -26,7 +26,7 @@ begin
     a.Add(TJSONObject.Create(['id', 1, 'dummy', 'Dummy string 1']));
     a.Add(TJSONObject.Create(['id', 2, 'dummy', 'Dummy string 2']));
     q.Insert(a);
-    q.ApplyUpdates(-1);
+    q.ApplyUpdates(0);
     WriteLn('Done.');
 
     WriteLn('Show inserted records ...');
@@ -41,7 +41,7 @@ begin
     a.Add(TJSONObject.Create(['id', 1, 'dummy', 'Dummy string 1 - Edited']));
     a.Add(TJSONObject.Create(['id', 2, 'dummy', 'Dummy string 2 - Edited']));
     q.Edit(a);
-    q.ApplyUpdates(-1);
+    q.ApplyUpdates(0);
     WriteLn('Done.');
 
     WriteLn('Show edited records ...');
@@ -56,15 +56,10 @@ begin
     a.Add(TJSONObject.Create(['id', 1]));
     a.Add(TJSONObject.Create(['id', 2]));
     q.Delete(a);
-    q.ApplyUpdates(-1);
+    q.ApplyUpdates(0);
     WriteLn('Done.');
 
-    try
-      db.Commit;
-    except
-      db.Rollback;
-      raise;
-    end;
+    q.Apply;
   finally
     a.Free;
     db.Free;
