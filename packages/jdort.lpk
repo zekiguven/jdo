@@ -20,7 +20,7 @@
     <Description Value="JSON Data Objects runtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
     <Version Release="6" Build="11"/>
-    <Files Count="15">
+    <Files Count="13">
       <Item1>
         <Filename Value="..\includes\jdo.inc"/>
         <Type Value="Include"/>
@@ -62,25 +62,17 @@
         <Type Value="Include"/>
       </Item10>
       <Item11>
-        <Filename Value="..\includes\jdotable.inc"/>
+        <Filename Value="..\includes\jdoutils.inc"/>
         <Type Value="Include"/>
       </Item11>
       <Item12>
-        <Filename Value="..\includes\jdotableh.inc"/>
+        <Filename Value="..\includes\jdoutilsh.inc"/>
         <Type Value="Include"/>
       </Item12>
       <Item13>
-        <Filename Value="..\includes\jdoutils.inc"/>
-        <Type Value="Include"/>
-      </Item13>
-      <Item14>
-        <Filename Value="..\includes\jdoutilsh.inc"/>
-        <Type Value="Include"/>
-      </Item14>
-      <Item15>
         <Filename Value="..\units\jdo.pas"/>
         <UnitName Value="JDO"/>
-      </Item15>
+      </Item13>
     </Files>
     <Type Value="RunTimeOnly"/>
     <RequiredPkgs Count="1">

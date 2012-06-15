@@ -38,7 +38,6 @@ type
 {$i jdosqlh.inc}
 {$i jdoqueryh.inc}
 {$i jdodatabaseh.inc}
-{$i jdotableh.inc}
 {$i jdoutilsh.inc}
 
 implementation
@@ -58,7 +57,6 @@ end;
 {$i jdosql.inc}
 {$i jdoquery.inc}
 {$i jdodatabase.inc}
-{$i jdotable.inc}
 {$i jdoutils.inc}
 
 end.
