@@ -31,7 +31,7 @@ end;
 constructor TJDOCustomDataBase.Create(AOwner: TComponent;
   const AConfiguration: string; const AConnect: Boolean);
 begin
-  inherited Create(AOwner);
+  Create(AOwner);
   FConfig.Configuration := AConfiguration;
   Connected := AConnect;
 end;
