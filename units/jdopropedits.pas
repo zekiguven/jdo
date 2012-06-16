@@ -22,17 +22,18 @@ unit JDOPropEdits;
 interface
 
 uses
-  PropEdits, Classes, SrcEditorIntf, CodeToolManager, CodeCache;
+  PropEdits, Classes, SysUtils, SrcEditorIntf, CodeToolManager, CodeCache;
 
 type
   TJDOConnectorTypePropertyEditor = class(TStringPropertyEditor)
-  private
-    FOldValue: AnsiString;
   public
     function GetAttributes: TPropertyAttributes; override;
     procedure GetValues(AProc: TGetStrProc); override;
     procedure SetValue(const ANewValue: AnsiString); override;
   end;
+
+procedure AddConnUnit(const ATypeName: string);
+procedure RemoveAllConnUnit;
 
 implementation
 
@@ -48,6 +49,65 @@ uses
   pqconnection,
   sqlite3conn,
   mssqlconn;
+
+const
+  ConnUnitNames: array[0..10] of string = ('IBConnection', 'MySQL40Conn',
+    'MySQL41Conn', 'MySQL50Conn', 'MySQL51Conn', 'MySQL55Conn', 'ODBCConn',
+    'OracleConnection', 'PQConnection', 'SQLite3Conn', 'MSSQLConn');
+
+function CodeBuffer: TCodeBuffer;
+var
+  VSrcEdit: TSourceEditorInterface;
+begin
+  VSrcEdit := SourceEditorManagerIntf.ActiveEditor;
+  if Assigned(VSrcEdit) then
+    Result := TCodeBuffer(VSrcEdit.CodeToolsBuffer);
+end;
+
+procedure AddConnUnit(const ATypeName: string);
+var
+  VUnit: string;
+  VCode: TCodeBuffer;
+begin
+  VCode := CodeBuffer;
+  if VCode = nil then
+    Exit;
+  if SameText(ATypeName, TIBConnectionDef.TypeName) then
+    VUnit := 'IBConnection';
+  if SameText(ATypeName, TMySQL40ConnectionDef.TypeName) then
+    VUnit := 'MySQL40Conn';
+  if SameText(ATypeName, TMySQL41ConnectionDef.TypeName) then
+    VUnit := 'MySQL41Conn';
+  if SameText(ATypeName, TMySQL50ConnectionDef.TypeName) then
+    VUnit := 'MySQL50Conn';
+  if SameText(ATypeName, TMySQL51ConnectionDef.TypeName) then
+    VUnit := 'MySQL51Conn';
+  if SameText(ATypeName, TMySQL55ConnectionDef.TypeName) then
+    VUnit := 'MySQL55Conn';
+  if SameText(ATypeName, TODBCConnectionDef.TypeName) then
+    VUnit := 'ODBCConn';
+  if SameText(ATypeName, TOracleConnectionDef.TypeName) then
+    VUnit := 'OracleConnection';
+  if SameText(ATypeName, TPQConnectionDef.TypeName) then
+    VUnit := 'PQConnection';
+  if SameText(ATypeName, TSQLite3ConnectionDef.TypeName) then
+    VUnit := 'SQLite3Conn';
+  if SameText(ATypeName, TMSSQLConnectionDef.TypeName) then
+    VUnit := 'MSSQLConn';
+  CodeToolBoss.AddUnitToMainUsesSection(VCode, VUnit, '');
+end;
+
+procedure RemoveAllConnUnit;
+var
+  I: Integer;
+  VCode: TCodeBuffer;
+begin
+  VCode := CodeBuffer;
+  if VCode = nil then
+    Exit;
+  for I := 0 to High(ConnUnitNames) do
+    CodeToolBoss.RemoveUnitFromAllUsesSections(VCode, ConnUnitNames[I]);
+end;
 
 function TJDOConnectorTypePropertyEditor.GetAttributes: TPropertyAttributes;
 begin
@@ -70,43 +130,10 @@ begin
 end;
 
 procedure TJDOConnectorTypePropertyEditor.SetValue(const ANewValue: AnsiString);
-var
-  VUnit: string;
-  VCode: TCodeBuffer;
-  VSrcEdit: TSourceEditorInterface;
 begin
   inherited;
-  VSrcEdit := SourceEditorManagerIntf.ActiveEditor;
-  if VSrcEdit = nil then
-    Exit;
-  VCode := TCodeBuffer(VSrcEdit.CodeToolsBuffer);
-  if VCode = nil then
-    Exit;
-  CodeToolBoss.RemoveUnitFromAllUsesSections(VCode, FOldValue);
-  if ANewValue = TIBConnectionDef.TypeName then
-    VUnit := 'IBConnection';
-  if ANewValue = TMySQL40ConnectionDef.TypeName then
-    VUnit := 'MySQL40Conn';
-  if ANewValue = TMySQL41ConnectionDef.TypeName then
-    VUnit := 'MySQL41Conn';
-  if ANewValue = TMySQL50ConnectionDef.TypeName then
-    VUnit := 'MySQL50Conn';
-  if ANewValue = TMySQL51ConnectionDef.TypeName then
-    VUnit := 'MySQL51Conn';
-  if ANewValue = TMySQL55ConnectionDef.TypeName then
-    VUnit := 'MySQL55Conn';
-  if ANewValue = TODBCConnectionDef.TypeName then
-    VUnit := 'ODBCConn';
-  if ANewValue = TOracleConnectionDef.TypeName then
-    VUnit := 'OracleConnection';
-  if ANewValue = TPQConnectionDef.TypeName then
-    VUnit := 'PQConnection';
-  if ANewValue = TSQLite3ConnectionDef.TypeName then
-    VUnit := 'SQLite3Conn';
-  if ANewValue = TMSSQLConnectionDef.TypeName then
-    VUnit := 'MSSQLConn';
-  FOldValue := VUnit;
-  CodeToolBoss.AddUnitToMainUsesSection(VCode, VUnit, '');
+  RemoveAllConnUnit;
+  AddConnUnit(ANewValue);
 end;
 
 end.
