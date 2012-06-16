@@ -22,7 +22,7 @@ unit JDOCompEdits;
 interface
 
 uses
-  JDO, ComponentEditors, PropEdits, Dialogs, Controls;
+  JDO, JDOPropEdits, ComponentEditors, PropEdits, Dialogs, Controls;
 
 type
   TJDODataBaseComponentEditor = class(TDefaultComponentEditor)
@@ -63,6 +63,8 @@ begin
     begin
       VHook.Modified(Self);
       VHook.RefreshPropertyValues;
+      RemoveAllConnUnit;
+      AddConnUnit(VDB.ConnectorType);
     end;
   finally
     VDialog.Free;
