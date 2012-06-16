@@ -21,8 +21,8 @@ begin
   q := TJDOQuery.Create(db);
 
   a := TJSONArray.Create;
-  db.StartTransaction(True);
   try
+    db.StartTransaction(True);
     try
       WriteLn('Creating FieldDefs ...');
       q.SQL.Text := 'select * from t1';

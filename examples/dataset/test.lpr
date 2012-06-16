@@ -19,47 +19,53 @@ begin
   q := TJDOQuery.Create(db);
   a := TJSONArray.Create;
   try
-    q.SQL.Text := 'select * from t1 order by id';
-    q.Open;
+    db.StartTransaction(True);
+    try
+      q.SQL.Text := 'select * from t1 order by id';
+      q.Open;
 
-    WriteLn('Inserting records ...');
-    a.Add(TJSONObject.Create(['id', 1, 'dummy', 'Dummy string 1']));
-    a.Add(TJSONObject.Create(['id', 2, 'dummy', 'Dummy string 2']));
-    q.Insert(a);
-    q.ApplyUpdates(0);
-    WriteLn('Done.');
+      WriteLn('Inserting records ...');
+      a.Add(TJSONObject.Create(['id', 1, 'dummy', 'Dummy string 1']));
+      a.Add(TJSONObject.Create(['id', 2, 'dummy', 'Dummy string 2']));
+      q.Insert(a);
+      q.ApplyUpdates(0);
+      WriteLn('Done.');
 
-    WriteLn('Show inserted records ...');
-    q.Refresh;
-    r := q.GetJSONArray;
-    WriteLn(r.AsJSON);
-    FreeAndNil(r);
-    WriteLn('Done.');
+      WriteLn('Show inserted records ...');
+      q.Refresh;
+      r := q.GetJSONArray;
+      WriteLn(r.AsJSON);
+      FreeAndNil(r);
+      WriteLn('Done.');
 
-    WriteLn('Editing records ...');
-    a.Clear;
-    a.Add(TJSONObject.Create(['id', 1, 'dummy', 'Dummy string 1 - Edited']));
-    a.Add(TJSONObject.Create(['id', 2, 'dummy', 'Dummy string 2 - Edited']));
-    q.Edit(a);
-    q.ApplyUpdates(0);
-    WriteLn('Done.');
+      WriteLn('Editing records ...');
+      a.Clear;
+      a.Add(TJSONObject.Create(['id', 1, 'dummy', 'Dummy string 1 - Edited']));
+      a.Add(TJSONObject.Create(['id', 2, 'dummy', 'Dummy string 2 - Edited']));
+      q.Edit(a);
+      q.ApplyUpdates(0);
+      WriteLn('Done.');
 
-    WriteLn('Show edited records ...');
-    q.Refresh;
-    r := q.GetJSONArray;
-    WriteLn(r.AsJSON);
-    FreeAndNil(r);
-    WriteLn('Done.');
+      WriteLn('Show edited records ...');
+      q.Refresh;
+      r := q.GetJSONArray;
+      WriteLn(r.AsJSON);
+      FreeAndNil(r);
+      WriteLn('Done.');
 
-    WriteLn('Deleting records ...');
-    a.Clear;
-    a.Add(TJSONObject.Create(['id', 1]));
-    a.Add(TJSONObject.Create(['id', 2]));
-    q.Delete(a);
-    q.ApplyUpdates(0);
-    WriteLn('Done.');
+      WriteLn('Deleting records ...');
+      a.Clear;
+      a.Add(TJSONObject.Create(['id', 1]));
+      a.Add(TJSONObject.Create(['id', 2]));
+      q.Delete(a);
+      q.ApplyUpdates(0);
+      WriteLn('Done.');
 
-    q.Apply;
+      db.Commit(False);
+    except
+      db.Rollback(False);
+      raise;
+    end;
   finally
     a.Free;
     db.Free;
