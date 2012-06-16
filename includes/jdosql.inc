@@ -25,8 +25,8 @@ constructor TJDOCustomSQL.Create(AOwner: TComponent;
   AQuery: TSQLQuery; const ATableName: string);
 begin
   Create(AOwner);
-  CheckQuery;
   FQuery := AQuery;
+  CheckQuery;
   FTableName := ATableName;
 end;
 
