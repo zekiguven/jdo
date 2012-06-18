@@ -48,6 +48,8 @@
     function SaveJSONToString: TJSONStringType;
     procedure Apply(const ARetaining: Boolean = False);
     procedure Undo(const ARetaining: Boolean = False);
+    procedure Commit(const ARetaining: Boolean = False);
+    procedure Rollback(const ARetaining: Boolean = False);
     function Execute: Boolean;
     function Open: Boolean;
     procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject);

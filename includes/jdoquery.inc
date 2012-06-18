@@ -392,6 +392,40 @@ begin
     VTrans.Rollback;
 end;
 
+procedure TJDOCustomQuery.Commit(const ARetaining: Boolean);
+var
+  VTrans: TSQLTransaction;
+begin
+  VTrans := Transaction as TSQLTransaction;
+  if not VTrans.Active then
+    Exit;
+  try
+    if ARetaining then
+      VTrans.CommitRetaining
+    else
+      VTrans.Commit;
+  except
+    if ARetaining then
+      VTrans.RollbackRetaining
+    else
+      VTrans.Rollback;
+    raise;
+  end;
+end;
+
+procedure TJDOCustomQuery.Rollback(const ARetaining: Boolean);
+var
+  VTrans: TSQLTransaction;
+begin
+  VTrans := Transaction as TSQLTransaction;
+  if not VTrans.Active then
+    Exit;
+  if ARetaining then
+    VTrans.RollbackRetaining
+  else
+    VTrans.Rollback;
+end;
+
 procedure TJDOCustomQuery.QueryToSchema(AQuery: TSQLQuery;
   ASchema: TJSONObject);
 var
