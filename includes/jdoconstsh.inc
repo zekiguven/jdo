@@ -54,6 +54,11 @@ const
   ERROR_MASK = '%s: %s';
   NullDate = 0;
 
+  SOpenConfigFile = 'Open configuration file ...';
+  SGenSQLStmt = 'Generate SQL statements ...';
+  SGenSQLStmtConfirm = 'Generate SQL statements?';
+  SSQLStmtGeneratedMsg = 'SQL statements were generated successfully!';
+
   // Error msgs
   SEmptyServerIndexDefsCountError = '"ServerIndexDefs.Count" must not be "0".';
   SEmptyFieldDefsCountError = '"FieldDefs.Count" must not be "0".';

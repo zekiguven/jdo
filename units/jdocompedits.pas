@@ -25,6 +25,15 @@ uses
   JDO, JDOPropEdits, ComponentEditors, PropEdits, Dialogs, Controls;
 
 type
+  TJDOConfiguratorComponentEditor = class(TDefaultComponentEditor)
+  private
+    procedure DoDialog;
+  public
+    procedure ExecuteVerb(AIndex: Integer); override;
+    function GetVerb(AIndex: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
   TJDODataBaseComponentEditor = class(TDefaultComponentEditor)
   private
     procedure DoDialog;
@@ -42,6 +51,54 @@ type
   end;
 
 implementation
+
+{ TJDOConfiguratorComponentEditor }
+
+procedure TJDOConfiguratorComponentEditor.DoDialog;
+var
+  VDialog: TOpenDialog;
+  VCfg: TJDOConfigurator;
+  VHook: TPropertyEditorHook;
+begin
+  VDialog := TOpenDialog.Create(nil);
+  try
+    if not VDialog.Execute then
+      Exit;
+    GetHook(VHook);
+    VCfg := GetComponent as TJDOConfigurator;
+    VCfg.Configuration := VDialog.FileName;
+    if Assigned(VHook) then
+    begin
+      VHook.Modified(Self);
+      VHook.RefreshPropertyValues;
+    end;
+  finally
+    VDialog.Free;
+  end;
+end;
+
+procedure TJDOConfiguratorComponentEditor.ExecuteVerb(AIndex: Integer);
+begin
+  case AIndex of
+    0: inherited;
+    1: DoDialog;
+  end;
+end;
+
+function TJDOConfiguratorComponentEditor.GetVerb(AIndex: Integer): string;
+begin
+  case AIndex of
+    0: Result := inherited GetVerb(AIndex);
+    1: Result := SOpenConfigFile;
+  end;
+end;
+
+function TJDOConfiguratorComponentEditor.GetVerbCount: Integer;
+begin
+  Result := 2;
+end;
+
+{ TJDODataBaseComponentEditor }
 
 procedure TJDODataBaseComponentEditor.DoDialog;
 var
@@ -83,7 +140,7 @@ function TJDODataBaseComponentEditor.GetVerb(AIndex: Integer): string;
 begin
   case AIndex of
     0: Result := inherited GetVerb(AIndex);
-    1: Result := 'Open configuration file ...';
+    1: Result := SOpenConfigFile;
   end;
 end;
 
@@ -102,7 +159,7 @@ begin
     0: inherited;
     1:
       begin
-        if MessageDlg('Generate SQL statements?', mtConfirmation,
+        if MessageDlg(SGenSQLStmtConfirm, mtConfirmation,
           mbYesNo, 0) <> mrYes then
           Exit;
         GetHook(VHook);
@@ -130,7 +187,7 @@ begin
         end;
         if Assigned(VHook) then
           VHook.Modified(Self);
-        ShowMessage('SQL statements were generated successfully!');
+        ShowMessage(SSQLStmtGeneratedMsg);
       end;
   end;
 end;
@@ -139,7 +196,7 @@ function TJDOSQLComponentEditor.GetVerb(AIndex: Integer): string;
 begin
   case AIndex of
     0: Result := inherited GetVerb(AIndex);
-    1: Result := 'Generate SQL statements ...';
+    1: Result := SGenSQLStmt;
   end;
 end;
 
