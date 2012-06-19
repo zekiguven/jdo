@@ -161,14 +161,14 @@ begin
     0: inherited;
     1..5:
       begin
+        VSQL := GetComponent as TJDOSQL;
+        if not Assigned(VSQL.Query) then
+          Exit;
         if MessageDlg(SGenSQLConfirm, mtConfirmation, mbYesNo, 0) <> mrYes then
           Exit;
         GetHook(VHook);
-        VSQL := GetComponent as TJDOSQL;
         with VSQL do
         begin
-          if not Assigned(VSQL.Query) then
-            Exit;
           try
             VIsDataBase := Assigned(Query.DataBase);
             if VIsDataBase then
