@@ -22,7 +22,7 @@ unit JDO;
 interface
 
 uses
-  Classes, SysUtils, SQLdb, DB, FPJSON, TypInfo, Variants, JSONParser;
+  Classes, SysUtils, SQLdb, DB, FPJSON, TypInfo, Variants, JSONParser, DBConst;
 
 {$i jdoconstsh.inc}
 
