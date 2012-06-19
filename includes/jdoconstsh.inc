@@ -55,9 +55,13 @@ const
   NullDate = 0;
 
   SOpenConfigFile = 'Open configuration file ...';
-  SGenSQLStmt = 'Generate SQL statements ...';
-  SGenSQLStmtConfirm = 'Generate SQL statements?';
-  SSQLStmtGeneratedMsg = 'SQL statements were generated successfully!';
+  SGenSelSQL = 'Generate SQL for select ...';
+  SGenInsSQL = 'Generate SQL for insert ...';
+  SGenUpdSQL = 'Generate SQL for update ...';
+  SGenDelSQL = 'Generate SQL for delete ...';
+  SGenAllSQL = 'Generate all SQL ...';
+  SGenSQLConfirm = 'Generate SQL?';
+  SSQLGeneratedMsg = 'SQL were generated successfully!';
 
   // Error msgs
   SEmptyServerIndexDefsCountError = '"ServerIndexDefs.Count" must not be "0".';
