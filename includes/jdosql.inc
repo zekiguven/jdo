@@ -195,10 +195,11 @@ begin
     FQuery := nil;
 end;
 
-function TJDOCustomSQL.Compose(const AStatementType: TJDOStatementType): Boolean;
+function TJDOCustomSQL.Compose(const AStatementType: TJDOStatementType;
+  const AIntoSQL: Boolean): Boolean;
 var
   VIsWhere: Boolean;
-  VCols, VValues: string;
+  VCols, VValues, VSQL: string;
 begin
   CheckQuery;
   CheckTableName;
@@ -241,20 +242,32 @@ begin
       jstInsert:
         begin
           PrepareCols(jstInsert, VCols, VValues);
-          FQuery.InsertSQL.Text := SQL_INSERT_TOKEN + SP + FTableName + SP +
-            PS + VCols + PE + SP + SQL_VALUES_TOKEN + SP + PS + VValues + PE;
+          VSQL := SQL_INSERT_TOKEN + SP + FTableName + SP + PS + VCols + PE +
+            SP + SQL_VALUES_TOKEN + SP + PS + VValues + PE;
+          if AIntoSQL then
+            FQuery.SQL.Text := VSQL
+          else
+            FQuery.InsertSQL.Text := VSQL;
         end;
       jstUpdate:
         begin
           PrepareCols(jstUpdate, VCols, VValues);
-          FQuery.UpdateSQL.Text := SQL_UPDATE_TOKEN + SP + FTableName + SP +
-            SQL_SET_TOKEN + SP + VCols + SP + SQL_WHERE_TOKEN + SP + VValues;
+          VSQL := SQL_UPDATE_TOKEN + SP + FTableName + SP + SQL_SET_TOKEN + SP +
+            VCols + SP + SQL_WHERE_TOKEN + SP + VValues;
+          if AIntoSQL then
+            FQuery.SQL.Text := VSQL
+          else
+            FQuery.UpdateSQL.Text := VSQL;
         end;
       jstDelete:
         begin
           PrepareCols(jstDelete, VCols, VValues);
-          FQuery.DeleteSQL.Text := SQL_DELETE_TOKEN + SP + SQL_FROM_TOKEN + SP +
-            FTableName + SP + SQL_WHERE_TOKEN + SP + VValues;
+          VSQL := SQL_DELETE_TOKEN + SP + SQL_FROM_TOKEN + SP + FTableName +
+            SP + SQL_WHERE_TOKEN + SP + VValues;
+          if AIntoSQL then
+            FQuery.SQL.Text := VSQL
+          else
+            FQuery.DeleteSQL.Text := VSQL;
         end;
     end;
     FStatementType := AStatementType;

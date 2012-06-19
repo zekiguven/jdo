@@ -52,7 +52,8 @@
     constructor Create(AOwner: TComponent; AQuery: TSQLQuery;
       const ATableName: string = ES); overload;
     destructor Destroy; override;
-    function Compose(const AStatementType: TJDOStatementType): Boolean; virtual;
+    function Compose(const AStatementType: TJDOStatementType;
+      const AIntoSQL: Boolean = False): Boolean; virtual;
     procedure ComposeAll;
     procedure Reset;
     procedure Clear;
