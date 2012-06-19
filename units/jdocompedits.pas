@@ -81,7 +81,7 @@ procedure TJDOConfiguratorComponentEditor.ExecuteVerb(AIndex: Integer);
 begin
   case AIndex of
     0: inherited;
-    1: DoDialog;
+    2: DoDialog;
   end;
 end;
 
@@ -89,13 +89,14 @@ function TJDOConfiguratorComponentEditor.GetVerb(AIndex: Integer): string;
 begin
   case AIndex of
     0: Result := inherited GetVerb(AIndex);
-    1: Result := SOpenConfigFile;
+    1: Result := SMenuSep;
+    2: Result := SOpenConfigFile;
   end;
 end;
 
 function TJDOConfiguratorComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 2;
+  Result := 3;
 end;
 
 { TJDODataBaseComponentEditor }
@@ -132,7 +133,7 @@ procedure TJDODataBaseComponentEditor.ExecuteVerb(AIndex: Integer);
 begin
   case AIndex of
     0: inherited;
-    1: DoDialog;
+    2: DoDialog;
   end;
 end;
 
@@ -140,13 +141,14 @@ function TJDODataBaseComponentEditor.GetVerb(AIndex: Integer): string;
 begin
   case AIndex of
     0: Result := inherited GetVerb(AIndex);
-    1: Result := SOpenConfigFile;
+    1: Result := SMenuSep;
+    2: Result := SOpenConfigFile;
   end;
 end;
 
 function TJDODataBaseComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 2;
+  Result := 3;
 end;
 
 { TJDOSQLComponentEditor }
@@ -159,7 +161,7 @@ var
 begin
   case AIndex of
     0: inherited;
-    1..5:
+    2..6:
       begin
         VSQL := GetComponent as TJDOSQL;
         if not Assigned(VSQL.Query) then
@@ -203,17 +205,18 @@ function TJDOSQLComponentEditor.GetVerb(AIndex: Integer): string;
 begin
   case AIndex of
     0: Result := inherited GetVerb(AIndex);
-    1: Result := SGenSelSQL;
-    2: Result := SGenInsSQL;
-    3: Result := SGenUpdSQL;
-    4: Result := SGenDelSQL;
-    5: Result := SGenAllSQL;
+    1: Result := SMenuSep;
+    2: Result := SGenSelSQL;
+    3: Result := SGenInsSQL;
+    4: Result := SGenUpdSQL;
+    5: Result := SGenDelSQL;
+    6: Result := SGenAllSQL;
   end;
 end;
 
 function TJDOSQLComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 6;
+  Result := 7;
 end;
 
 end.
