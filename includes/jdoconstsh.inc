@@ -62,7 +62,10 @@ const
   SGenDelSQL = 'Generate SQL for delete ...';
   SGenAllSQL = 'Generate all SQL ...';
   SGenSQLConfirm = 'Generate SQL?';
-  SSQLGeneratedMsg = 'SQL were generated successfully!';
+  SSQLGeneratedMsg = 'SQL generated successfully!';
+  SLoadJSONFileMsg = 'Load JSON from file ...';
+  SSaveJSONFileMsg = 'Save JSON to file ...';
+  SJSONLoadedMsg = 'JSON loaded successfully!';
 
   // Error msgs
   SEmptyServerIndexDefsCountError = '"ServerIndexDefs.Count" must not be "0".';

@@ -36,6 +36,7 @@ begin
   RegisterComponentEditor(TJDOConfigurator, TJDOConfiguratorComponentEditor);
   RegisterComponentEditor(TJDOSQL, TJDOSQLComponentEditor);
   RegisterComponentEditor(TJDODataBase, TJDODataBaseComponentEditor);
+  RegisterComponentEditor(TJDOQuery, TJDOQueryComponentEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDOConfigurator,
     'Configuration', TFileNamePropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDODataBase,
