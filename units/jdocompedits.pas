@@ -27,7 +27,7 @@ uses
 type
   TJDOConfiguratorComponentEditor = class(TDefaultComponentEditor)
   private
-    procedure DoDialog;
+    procedure DoOpenDialog;
   public
     procedure ExecuteVerb(AIndex: Integer); override;
     function GetVerb(AIndex: Integer): string; override;
@@ -36,7 +36,7 @@ type
 
   TJDODataBaseComponentEditor = class(TDefaultComponentEditor)
   private
-    procedure DoDialog;
+    procedure DoOpenDialog;
   public
     procedure ExecuteVerb(AIndex: Integer); override;
     function GetVerb(AIndex: Integer): string; override;
@@ -50,11 +50,21 @@ type
     function GetVerbCount: Integer; override;
   end;
 
+  TJDOQueryComponentEditor = class(TDefaultComponentEditor)
+  private
+    procedure DoOpenDialog;
+    procedure DoSaveDialog;
+  public
+    procedure ExecuteVerb(AIndex: Integer); override;
+    function GetVerb(AIndex: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
 implementation
 
 { TJDOConfiguratorComponentEditor }
 
-procedure TJDOConfiguratorComponentEditor.DoDialog;
+procedure TJDOConfiguratorComponentEditor.DoOpenDialog;
 var
   VDialog: TOpenDialog;
   VCfg: TJDOConfigurator;
@@ -81,7 +91,7 @@ procedure TJDOConfiguratorComponentEditor.ExecuteVerb(AIndex: Integer);
 begin
   case AIndex of
     0: inherited;
-    2: DoDialog;
+    2: DoOpenDialog;
   end;
 end;
 
@@ -101,7 +111,7 @@ end;
 
 { TJDODataBaseComponentEditor }
 
-procedure TJDODataBaseComponentEditor.DoDialog;
+procedure TJDODataBaseComponentEditor.DoOpenDialog;
 var
   VDB: TJDODataBase;
   VDialog: TOpenDialog;
@@ -133,7 +143,7 @@ procedure TJDODataBaseComponentEditor.ExecuteVerb(AIndex: Integer);
 begin
   case AIndex of
     0: inherited;
-    2: DoDialog;
+    2: DoOpenDialog;
   end;
 end;
 
@@ -217,6 +227,73 @@ end;
 function TJDOSQLComponentEditor.GetVerbCount: Integer;
 begin
   Result := 7;
+end;
+
+{ TJDOQueryComponentEditor }
+
+procedure TJDOQueryComponentEditor.DoOpenDialog;
+var
+  VQuery: TJDOQuery;
+  VDialog: TOpenDialog;
+  VHook: TPropertyEditorHook;
+begin
+  VDialog := TOpenDialog.Create(nil);
+  try
+    if not VDialog.Execute then
+      Exit;
+    GetHook(VHook);
+    VQuery := GetComponent as TJDOQuery;
+    VQuery.LoadJSONFromFile(VDialog.FileName);
+    VQuery.Apply(False);
+    ShowMessage(SJSONLoadedMsg);
+    if Assigned(VHook) then
+    begin
+      VHook.Modified(Self);
+      VHook.RefreshPropertyValues;
+    end;
+  finally
+    VDialog.Free;
+  end;
+end;
+
+procedure TJDOQueryComponentEditor.DoSaveDialog;
+var
+  VQuery: TJDOQuery;
+  VDialog: TSaveDialog;
+begin
+  VDialog := TSaveDialog.Create(nil);
+  try
+    if not VDialog.Execute then
+      Exit;
+    VQuery := GetComponent as TJDOQuery;
+    VQuery.SaveJSONToFile(VDialog.FileName);
+  finally
+    VDialog.Free;
+  end;
+end;
+
+procedure TJDOQueryComponentEditor.ExecuteVerb(AIndex: Integer);
+begin
+  case AIndex of
+    0: inherited;
+    2: DoOpenDialog;
+    3: DoSaveDialog;
+  end;
+end;
+
+function TJDOQueryComponentEditor.GetVerb(AIndex: Integer): string;
+begin
+  case AIndex of
+    0: Result := inherited GetVerb(AIndex);
+    1: Result := SMenuSep;
+    2: Result := SLoadJSONFileMsg;
+    3: Result := SSaveJSONFileMsg;
+  end;
+end;
+
+function TJDOQueryComponentEditor.GetVerbCount: Integer;
+begin
+  Result := 4;
 end;
 
 end.
