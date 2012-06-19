@@ -57,6 +57,8 @@
     procedure QueryToJSONSchema(AQuery: TSQLQuery;
       out AJSONSchema: TJSONStringType);
     function JSONSchema: TJSONStringType;
+    function Field(const AFieldName: string): TField;
+    function Param(const AParamName: string): TParam;
     procedure Append(AJSON: TJSONArray); overload;
     procedure Append(AJSON: TJSONObject); overload;
     procedure Insert(AJSON: TJSONArray); overload;

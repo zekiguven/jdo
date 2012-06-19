@@ -498,6 +498,20 @@ begin
   QueryToJSONSchema(Self, Result);
 end;
 
+function TJDOCustomQuery.Field(const AFieldName: string): TField;
+begin
+  Result := Fields.FindField(AFieldName);
+  if Result = nil then
+    DatabaseErrorFmt(SFieldNotFound, [AFieldName], Self);
+end;
+
+function TJDOCustomQuery.Param(const AParamName: string): TParam;
+begin
+  Result := Params.FindParam(AParamName);
+  if Result = nil then
+    DatabaseErrorFmt(SParameterNotFound, [AParamName], Self);
+end;
+
 procedure TJDOCustomQuery.Append(AJSON: TJSONArray);
 var
   I: Integer;
