@@ -54,6 +54,7 @@ const
   ERROR_MASK = '%s: %s';
   NullDate = 0;
 
+  SMenuSep = '-';
   SOpenConfigFile = 'Open configuration file ...';
   SGenSelSQL = 'Generate SQL for select ...';
   SGenInsSQL = 'Generate SQL for insert ...';
