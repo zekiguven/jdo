@@ -149,6 +149,8 @@ begin
   Result := 2;
 end;
 
+{ TJDOSQLComponentEditor }
+
 procedure TJDOSQLComponentEditor.ExecuteVerb(AIndex: Integer);
 var
   VSQL: TJDOSQL;
@@ -157,10 +159,9 @@ var
 begin
   case AIndex of
     0: inherited;
-    1:
+    1..5:
       begin
-        if MessageDlg(SGenSQLStmtConfirm, mtConfirmation,
-          mbYesNo, 0) <> mrYes then
+        if MessageDlg(SGenSQLConfirm, mtConfirmation, mbYesNo, 0) <> mrYes then
           Exit;
         GetHook(VHook);
         VSQL := GetComponent as TJDOSQL;
@@ -177,7 +178,13 @@ begin
             Compose(jstSelect);
             Query.Open;
             Query.Close;
-            ComposeAll;
+            case AIndex of
+              1: Compose(jstSelect);
+              2: Compose(jstInsert);
+              3: Compose(jstUpdate);
+              4: Compose(jstDelete);
+              5: ComposeAll;
+            end;
           finally
             Reset;
             if VIsDataBase then
@@ -187,7 +194,7 @@ begin
         end;
         if Assigned(VHook) then
           VHook.Modified(Self);
-        ShowMessage(SSQLStmtGeneratedMsg);
+        ShowMessage(SSQLGeneratedMsg);
       end;
   end;
 end;
@@ -196,13 +203,17 @@ function TJDOSQLComponentEditor.GetVerb(AIndex: Integer): string;
 begin
   case AIndex of
     0: Result := inherited GetVerb(AIndex);
-    1: Result := SGenSQLStmt;
+    1: Result := SGenSelSQL;
+    2: Result := SGenInsSQL;
+    3: Result := SGenUpdSQL;
+    4: Result := SGenDelSQL;
+    5: Result := SGenAllSQL;
   end;
 end;
 
 function TJDOSQLComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 2;
+  Result := 6;
 end;
 
 end.
