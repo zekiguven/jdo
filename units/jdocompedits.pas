@@ -191,11 +191,11 @@ begin
             Query.Open;
             Query.Close;
             case AIndex of
-              1: Compose(jstSelect);
-              2: Compose(jstInsert);
-              3: Compose(jstUpdate);
-              4: Compose(jstDelete);
-              5: ComposeAll;
+              2: Compose(jstSelect);
+              3: Compose(jstInsert);
+              4: Compose(jstUpdate);
+              5: Compose(jstDelete);
+              6: ComposeAll;
             end;
           finally
             Reset;
