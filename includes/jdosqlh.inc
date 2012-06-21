@@ -59,7 +59,7 @@
     procedure Clear;
     procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle;
       const ALineBreak: ShortString = SP);
-    procedure Like(const AKey: string; const ACaseInsensitive: Boolean = False);
+    procedure Like(const AField: string; const ACaseInsensitive: Boolean = False);
     property OrderBy: string read FOrderBy write FOrderBy;
     property Ordered: Boolean read FOrdered write FOrdered default True;
     property Where: string read FWhere write FWhere;

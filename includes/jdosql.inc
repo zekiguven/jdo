@@ -329,11 +329,11 @@ begin
   end;
 end;
 
-procedure TJDOCustomSQL.Like(const AKey: string; const ACaseInsensitive: Boolean);
+procedure TJDOCustomSQL.Like(const AField: string; const ACaseInsensitive: Boolean);
 begin
   if ACaseInsensitive then
-    FLike := SQL_LOWER_TOKEN + PS + AKey + PE
+    FLike := SQL_LOWER_TOKEN + PS + AField + PE
   else
-    FLike := AKey;
-  FLike += SP + SQL_LIKE_TOKEN + SP + PS + CO + AKey + PE;
+    FLike := AField;
+  FLike += SP + SQL_LIKE_TOKEN + SP + PS + CO + AField + PE;
 end;
