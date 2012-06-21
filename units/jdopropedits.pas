@@ -22,7 +22,8 @@ unit JDOPropEdits;
 interface
 
 uses
-  PropEdits, Classes, SysUtils, SrcEditorIntf, CodeToolManager, CodeCache;
+  JDO, SQLdb, PropEdits, Classes, SysUtils, SrcEditorIntf, CodeToolManager,
+  CodeCache;
 
 type
   TJDOConnectorTypePropertyEditor = class(TStringPropertyEditor)
@@ -30,6 +31,12 @@ type
     function GetAttributes: TPropertyAttributes; override;
     procedure GetValues(AProc: TGetStrProc); override;
     procedure SetValue(const ANewValue: AnsiString); override;
+  end;
+
+  TJDOTableNamePropertyEditor = class(TStringPropertyEditor)
+  public
+    function GetAttributes: TPropertyAttributes; override;
+    procedure GetValues(AProc: TGetStrProc); override;
   end;
 
 procedure AddConnUnit(const ATypeName: string);
@@ -109,6 +116,8 @@ begin
     CodeToolBoss.RemoveUnitFromAllUsesSections(VCode, ConnUnitNames[I]);
 end;
 
+{ TJDOConnectorTypePropertyEditor }
+
 function TJDOConnectorTypePropertyEditor.GetAttributes: TPropertyAttributes;
 begin
   Result := [paMultiSelect, paValueList, paRevertable];
@@ -134,6 +143,40 @@ begin
   inherited;
   RemoveAllConnUnit;
   AddConnUnit(ANewValue);
+end;
+
+{ TJDOTableNamePropertyEditor }
+
+function TJDOTableNamePropertyEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paMultiSelect, paValueList, paRevertable];
+end;
+
+procedure TJDOTableNamePropertyEditor.GetValues(AProc: TGetStrProc);
+var
+  I: Integer;
+  VSQL: TJDOSQL;
+  VTables: TStrings;
+  VDB: TSQLConnection;
+begin
+  VSQL := GetComponent(0) as TJDOSQL;
+  if not Assigned(VSQL) then
+    Exit;
+  if not Assigned(VSQL.Query) then
+    Exit;
+  VDB := VSQL.Query.DataBase as TSQLConnection;
+  if not Assigned(VDB) then
+    Exit;
+  VDB.Close;
+  VDB.Open;
+  VTables := TStringList.Create;
+  try
+    VDB.GetTableNames(VTables);
+    for I := 0 to Pred(VTables.Count) do
+      AProc(VTables[I]);
+  finally
+    VTables.Free;
+  end;
 end;
 
 end.

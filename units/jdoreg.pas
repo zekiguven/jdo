@@ -47,6 +47,8 @@ begin
     'DatabaseName', TFileNamePropertyEditor);
   RegisterPropertyEditor(TypeInfo(TJDOStatementType), TJDOSQL,
     'StatementType', THiddenPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), TJDOSQL,
+    'TableName', TJDOTableNamePropertyEditor);
   RegisterPropertyEditor(TypeInfo(TSQLTransaction), TJDODataBase,
     'Transaction', THiddenPropertyEditor);
 end;
