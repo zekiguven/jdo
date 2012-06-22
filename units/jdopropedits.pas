@@ -141,8 +141,11 @@ end;
 procedure TJDOConnectorTypePropertyEditor.SetValue(const ANewValue: AnsiString);
 begin
   inherited;
-  RemoveAllConnUnit;
-  AddConnUnit(ANewValue);
+  if ANewValue <> ES then
+  begin
+    RemoveAllConnUnit;
+    AddConnUnit(ANewValue);
+  end;
 end;
 
 { TJDOTableNamePropertyEditor }

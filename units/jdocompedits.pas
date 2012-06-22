@@ -129,10 +129,13 @@ begin
     VDB.Connected := VIsConnected;
     if Assigned(VHook) then
     begin
+      if VDB.ConnectorType <> ES then
+      begin
+        RemoveAllConnUnit;
+        AddConnUnit(VDB.ConnectorType);
+      end;
       VHook.Modified(Self);
       VHook.RefreshPropertyValues;
-      RemoveAllConnUnit;
-      AddConnUnit(VDB.ConnectorType);
     end;
   finally
     VDialog.Free;
