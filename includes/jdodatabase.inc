@@ -36,6 +36,18 @@ begin
   Connected := AConnect;
 end;
 
+{$IFDEF JDO_CRYPT}
+procedure TJDOCustomDataBase.SetCryptKey(AValue: string);
+begin
+  if AValue <> FCryptKey then
+  begin
+    FCryptKey := AValue;
+    FConfig.CryptKey := AValue;
+    FConfig.Configure;
+  end;
+end;
+{$ENDIF}
+
 procedure TJDOCustomDataBase.Loaded;
 begin
   inherited Loaded;
@@ -63,16 +75,6 @@ end;
 procedure TJDOCustomDataBase.SetConfiguration(const AValue: string);
 begin
   FConfig.Configuration := AValue;
-end;
-
-procedure TJDOCustomDataBase.SetCryptKey(AValue: string);
-begin
-  if AValue <> FCryptKey then
-  begin
-    FCryptKey := AValue;
-    FConfig.CryptKey := AValue;
-    FConfig.Configure;
-  end;
 end;
 
 function TJDOCustomDataBase.InTransaction: Boolean;
