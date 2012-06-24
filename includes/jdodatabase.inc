@@ -65,6 +65,16 @@ begin
   FConfig.Configuration := AValue;
 end;
 
+procedure TJDOCustomDataBase.SetCryptKey(AValue: string);
+begin
+  if AValue <> FCryptKey then
+  begin
+    FCryptKey := AValue;
+    FConfig.CryptKey := AValue;
+    FConfig.Configure;
+  end;
+end;
+
 function TJDOCustomDataBase.InTransaction: Boolean;
 begin
   Result := Transaction.Active;

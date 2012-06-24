@@ -51,10 +51,10 @@
 
   TJDOConfigurator = class(TJDOCustomConfigurator)
   published
-    property Configuration;
 {$IFDEF JDO_CRYPT}
     property CryptKey;
 {$ENDIF}
+    property Configuration;
     property Target;
   end;
 

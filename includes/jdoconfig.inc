@@ -112,7 +112,7 @@ begin
 {$IFDEF JDO_CRYPT}
     begin
       if FCryptKey <> ES then
-        VValue := DeCrypt(VValue, FCryptKey);
+        VValue := Trim(DeCrypt(VValue, FCryptKey));
 {$ENDIF}
       SetPropValue(FTarget, VPropName, VValue);
 {$IFDEF JDO_CRYPT}

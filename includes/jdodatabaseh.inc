@@ -21,6 +21,10 @@
   private
     FConfig: TJDOConfigurator;
     FQuery: TJDOQuery;
+{$IFDEF JDO_CRYPT}
+    FCryptKey: string;
+    procedure SetCryptKey(AValue: string);
+{$ENDIF}
     function GetConfiguration: string;
     procedure SetConfiguration(const AValue: string);
   protected
@@ -36,6 +40,9 @@
     procedure RestartTransaction;
     procedure Commit(const ARetaining: Boolean); overload;
     procedure Rollback(const ARetaining: Boolean); overload;
+{$IFDEF JDO_CRYPT}
+    property CryptKey: string read FCryptKey write SetCryptKey;
+{$ENDIF}
     property Configuration: string read GetConfiguration write SetConfiguration;
     property Query: TJDOQuery read FQuery;
   end;
@@ -44,6 +51,9 @@
 
   TJDODataBase = class(TJDOCustomDataBase)
   published
+{$IFDEF JDO_CRYPT}
+    property CryptKey;
+{$ENDIF}
     property Configuration;
   end;
 
