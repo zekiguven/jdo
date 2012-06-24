@@ -22,6 +22,9 @@ unit JDO;
 interface
 
 uses
+{$IFDEF JDO_CRYPT}
+  BlowFish,
+{$ENDIF}
   Classes, SysUtils, SQLdb, DB, FPJSON, TypInfo, Variants, JSONParser, DBConst;
 
 {$i jdoconstsh.inc}

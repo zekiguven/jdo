@@ -35,6 +35,18 @@ begin
   inherited Destroy;
 end;
 
+{$IFDEF JDO_CRYPT}
+class function TJDOCustomConfigurator.Crypt(const AStr, AKey: string): string;
+begin
+  Result := StrToHex(CryptStr(AStr, AKey));
+end;
+
+class function TJDOCustomConfigurator.DeCrypt(const AStr, AKey: string): string;
+begin
+  Result := DeCryptStr(HexToStr(AStr), AKey);
+end;
+{$ENDIF}
+
 function TJDOCustomConfigurator.GetValues(AName: string): string;
 begin
   Result := FConfigFile.Values[AName];
@@ -73,13 +85,6 @@ begin
   end;
 end;
 
-procedure TJDOCustomConfigurator.Loaded;
-begin
-  inherited Loaded;
-  if not (csDesigning in ComponentState) then
-    Configure;
-end;
-
 procedure TJDOCustomConfigurator.Notification(AComponent: TComponent;
   Operation: TOperation);
 begin
@@ -91,17 +96,27 @@ end;
 procedure TJDOCustomConfigurator.Configure;
 var
   I: Integer;
+  VValue: string;
   VPropName, VToken: ShortString;
 begin
   if not Assigned(FTarget) then
-    raise EJDOConfig.Create(Self, SNilTargetError);
+    Exit;
   for I := 0 to Pred(FConfigFile.Count) do
   begin
     VPropName := FConfigFile.Names[I];
     VToken := Copy(VPropName, 1, 1);
     if (VToken = PO) or (VToken = ES) then
       Continue;
+    VValue := FConfigFile.Values[VPropName];
     if IsPublishedProp(FTarget, VPropName) then
-      SetPropValue(FTarget, VPropName, FConfigFile.Values[VPropName]);
+{$IFDEF JDO_CRYPT}
+    begin
+      if FCryptKey <> ES then
+        VValue := DeCrypt(VValue, FCryptKey);
+{$ENDIF}
+      SetPropValue(FTarget, VPropName, VValue);
+{$IFDEF JDO_CRYPT}
+    end;
+{$ENDIF}
   end;
 end;

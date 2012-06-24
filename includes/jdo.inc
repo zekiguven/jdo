@@ -17,3 +17,4 @@
 
 {$mode objfpc}{$H+}
 {$DEFINE JDO_INLINE}
+{.$DEFINE JDO_CRYPT}

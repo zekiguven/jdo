@@ -19,6 +19,9 @@
 
   TJDOCustomConfigurator = class(TComponent)
   private
+{$IFDEF JDO_CRYPT}
+    FCryptKey: string;
+{$ENDIF}
     FConfiguration: string;
     FConfigFile: TStrings;
     FTarget: TComponent;
@@ -26,7 +29,6 @@
     procedure SetConfiguration(const AValue: string);
     procedure SetTarget(AValue: TComponent);
   protected
-    procedure Loaded; override;
     procedure Notification(AComponent: TComponent;
       Operation: TOperation); override;
   public
@@ -35,8 +37,13 @@
       const AConfiguration: string); overload;
     destructor Destroy; override;
     procedure Configure;
-    property Target: TComponent read FTarget write SetTarget;
+{$IFDEF JDO_CRYPT}
+    class function Crypt(const AStr, AKey: string): string;
+    class function DeCrypt(const AStr, AKey: string): string;
+    property CryptKey: string read FCryptKey write FCryptKey;
+{$ENDIF}
     property Configuration: string read FConfiguration write SetConfiguration;
+    property Target: TComponent read FTarget write SetTarget;
     property Values[AName: string]: string read GetValues; default;
   end;
 
@@ -45,6 +52,9 @@
   TJDOConfigurator = class(TJDOCustomConfigurator)
   published
     property Configuration;
+{$IFDEF JDO_CRYPT}
+    property CryptKey;
+{$ENDIF}
     property Target;
   end;
 

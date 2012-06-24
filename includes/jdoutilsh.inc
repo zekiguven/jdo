@@ -23,3 +23,9 @@ function DateOf(AData: TJSONData; const ADefValue: TDate): TDate;{$IFDEF JDO_INL
 function DateTimeOf(AData: TJSONData; const ADefValue: TDateTime): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
 function NextIndexName(var AFields: string; const ADelimiter: Char = SC): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
 function IndexNamesCount(const AFields: string; const ADelimiter: Char = SC): Integer;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function StrToHex(const AStr: string): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function HexToStr(const AHex: string): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+{$IFDEF JDO_CRYPT}
+function CryptStr(const AStr, AKey: string): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function DeCryptStr(const AStr, AKey: string): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+{$ENDIF}

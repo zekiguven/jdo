@@ -86,3 +86,55 @@ begin
   if B then
     Inc(Result);
 end;
+
+function StrToHex(const AStr: string): string;
+var
+  I: Integer;
+begin
+  Result:= ES;
+  for I := 1 to Length(AStr) do
+    Result += IntToHex(Ord(AStr[I]), 2);
+end;
+
+function HexToStr(const AHex: string): string;
+var
+  I: Integer;
+begin
+  Result:= ES;
+  for I := 1 to Length(AHex) div 2 do
+    Result := Result + Char(StrToInt('$' + Copy(AHex, (I - 1) * 2 + 1, 2)));
+end;
+
+{$IFDEF JDO_CRYPT}
+function CryptStr(const AStr, AKey: string): string;
+var
+  VInput: TStringStream;
+  VBF: TBlowFishEncryptStream;
+begin
+  VInput := TStringStream.Create(ES);
+  VBF := TBlowFishEncryptStream.Create(AKey, VInput);
+  try
+    VBF.Write(AStr[1], Length(AStr));
+  finally
+    VBF.Free;
+    Result := VInput.DataString;
+    VInput.Free;
+  end;
+end;
+
+function DeCryptStr(const AStr, AKey: string): string;
+var
+  VOutput: TStringStream;
+  VBF: TBlowFishDeCryptStream;
+begin
+  VOutput := TStringStream.Create(AStr);
+  VBF := TBlowFishDeCryptStream.Create(AKey, VOutput);
+  try
+    SetLength(Result, VOutput.Size);
+    VBF.Read(Result[1], VOutput.Size);
+  finally
+    VBF.Free;
+    VOutput.Free;
+  end;
+end;
+{$ENDIF}
