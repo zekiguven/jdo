@@ -9,9 +9,9 @@ const
   le = LineEnding;
   sversion = '1.0';
   sdate = {$i %date%};
-  scpuos = {$i %fpctargetcpu%};
+  scpu = {$i %fpctargetcpu%};
   sabout =
-    'JDO Command Line Tool version ' + sversion + ' [' + sdate + '] for ' + scpuos + le +
+    'JDO Command Line Tool version ' + sversion + ' [' + sdate + '] for ' + scpu + le +
     'Copyright (c) 2010-2012 Silvio Clecio';
   shelp =
     '%s [options]' + le +
