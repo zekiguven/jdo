@@ -2,7 +2,7 @@
 <CONFIG>
   <Package Version="4">
     <PathDelim Value="\"/>
-    <Name Value="JDODT"/>
+    <Name Value="JDOEX"/>
     <AddToProjectUsesSection Value="True"/>
     <Author Value="Silvio Clecio - http://silvioprog.com.br"/>
     <CompilerOptions>
@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\includes"/>
-        <OtherUnitFiles Value="..\units"/>
+        <OtherUnitFiles Value="..\ideintf"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
@@ -20,35 +20,31 @@
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Description Value="JSON Data Objects designtime package."/>
+    <Description Value="JSON Data Objects experts package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="2" Build="1"/>
-    <Files Count="4">
+    <Version Release="1"/>
+    <Files Count="3">
       <Item1>
-        <Filename Value="..\includes\jdoreg.lrs"/>
-        <Type Value="LRS"/>
+        <Filename Value="..\ideintf\frmjdotool.pas"/>
+        <UnitName Value="frmjdotool"/>
       </Item1>
       <Item2>
-        <Filename Value="..\units\jdocompedits.pas"/>
-        <UnitName Value="JDOCompEdits"/>
+        <Filename Value="..\ideintf\frmjdotool.lfm"/>
+        <Type Value="LFM"/>
       </Item2>
       <Item3>
-        <Filename Value="..\units\jdopropedits.pas"/>
-        <UnitName Value="JDOPropEdits"/>
-      </Item3>
-      <Item4>
-        <Filename Value="..\units\jdoreg.pas"/>
+        <Filename Value="..\ideintf\jdomenuintf.pas"/>
         <HasRegisterProc Value="True"/>
-        <UnitName Value="JDOReg"/>
-      </Item4>
+        <UnitName Value="jdomenuintf"/>
+      </Item3>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">
       <Item1>
-        <PackageName Value="CodeTools"/>
+        <PackageName Value="JDODT"/>
       </Item1>
       <Item2>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="SynEdit"/>
       </Item2>
     </RequiredPkgs>
     <UsageOptions>

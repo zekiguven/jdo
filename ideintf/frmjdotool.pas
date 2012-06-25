@@ -17,7 +17,7 @@
 
 unit frmjdotool;
 
-{$mode objfpc}{$H+}
+{$I jdo.inc}
 
 interface
 
@@ -67,6 +67,7 @@ type
   public
     procedure Validate(const AExp: Boolean; const AMsg: string;
       const AControl: TWinControl);
+    class procedure Execute;
   end;
 
 var
@@ -95,6 +96,16 @@ begin
       AControl.SetFocus;
     ShowMessage(AMsg);
     Abort;
+  end;
+end;
+
+class procedure TfrJDOTool.Execute;
+begin
+  with Self.Create(nil) do
+  try
+    ShowModal;
+  finally
+    Free;
   end;
 end;
 
