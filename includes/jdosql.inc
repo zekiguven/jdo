@@ -75,7 +75,7 @@ procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
   out ACols, AValues: string);
 
   procedure GetValues(out S: TStrings; out IxDef: TIndexDef;
-    const C: Integer); inline;
+    const C: Integer; const ValPK: Boolean); inline;
   var
     I: Integer;
   begin
@@ -90,7 +90,8 @@ procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
         Exit;
       end;
     end;
-    raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
+    if ValPK then
+      raise EJDOSQL.Create(Self, SPrimaryKeyNotFound);
   end;
 
 var
@@ -133,7 +134,7 @@ begin
         if C > 0 then
         begin
           try
-            GetValues(VValues, VIndexDef, C);
+            GetValues(VValues, VIndexDef, C, False);
             for I := 0 to Pred(FQuery.FieldDefs.Count) do
             begin
               VFieldName := FQuery.FieldDefs[I].Name;
@@ -164,7 +165,7 @@ begin
       begin
         InternalCheckServerIndexDefs(C);
         try
-          GetValues(VValues, VIndexDef, C);
+          GetValues(VValues, VIndexDef, C, True);
           for I := 0 to Pred(FQuery.FieldDefs.Count) do
           begin
             VFieldName := FQuery.FieldDefs[I].Name;
