@@ -6,8 +6,10 @@ object frJDOTool: TfrJDOTool
   Caption = 'JDO Tool'
   ClientHeight = 330
   ClientWidth = 437
+  OnCreate = FormCreate
   OnShow = FormShow
   Position = poDesktopCenter
+  SessionProperties = 'edConfig.FileName;edWrap.Value'
   LCLVersion = '1.1'
   object pcClient: TPageControl
     Left = 0
@@ -2149,5 +2151,10 @@ object frJDOTool: TfrJDOTool
     object miSelAll: TMenuItem
       Action = acSelAll
     end
+  end
+  object xml: TXMLPropStorage
+    StoredValues = <>
+    left = 256
+    top = 128
   end
 end

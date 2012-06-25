@@ -23,7 +23,8 @@ interface
 
 uses
   Forms, StdCtrls, ComCtrls, EditBtn, ExtCtrls, SysUtils, Controls, Dialogs,
-  Spin, ActnList, StdActns, Menus, SynHighlighterSQL, SynMemo, JDO;
+  Spin, ActnList, StdActns, Menus, XMLPropStorage, SynHighlighterSQL, SynMemo,
+  JDO, jdoideintf;
 
 type
   TfrJDOTool = class(TForm)
@@ -56,6 +57,7 @@ type
     tsInsert: TTabSheet;
     tsUpdate: TTabSheet;
     tsDelete: TTabSheet;
+    xml: TXMLPropStorage;
     procedure acSelAllExecute(Sender: TObject);
     procedure btGenSQLClick(Sender: TObject);
     procedure cbTableNameEditingDone(Sender: TObject);
@@ -63,6 +65,7 @@ type
     procedure edConfigAcceptFileName(Sender: TObject; Var Value: String);
     procedure edTableAliasEditingDone(Sender: TObject);
     procedure edConfigEditingDone(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
   public
     procedure Validate(const AExp: Boolean; const AMsg: string;
@@ -84,6 +87,11 @@ implementation
 procedure TfrJDOTool.edConfigEditingDone(Sender: TObject);
 begin
   db.Configuration := edConfig.Text;
+end;
+
+procedure TfrJDOTool.FormCreate(Sender: TObject);
+begin
+  xml.FileName := GetExpertsConfigFileName;
 end;
 
 procedure TfrJDOTool.FormShow(Sender: TObject);
