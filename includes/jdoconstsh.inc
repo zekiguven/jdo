@@ -56,12 +56,12 @@ const
 
   SMenuSep = '-';
   SOpenConfigFile = 'Open configuration file ...';
-  SGenSelSQL = 'Generate SQL for select ...';
-  SGenInsSQL = 'Generate SQL for insert ...';
-  SGenUpdSQL = 'Generate SQL for update ...';
-  SGenDelSQL = 'Generate SQL for delete ...';
-  SGenAllSQL = 'Generate all SQL ...';
-  SGenSQLConfirm = 'Generate SQL?';
+  SGenSelSQL = 'Generates SQL for select ...';
+  SGenInsSQL = 'Generates SQL for insert ...';
+  SGenUpdSQL = 'Generates SQL for update ...';
+  SGenDelSQL = 'Generates SQL for delete ...';
+  SGenAllSQL = 'Generates all SQL ...';
+  SGenSQLConfirm = 'Generates SQL?';
   SSQLGeneratedMsg = 'SQL generated successfully!';
   SLoadJSONFileMsg = 'Load JSON from file ...';
   SSaveJSONFileMsg = 'Save JSON to file ...';
