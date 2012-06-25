@@ -70,6 +70,10 @@ type
     class procedure Execute;
   end;
 
+const
+  SEmptyConfig = 'Please specify a configuration.';
+  SEmptyTableName = 'Please specify a table name.';
+
 var
   frJDOTool: TfrJDOTool;
 
@@ -113,6 +117,7 @@ procedure TfrJDOTool.cbTableNameGetItems(Sender: TObject);
 var
   item: string;
 begin
+  Validate(edConfig.Text <> ES, SEmptyConfig, edConfig);
   item := cbTableName.Text;
   cbTableName.Clear;
   db.GetTableNames(cbTableName.Items);
@@ -128,8 +133,8 @@ procedure TfrJDOTool.btGenSQLClick(Sender: TObject);
 var
   wrap: Integer;
 begin
-  Validate(edConfig.Text <> ES, 'Please specify a configuration.', edConfig);
-  Validate(cbTableName.Text <> ES, 'Please specify a table name.', cbTableName);
+  Validate(edConfig.Text <> ES, SEmptyConfig, edConfig);
+  Validate(cbTableName.Text <> ES, SEmptyTableName, cbTableName);
   db.Query.Close;
   db.Query.FieldDefs.Clear;
   db.Query.SQL.Text := SQL_SELECT_TOKEN + SP + AK + SP + SQL_FROM_TOKEN + SP +
@@ -138,6 +143,7 @@ begin
   db.Query.Close;
   db.Query.SQL.Clear;
   sql.ComposeAll;
+  db.Commit(False);
   wrap := edWrap.Value;
   if wrap > 0 then
   begin
