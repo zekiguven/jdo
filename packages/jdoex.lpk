@@ -22,8 +22,8 @@
     </CompilerOptions>
     <Description Value="JSON Data Objects experts package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="1"/>
-    <Files Count="3">
+    <Version Release="1" Build="1"/>
+    <Files Count="4">
       <Item1>
         <Filename Value="..\ideintf\frmjdotool.pas"/>
         <UnitName Value="frmjdotool"/>
@@ -33,10 +33,14 @@
         <Type Value="LFM"/>
       </Item2>
       <Item3>
+        <Filename Value="..\ideintf\jdoideintf.pas"/>
+        <UnitName Value="jdoideintf"/>
+      </Item3>
+      <Item4>
         <Filename Value="..\ideintf\jdomenuintf.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="jdomenuintf"/>
-      </Item3>
+      </Item4>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">
