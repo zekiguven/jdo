@@ -16,7 +16,7 @@ DESCRIPTION
 The JDO is a powerful object oriented framework for data
 persistance using JSON as comunication protocol. It's
 simple, with a short sintax and supports PostgreSQL,
-SQLite3, MySQL, Firebird, Oracle and ODBC.
+SQLite3, MySQL, Firebird, Oracle, MSSQL and ODBC.
 
 WIKI
 ====
