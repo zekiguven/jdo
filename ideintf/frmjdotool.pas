@@ -60,6 +60,7 @@ type
     procedure btGenSQLClick(Sender: TObject);
     procedure cbTableNameEditingDone(Sender: TObject);
     procedure cbTableNameGetItems(Sender: TObject);
+    procedure edConfigAcceptFileName(Sender: TObject; Var Value: String);
     procedure edTableAliasEditingDone(Sender: TObject);
     procedure edConfigEditingDone(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -99,17 +100,22 @@ end;
 
 procedure TfrJDOTool.cbTableNameGetItems(Sender: TObject);
 var
-  VItem: string;
+  item: string;
 begin
-  VItem := cbTableName.Text;
+  item := cbTableName.Text;
   cbTableName.Clear;
   db.GetTableNames(cbTableName.Items);
-  cbTableName.ItemIndex := cbTableName.Items.IndexOf(VItem);
+  cbTableName.ItemIndex := cbTableName.Items.IndexOf(item);
+end;
+
+procedure TfrJDOTool.edConfigAcceptFileName(Sender: TObject; Var Value: String);
+begin
+  db.Configuration := Value;
 end;
 
 procedure TfrJDOTool.btGenSQLClick(Sender: TObject);
 var
-  VWrap: Integer;
+  wrap: Integer;
 begin
   Validate(edConfig.Text <> ES, 'Please specify a configuration.', edConfig);
   Validate(cbTableName.Text <> ES, 'Please specify a table name.', cbTableName);
@@ -121,13 +127,13 @@ begin
   db.Query.Close;
   db.Query.SQL.Clear;
   sql.ComposeAll;
-  VWrap := edWrap.Value;
-  if VWrap > 0 then
+  wrap := edWrap.Value;
+  if wrap > 0 then
   begin
-    edSelect.Text := WrapText(db.Query.SQL.Text, VWrap);
-    edInsert.Text := WrapText(db.Query.InsertSQL.Text, VWrap);
-    edUpdate.Text := WrapText(db.Query.UpdateSQL.Text, VWrap);
-    edDelete.Text := WrapText(db.Query.DeleteSQL.Text, VWrap);
+    edSelect.Text := WrapText(db.Query.SQL.Text, wrap);
+    edInsert.Text := WrapText(db.Query.InsertSQL.Text, wrap);
+    edUpdate.Text := WrapText(db.Query.UpdateSQL.Text, wrap);
+    edDelete.Text := WrapText(db.Query.DeleteSQL.Text, wrap);
   end
   else
   begin

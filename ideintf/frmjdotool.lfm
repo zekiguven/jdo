@@ -1966,6 +1966,7 @@ object frJDOTool: TfrJDOTool
       Height = 21
       Top = 19
       Width = 402
+      OnAcceptFileName = edConfigAcceptFileName
       FilterIndex = 0
       HideDirectories = False
       ButtonWidth = 23
