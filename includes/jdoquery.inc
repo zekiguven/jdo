@@ -37,8 +37,8 @@ begin
     raise EJDOQuery.Create(Self, SNilJSONParamError);
 end;
 
-procedure TJDOCustomQuery.JSONToQuery(AJSON: TJSONObject;
-  AQuery: TSQLQuery; ADateAsString: Boolean);
+class procedure TJDOCustomQuery.JSONToQuery(AJSON: TJSONObject;
+  AQuery: TSQLQuery; const ADateAsString: Boolean);
 var
   I: Integer;
   VName: string;
@@ -79,8 +79,8 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.JSONToDataSet(AJSON: TJSONObject; ADataSet: TDataSet;
-  ADateAsString: Boolean);
+class procedure TJDOCustomQuery.JSONToDataSet(AJSON: TJSONObject;
+  ADataSet: TDataSet; const ADateAsString: Boolean);
 var
   I: Integer;
   VName: string;
@@ -119,8 +119,8 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.DataSetToJSON(ADataSet: TDataSet;
-  AJSON: TJSONArray);
+class procedure TJDOCustomQuery.DataSetToJSON(ADataSet: TDataSet;
+  AJSON: TJSONArray; const ADateAsString: Boolean);
 var
   VJSON: TJSONObject;
 begin
@@ -128,13 +128,14 @@ begin
   while not ADataSet.EOF do
   begin
     VJSON := TJSONObject.Create;
-    DataSetToJSON(ADataSet, VJSON);
+    DataSetToJSON(ADataSet, VJSON, ADateAsString);
     AJSON.Add(VJSON);
     ADataSet.Next;
   end;
 end;
 
-procedure TJDOCustomQuery.DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONObject);
+class procedure TJDOCustomQuery.DataSetToJSON(ADataSet: TDataSet;
+  AJSON: TJSONObject; const ADateAsString: Boolean);
 var
   I: Integer;
   VField: TField;
@@ -143,7 +144,7 @@ begin
   for I := 0 to Pred(ADataSet.Fields.Count) do
   begin
     VField := ADataSet.Fields[I];
-    VFieldType := GetJSONType(VField.DataType);
+    VFieldType := TJDOCustomQuery.GetJSONType(VField.DataType);
     VFieldName := VField.FieldName;
     if (VFieldType = FT_NULL) or VField.IsNull then
     begin
@@ -155,7 +156,7 @@ begin
     if VFieldType = FT_BOOLEAN then
       AJSON.Add(VFieldName, VField.AsBoolean);
     if VFieldType = FT_DATE then
-      if FDateAsString then
+      if ADateAsString then
         AJSON.Add(VFieldName, VField.AsString)
       else
         AJSON.Add(VFieldName, VField.AsFloat);
@@ -226,7 +227,7 @@ begin
   try
     DisableControls;
     VBookMark := BookMark;
-    DataSetToJSON(Self, Result);
+    DataSetToJSON(Self, Result, FDateAsString);
   finally
     BookMark := VBookMark;
     EnableControls;
@@ -238,7 +239,7 @@ begin
   Result := TJSONObject.Create;
   Open;
   if RecordCount <> 0 then
-    DataSetToJSON(Self, Result);
+    DataSetToJSON(Self, Result, FDateAsString);
 end;
 
 procedure TJDOCustomQuery.SetJSONArray(AJSON: TJSONArray);
@@ -249,7 +250,7 @@ begin
   InternalCheckJSONParam(AJSON);
   for I := 0 to Pred(AJSON.Count) do
   begin
-    JSONToQuery(AJSON.Objects[I], Self, FDateAsString);
+    TJDOCustomQuery.JSONToQuery(AJSON.Objects[I], Self, FDateAsString);
     ExecSQL;
   end;
 end;
@@ -258,7 +259,7 @@ procedure TJDOCustomQuery.SetJSONObject(AJSON: TJSONObject);
 begin
   InternalCheckFieldDefs;
   InternalCheckJSONParam(AJSON);
-  JSONToQuery(AJSON, Self, FDateAsString);
+  TJDOCustomQuery.JSONToQuery(AJSON, Self, FDateAsString);
   ExecSQL;
 end;
 
@@ -442,7 +443,7 @@ begin
     VFieldDef := AQuery.FieldDefs[I];
     VObject := TJSONObject.Create(['name', VFieldDef.name]);
     VArray.Add(VObject);
-    VFieldType := GetJSONType(VFieldDef.DataType);
+    VFieldType := TJDOCustomQuery.GetJSONType(VFieldDef.DataType);
     VObject.Strings['type'] := VFieldType;
     if VFieldType = FT_STRING then
       VObject.Integers['maxlen'] := VFieldDef.Size;
@@ -476,7 +477,7 @@ begin
   for I := 0 to Pred(C) do
   begin
     VFieldDef := AQuery.FieldDefs[I];
-    VFieldType := GetJSONType(VFieldDef.DataType);
+    VFieldType := TJDOCustomQuery.GetJSONType(VFieldDef.DataType);
     AJSONSchema += '{ "name": "' + VFieldDef.Name + '"';
     AJSONSchema += ', "type": "' + VFieldType + '"';
     if VFieldType = FT_STRING then
@@ -520,7 +521,7 @@ begin
   for I := 0 to Pred(AJSON.Count) do
   begin
     inherited Append;
-    JSONToDataSet(AJSON.Objects[I], Self, FDateAsString);
+    TJDOCustomQuery.JSONToDataSet(AJSON.Objects[I], Self, FDateAsString);
     Post;
   end;
 end;
@@ -529,7 +530,7 @@ procedure TJDOCustomQuery.Append(AJSON: TJSONObject);
 begin
   InternalCheckJSONParam(AJSON);
   inherited Append;
-  JSONToDataSet(AJSON, Self, FDateAsString);
+  TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
 end;
 
 procedure TJDOCustomQuery.Insert(AJSON: TJSONArray);
@@ -540,7 +541,7 @@ begin
   for I := 0 to Pred(AJSON.Count) do
   begin
     inherited Insert;
-    JSONToDataSet(AJSON.Objects[I], Self, FDateAsString);
+    TJDOCustomQuery.JSONToDataSet(AJSON.Objects[I], Self, FDateAsString);
     Post;
   end;
 end;
@@ -549,7 +550,7 @@ procedure TJDOCustomQuery.Insert(AJSON: TJSONObject);
 begin
   InternalCheckJSONParam(AJSON);
   inherited Insert;
-  JSONToDataSet(AJSON, Self, FDateAsString);
+  TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
 end;
 
 procedure TJDOCustomQuery.Edit(AJSON: TJSONArray);
@@ -572,7 +573,7 @@ begin
           GetJSONValuesFromPrimaryKey(VObject), []) then
         begin
           inherited Edit;
-          JSONToDataSet(VObject, Self, FDateAsString);
+          TJDOCustomQuery.JSONToDataSet(VObject, Self, FDateAsString);
           Post;
         end;
       end;
@@ -585,7 +586,7 @@ begin
           VObject[VPrimaryKey.Fields].Value, []) then
         begin
           inherited Edit;
-          JSONToDataSet(VObject, Self, FDateAsString);
+          TJDOCustomQuery.JSONToDataSet(VObject, Self, FDateAsString);
           Post;
         end;
       end;
@@ -608,14 +609,14 @@ begin
       if Locate(VPrimaryKey.Fields, GetJSONValuesFromPrimaryKey(AJSON), []) then
       begin
         inherited Edit;
-        JSONToDataSet(AJSON, Self, FDateAsString);
+        TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
       end;
     end
     else
       if Locate(VPrimaryKey.Fields, AJSON[VPrimaryKey.Fields].Value, []) then
       begin
         inherited Edit;
-        JSONToDataSet(AJSON, Self, FDateAsString);
+        TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
       end;
   finally
     BookMark := VBookMark;
