@@ -9,7 +9,7 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <IncludeFiles Value="..\includes"/>
+        <IncludeFiles Value="..\includes;..\resources"/>
         <OtherUnitFiles Value="..\units"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
@@ -25,7 +25,7 @@
     <Version Release="2" Build="1"/>
     <Files Count="4">
       <Item1>
-        <Filename Value="..\includes\jdoreg.lrs"/>
+        <Filename Value="..\resources\jdoreg.lrs"/>
         <Type Value="LRS"/>
       </Item1>
       <Item2>
@@ -57,5 +57,8 @@
     <PublishOptions>
       <Version Value="2"/>
     </PublishOptions>
+    <CustomOptions Items="ExternHelp" Version="2">
+      <_ExternHelp Items="Count"/>
+    </CustomOptions>
   </Package>
 </CONFIG>
