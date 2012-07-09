@@ -40,8 +40,8 @@
       const ADateAsString: Boolean);
     class procedure DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONObject;
       const ADateAsString: Boolean);
-    class procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject);
-    class procedure QueryToSchema(AQuery: TSQLQuery; out ASchema: TJSONStringType);
+    class procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject); overload;
+    class procedure QueryToSchema(AQuery: TSQLQuery; out ASchema: TJSONStringType); overload;
     procedure GetJSON(out AJSON: TJSONArray); overload;
     procedure GetJSON(out AJSON: TJSONObject); overload;
     procedure SetJSON(AJSON: TJSONArray); overload;
