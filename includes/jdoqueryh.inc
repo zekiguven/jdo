@@ -22,6 +22,8 @@
     FDateAsString: Boolean;
     FOnExecute: TNotifyEvent;
     FOnOpen: TNotifyEvent;
+    function GetAsJSON: TJSONStringType;
+    procedure SetAsJSON(const AValue: TJSONStringType);
   protected
     procedure InternalCheckFieldDefs;
     procedure InternalCheckJSONParam(AJSON: TJSONData);
@@ -38,16 +40,14 @@
       const ADateAsString: Boolean);
     class procedure DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONObject;
       const ADateAsString: Boolean);
-    function GetJSONArray: TJSONArray;
-    function GetJSONObject: TJSONObject;
-    procedure SetJSONArray(AJSON: TJSONArray);
-    procedure SetJSONObject(AJSON: TJSONObject);
+    procedure GetJSON(out AJSON: TJSONArray); overload;
+    procedure GetJSON(out AJSON: TJSONObject); overload;
+    procedure SetJSON(AJSON: TJSONArray); overload;
+    procedure SetJSON(AJSON: TJSONObject); overload;
     procedure LoadJSONFromStream(AStream: TStream);
     procedure LoadJSONFromFile(const AFileName: TFileName);
-    procedure LoadJSONFromString(const AString: TJSONStringType);
     procedure SaveJSONToStream(AStream: TStream);
     procedure SaveJSONToFile(const AFileName: TFileName);
-    function SaveJSONToString: TJSONStringType;
     procedure Apply(const ARetaining: Boolean = False);
     procedure Undo(const ARetaining: Boolean = False);
     procedure Commit(const ARetaining: Boolean = False);
@@ -70,7 +70,7 @@
     procedure Delete(AJSON: TJSONArray); overload;
     procedure Delete(AJSON: TJSONObject); overload;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
-    property JSON: TJSONStringType read SaveJSONToString write LoadJSONFromString;
+    property AsJSON: TJSONStringType read GetAsJSON write SetAsJSON;
     property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
     property OnOpen: TNotifyEvent read FOnOpen write FOnOpen;
   end;

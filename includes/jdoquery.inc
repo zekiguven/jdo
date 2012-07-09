@@ -216,33 +216,33 @@ begin
   end;
 end;
 
-function TJDOCustomQuery.GetJSONArray: TJSONArray;
+procedure TJDOCustomQuery.GetJSON(out AJSON: TJSONArray);
 var
   VBookMark: TBookMark;
 begin
-  Result := TJSONArray.Create;
+  AJSON := TJSONArray.Create;
   Open;
   if RecordCount = 0 then
     Exit;
   try
     DisableControls;
     VBookMark := BookMark;
-    DataSetToJSON(Self, Result, FDateAsString);
+    DataSetToJSON(Self, AJSON, FDateAsString);
   finally
     BookMark := VBookMark;
     EnableControls;
   end;
 end;
 
-function TJDOCustomQuery.GetJSONObject: TJSONObject;
+procedure TJDOCustomQuery.GetJSON(out AJSON: TJSONObject);
 begin
-  Result := TJSONObject.Create;
+  AJSON := TJSONObject.Create;
   Open;
   if RecordCount <> 0 then
-    DataSetToJSON(Self, Result, FDateAsString);
+    DataSetToJSON(Self, AJSON, FDateAsString);
 end;
 
-procedure TJDOCustomQuery.SetJSONArray(AJSON: TJSONArray);
+procedure TJDOCustomQuery.SetJSON(AJSON: TJSONArray);
 var
   I: Integer;
 begin
@@ -255,7 +255,7 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.SetJSONObject(AJSON: TJSONObject);
+procedure TJDOCustomQuery.SetJSON(AJSON: TJSONObject);
 begin
   InternalCheckFieldDefs;
   InternalCheckJSONParam(AJSON);
@@ -306,11 +306,11 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.LoadJSONFromString(const AString: TJSONStringType);
+procedure TJDOCustomQuery.SetAsJSON(const AValue: TJSONStringType);
 var
   VString: TStringStream;
 begin
-  VString := TStringStream.Create(AString);
+  VString := TStringStream.Create(AValue);
   try
     LoadJSONFromStream(VString);
   finally
@@ -323,7 +323,7 @@ var
   VArray: TJSONArray;
   VJSON: TJSONStringType;
 begin
-  VArray := GetJSONArray;
+  GetJSON(VArray);
   try
     VJSON := VArray.AsJSON;
     AStream.Write(Pointer(VJSON)^, Length(VJSON));
@@ -344,7 +344,7 @@ begin
   end;
 end;
 
-function TJDOCustomQuery.SaveJSONToString: TJSONStringType;
+function TJDOCustomQuery.GetAsJSON: TJSONStringType;
 var
   VString: TStringStream;
 begin
