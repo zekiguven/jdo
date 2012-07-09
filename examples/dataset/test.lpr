@@ -14,6 +14,7 @@ var
   db: TJDODataBase;
   q: TJDOQuery;
   a, r: TJSONArray;
+  s: TJSONObject;
 begin
   db := TJDODataBase.Create(nil, 'connectortype=sqlite3;databasename=db.sqlite3');
   q := TJDOQuery.Create(db);
@@ -31,12 +32,16 @@ begin
       q.ApplyUpdates(0);
       WriteLn('Done.');
 
-      WriteLn('Show inserted records ...');
+      WriteLn;
+
+      WriteLn('Showing inserted records ...');
       q.Refresh;
-      r := q.GetJSONArray;
+      q.GetJSON(r);
       WriteLn(r.AsJSON);
       FreeAndNil(r);
       WriteLn('Done.');
+
+      WriteLn;
 
       WriteLn('Editing records ...');
       a.Clear;
@@ -46,12 +51,16 @@ begin
       q.ApplyUpdates(0);
       WriteLn('Done.');
 
-      WriteLn('Show edited records ...');
+      WriteLn;
+
+      WriteLn('Showing edited records ...');
       q.Refresh;
-      r := q.GetJSONArray;
+      q.GetJSON(r);
       WriteLn(r.AsJSON);
       FreeAndNil(r);
       WriteLn('Done.');
+
+      WriteLn;
 
       WriteLn('Deleting records ...');
       a.Clear;
@@ -60,6 +69,16 @@ begin
       q.Delete(a);
       q.ApplyUpdates(0);
       WriteLn('Done.');
+
+      WriteLn;
+
+      WriteLn('Showing JSON schema ...');
+      q.GetSchema(s);
+      WriteLn(s.AsJSON);
+      FreeAndNil(s);
+      WriteLn('Done.');
+
+      WriteLn;
 
       db.Commit(False);
     except

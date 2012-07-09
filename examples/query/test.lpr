@@ -12,6 +12,7 @@ uses
 var
   db: TJDODataBase;
   q: TJDOQuery;
+  s: string;
   a, r: TJSONArray;
 begin
   // you can also use: db := TJDODataBase.Create('connectortype=sqlite3;databasename=db.sqlite3');
@@ -30,46 +31,67 @@ begin
       q.FieldDefs.Update;
       WriteLn('Done.');
 
+      WriteLn;
+
       WriteLn('Deleting all records ...');
       q.SQL.Text := 'delete from t1';
       q.Execute;
       WriteLn('Done.');
 
+      WriteLn;
+
       WriteLn('Inserting records ...');
       a.Add(TJSONObject.Create(['dummy', 'Dummy string 1']));
       a.Add(TJSONObject.Create(['dummy', 'Dummy string 2']));
       q.SQL.Text := 'insert into t1 (dummy) values (:dummy)';
-      q.SetJSONArray(a);
+      q.SetJSON(a);
       WriteLn('Done.');
 
-      WriteLn('Show inserted records ...');
+      WriteLn;
+
+      WriteLn('Showing inserted records ...');
       q.SQL.Text := 'select * from t1';
-      r := q.GetJSONArray;
+      q.GetJSON(r);
       q.Close;
       WriteLn(r.AsJSON);
       FreeAndNil(r);
       WriteLn('Done.');
+
+      WriteLn;
 
       WriteLn('Editing records ...');
       a.Clear;
       a.Add(TJSONObject.Create(['id', 1, 'dummy', 'Dummy string 1 - Edited']));
       a.Add(TJSONObject.Create(['id', 2, 'dummy', 'Dummy string 2 - Edited']));
       q.SQL.Text := 'update t1 set dummy = :dummy where id = :id';
-      q.SetJSONArray(a);
+      q.SetJSON(a);
       WriteLn('Done.');
 
-      WriteLn('Show edited records ...');
+      WriteLn;
+
+      WriteLn('Showing edited records ...');
       q.SQL.Text := 'select * from t1';
-      r := q.GetJSONArray;
+      q.GetJSON(r);
       q.Close;
       WriteLn(r.AsJSON);
       FreeAndNil(r);
       WriteLn('Done.');
 
+      WriteLn;
+
       WriteLn('Deleting records ...');
       q.SQL.Text := 'delete from t1 where id = :id';
-      q.SetJSONArray(a);
+      q.SetJSON(a);
       WriteLn('Done.');
+
+      WriteLn;
+
+      WriteLn('Showing JSON schema ...');
+      q.GetSchema(s);
+      WriteLn(s);
+      WriteLn('Done.');
+
+      WriteLn;
 
       db.Commit(False);
     except
