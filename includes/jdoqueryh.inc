@@ -40,6 +40,8 @@
       const ADateAsString: Boolean);
     class procedure DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONObject;
       const ADateAsString: Boolean);
+    class procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject);
+    class procedure QueryToSchema(AQuery: TSQLQuery; out ASchema: TJSONStringType);
     procedure GetJSON(out AJSON: TJSONArray); overload;
     procedure GetJSON(out AJSON: TJSONObject); overload;
     procedure SetJSON(AJSON: TJSONArray); overload;
@@ -54,11 +56,8 @@
     procedure Rollback(const ARetaining: Boolean = False);
     function Execute: Boolean;
     function Open: Boolean;
-    procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject);
-    function Schema: TJSONObject;
-    procedure QueryToJSONSchema(AQuery: TSQLQuery;
-      out AJSONSchema: TJSONStringType);
-    function JSONSchema: TJSONStringType;
+    procedure GetSchema(out ASchema: TJSONObject); overload;
+    procedure GetSchema(out ASchema: TJSONStringType); overload;
     function Field(const AFieldName: string): TField;
     function Param(const AParamName: string): TParam;
     procedure Append(AJSON: TJSONArray); overload;

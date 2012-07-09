@@ -427,7 +427,7 @@ begin
     VTrans.Rollback;
 end;
 
-procedure TJDOCustomQuery.QueryToSchema(AQuery: TSQLQuery;
+class procedure TJDOCustomQuery.QueryToSchema(AQuery: TSQLQuery;
   ASchema: TJSONObject);
 var
   I: Integer;
@@ -454,15 +454,15 @@ begin
   end;
 end;
 
-function TJDOCustomQuery.Schema: TJSONObject;
+procedure TJDOCustomQuery.GetSchema(out ASchema: TJSONObject);
 begin
-  Result := TJSONObject.Create;
+  ASchema := TJSONObject.Create;
   InternalCheckFieldDefs;
-  QueryToSchema(Self, Result);
+  TJDOCustomQuery.QueryToSchema(Self, ASchema);
 end;
 
-procedure TJDOCustomQuery.QueryToJSONSchema(AQuery: TSQLQuery;
-  out AJSONSchema: TJSONStringType);
+class procedure TJDOCustomQuery.QueryToSchema(AQuery: TSQLQuery;
+  out ASchema: TJSONStringType);
 var
   I, C: Integer;
   VFieldDef: TFieldDef;
@@ -471,32 +471,32 @@ begin
   C := AQuery.FieldDefs.Count;
   if C = 0 then
   begin
-    AJSONSchema := '{}';
+    ASchema := '{}';
     Exit;
   end;
   for I := 0 to Pred(C) do
   begin
     VFieldDef := AQuery.FieldDefs[I];
     VFieldType := TJDOCustomQuery.GetJSONType(VFieldDef.DataType);
-    AJSONSchema += '{ "name": "' + VFieldDef.Name + '"';
-    AJSONSchema += ', "type": "' + VFieldType + '"';
+    ASchema += '{ "name": "' + VFieldDef.Name + '"';
+    ASchema += ', "type": "' + VFieldType + '"';
     if VFieldType = FT_STRING then
-      AJSONSchema += ', "maxlen": ' + IntToStr(VFieldDef.Size);
+      ASchema += ', "maxlen": ' + IntToStr(VFieldDef.Size);
     if VFieldDef.Required then
-      AJSONSchema += ', "required": true';
+      ASchema += ', "required": true';
     if VFieldDef.Precision <> -1 then
-      AJSONSchema += ', "precision": ' + IntToStr(VFieldDef.Precision);
+      ASchema += ', "precision": ' + IntToStr(VFieldDef.Precision);
     if Succ(I) < C then
-      AJSONSchema += ' }, '
+      ASchema += ' }, '
     else
-      AJSONSchema += ' }';
+      ASchema += ' }';
   end;
 end;
 
-function TJDOCustomQuery.JSONSchema: TJSONStringType;
+procedure TJDOCustomQuery.GetSchema(out ASchema: TJSONStringType);
 begin
   InternalCheckFieldDefs;
-  QueryToJSONSchema(Self, Result);
+  TJDOCustomQuery.QueryToSchema(Self, ASchema);
 end;
 
 function TJDOCustomQuery.Field(const AFieldName: string): TField;
