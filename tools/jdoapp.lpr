@@ -153,7 +153,7 @@ begin
       if json then
       begin
         db.Query.Open;
-        WriteLn(db.Query.JSON);
+        WriteLn(db.Query.AsJSON);
       end;
     except
       on e: Exception do
