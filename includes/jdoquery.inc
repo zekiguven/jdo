@@ -226,10 +226,14 @@ begin
     Exit;
   try
     DisableControls;
-    VBookMark := BookMark;
+    VBookMark := {$IFDEF JDO_NEW_FPC}BookMark{$ELSE}GetBookmark{$ENDIF};
     DataSetToJSON(Self, AJSON, FDateAsString);
   finally
-    BookMark := VBookMark;
+{$IFDEF JDO_NEW_FPC}
+    BookMark := VBookMark
+{$ELSE}
+    GotoBookmark(VBookMark)
+{$ENDIF};
     EnableControls;
   end;
 end;
@@ -563,7 +567,7 @@ begin
   InternalCheckJSONParam(AJSON);
   try
     VPrimaryKey := GetPrimaryKey;
-    VBookMark := BookMark;
+    VBookMark := {$IFDEF JDO_NEW_FPC}BookMark{$ELSE}GetBookmark{$ENDIF};
     if Pos(SC, VPrimaryKey.Fields) <> 0 then
     begin
       for I := 0 to Pred(AJSON.Count) do
@@ -591,7 +595,11 @@ begin
         end;
       end;
   finally
-    BookMark := VBookMark;
+{$IFDEF JDO_NEW_FPC}
+    BookMark := VBookMark
+{$ELSE}
+    GotoBookmark(VBookMark)
+{$ENDIF};
   end;
 end;
 
@@ -603,7 +611,7 @@ begin
   InternalCheckJSONParam(AJSON);
   try
     VPrimaryKey := GetPrimaryKey;
-    VBookMark := BookMark;
+    VBookMark := {$IFDEF JDO_NEW_FPC}BookMark{$ELSE}GetBookmark{$ENDIF};
     if Pos(SC, VPrimaryKey.Fields) <> 0 then
     begin
       if Locate(VPrimaryKey.Fields, GetJSONValuesFromPrimaryKey(AJSON), []) then
@@ -619,7 +627,11 @@ begin
         TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
       end;
   finally
-    BookMark := VBookMark;
+{$IFDEF JDO_NEW_FPC}
+    BookMark := VBookMark
+{$ELSE}
+    GotoBookmark(VBookMark)
+{$ENDIF};
   end;
 end;
 
@@ -633,7 +645,7 @@ begin
   InternalCheckJSONParam(AJSON);
   try
     VPrimaryKey := GetPrimaryKey;
-    VBookMark := BookMark;
+    VBookMark := {$IFDEF JDO_NEW_FPC}BookMark{$ELSE}GetBookmark{$ENDIF};
     if Pos(SC, VPrimaryKey.Fields) <> 0 then
     begin
       for I := 0 to Pred(AJSON.Count) do
@@ -654,7 +666,11 @@ begin
       end;
   finally
     if not IsEmpty then
-      BookMark := VBookMark;
+{$IFDEF JDO_NEW_FPC}
+      BookMark := VBookMark
+{$ELSE}
+      GotoBookmark(VBookMark)
+{$ENDIF};
   end;
 end;
 
@@ -666,7 +682,7 @@ begin
   InternalCheckJSONParam(AJSON);
   try
     VPrimaryKey := GetPrimaryKey;
-    VBookMark := BookMark;
+    VBookMark := {$IFDEF JDO_NEW_FPC}BookMark{$ELSE}GetBookmark{$ENDIF};
     if Pos(SC, VPrimaryKey.Fields) <> 0 then
     begin
       if Locate(VPrimaryKey.Fields, GetJSONValuesFromPrimaryKey(AJSON), []) then
@@ -677,6 +693,10 @@ begin
         inherited Delete;
   finally
     if not IsEmpty then
-      BookMark := VBookMark;
+{$IFDEF JDO_NEW_FPC}
+      BookMark := VBookMark
+{$ELSE}
+      GotoBookmark(VBookMark)
+{$ENDIF};
   end;
 end;

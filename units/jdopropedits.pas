@@ -45,17 +45,21 @@ procedure RemoveAllConnUnit;
 implementation
 
 uses
+{$IFDEF JDO_NEW_FPC}
+  mysql55conn,
+  mssqlconn,
+{$ELSE}
+  sqlite3def,
+{$ENDIF}
   IBConnection,
   mysql40conn,
   mysql41conn,
   mysql50conn,
   mysql51conn,
-  mysql55conn,
   odbcconn,
   oracleconnection,
   pqconnection,
-  sqlite3conn,
-  mssqlconn;
+  sqlite3conn;
 
 const
   ConnUnitNames: array[0..10] of string = ('IBConnection', 'MySQL40Conn',
@@ -89,8 +93,10 @@ begin
     VUnit := 'MySQL50Conn';
   if SameText(ATypeName, TMySQL51ConnectionDef.TypeName) then
     VUnit := 'MySQL51Conn';
+{$IFDEF JDO_NEW_FPC}
   if SameText(ATypeName, TMySQL55ConnectionDef.TypeName) then
     VUnit := 'MySQL55Conn';
+{$ENDIF}
   if SameText(ATypeName, TODBCConnectionDef.TypeName) then
     VUnit := 'ODBCConn';
   if SameText(ATypeName, TOracleConnectionDef.TypeName) then
@@ -99,8 +105,10 @@ begin
     VUnit := 'PQConnection';
   if SameText(ATypeName, TSQLite3ConnectionDef.TypeName) then
     VUnit := 'SQLite3Conn';
+{$IFDEF JDO_NEW_FPC}
   if SameText(ATypeName, TMSSQLConnectionDef.TypeName) then
     VUnit := 'MSSQLConn';
+{$ENDIF}
   CodeToolBoss.AddUnitToMainUsesSection(VCode, VUnit, '');
 end;
 
@@ -130,12 +138,16 @@ begin
   AProc(TMySQL41ConnectionDef.TypeName);
   AProc(TMySQL50ConnectionDef.TypeName);
   AProc(TMySQL51ConnectionDef.TypeName);
+{$IFDEF JDO_NEW_FPC}
   AProc(TMySQL55ConnectionDef.TypeName);
+{$ENDIF}
   AProc(TODBCConnectionDef.TypeName);
   AProc(TOracleConnectionDef.TypeName);
   AProc(TPQConnectionDef.TypeName);
   AProc(TSQLite3ConnectionDef.TypeName);
+{$IFDEF JDO_NEW_FPC}
   AProc(TMSSQLConnectionDef.TypeName);
+{$ENDIF}
 end;
 
 procedure TJDOConnectorTypePropertyEditor.SetValue(const ANewValue: AnsiString);
