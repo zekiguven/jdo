@@ -18,3 +18,6 @@
 {$mode objfpc}{$H+}
 {$DEFINE JDO_INLINE}
 {.$DEFINE JDO_CRYPT}
+{$IF ((FPC_VERSION >= 2) and (FPC_RELEASE >= 7) and (FPC_PATCH >= 0))}
+  {$DEFINE JDO_NEW_FPC}
+{$ENDIF}

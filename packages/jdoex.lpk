@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\includes"/>
-        <OtherUnitFiles Value="..\ideintf"/>
+        <OtherUnitFiles Value="..\ideintf;..\brokers"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>

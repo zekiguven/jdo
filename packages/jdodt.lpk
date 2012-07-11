@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\includes;..\resources"/>
-        <OtherUnitFiles Value="..\units"/>
+        <OtherUnitFiles Value="..\units;..\brokers"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
@@ -22,7 +22,7 @@
     </CompilerOptions>
     <Description Value="JSON Data Objects designtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="2" Build="1"/>
+    <Version Release="2" Build="2"/>
     <Files Count="4">
       <Item1>
         <Filename Value="..\resources\jdoreg.lrs"/>
