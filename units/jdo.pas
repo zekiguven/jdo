@@ -2,7 +2,7 @@
   JSON Data Objects unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -30,6 +30,13 @@ uses
 {$i jdoconstsh.inc}
 
 type
+  IJDOAboutComponent = interface
+    ['{05155F56-E531-4284-AA35-9E78C18A5773}']
+    function GetAbout: string;
+    procedure SetAbout(AValue: string);
+    property About: string read GetAbout write SetAbout stored False;
+  end;
+
   EJDOException = class(Exception)
   public
     constructor Create(AInstance: TObject; const AMsg: string);

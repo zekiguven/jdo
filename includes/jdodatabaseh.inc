@@ -2,7 +2,7 @@
   JDODataBase interface include
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -17,7 +17,7 @@
 
   EJDODataBase = class(EJDOException);
 
-  TJDOCustomDataBase = class(TSQLConnector)
+  TJDOCustomDataBase = class(TSQLConnector, IJDOAboutComponent)
   private
     FConfig: TJDOConfigurator;
     FQuery: TJDOQuery;
@@ -25,7 +25,9 @@
     FCryptKey: string;
     procedure SetCryptKey(AValue: string);
 {$ENDIF}
+    function GetAbout: string;
     function GetConfiguration: string;
+    procedure SetAbout(AValue: string);
     procedure SetConfiguration(const AValue: string);
   protected
     procedure Loaded; override;
@@ -40,6 +42,7 @@
     procedure RestartTransaction;
     procedure Commit(const ARetaining: Boolean); overload;
     procedure Rollback(const ARetaining: Boolean); overload;
+    property About: string read GetAbout write SetAbout stored False;
 {$IFDEF JDO_CRYPT}
     property CryptKey: string read FCryptKey write SetCryptKey;
 {$ENDIF}
@@ -51,6 +54,7 @@
 
   TJDODataBase = class(TJDOCustomDataBase)
   published
+    property About;
 {$IFDEF JDO_CRYPT}
     property CryptKey;
 {$ENDIF}

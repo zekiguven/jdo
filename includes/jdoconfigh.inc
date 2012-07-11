@@ -2,7 +2,7 @@
   JDOConfig interface include
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -17,7 +17,7 @@
 
   EJDOConfig = class(EJDOException);
 
-  TJDOCustomConfigurator = class(TComponent)
+  TJDOCustomConfigurator = class(TComponent, IJDOAboutComponent)
   private
 {$IFDEF JDO_CRYPT}
     FCryptKey: string;
@@ -25,7 +25,9 @@
     FConfiguration: string;
     FConfigFile: TStrings;
     FTarget: TComponent;
+    function GetAbout: string;
     function GetValues(AName: string): string;
+    procedure SetAbout(AValue: string);
     procedure SetConfiguration(const AValue: string);
     procedure SetTarget(AValue: TComponent);
   protected
@@ -37,6 +39,7 @@
       const AConfiguration: string); overload;
     destructor Destroy; override;
     procedure Configure;
+    property About: string read GetAbout write SetAbout stored False;
 {$IFDEF JDO_CRYPT}
     class function Crypt(const AStr, AKey: string): string;
     class function DeCrypt(const AStr, AKey: string): string;
@@ -51,6 +54,7 @@
 
   TJDOConfigurator = class(TJDOCustomConfigurator)
   published
+    property About;
 {$IFDEF JDO_CRYPT}
     property CryptKey;
 {$ENDIF}

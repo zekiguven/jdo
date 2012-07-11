@@ -2,7 +2,7 @@
   JDOQuery interface include
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -17,12 +17,14 @@
 
   EJDOQuery = class(EJDOException);
 
-  TJDOCustomQuery = class(TSQLQuery)
+  TJDOCustomQuery = class(TSQLQuery, IJDOAboutComponent)
   private
     FDateAsString: Boolean;
     FOnExecute: TNotifyEvent;
     FOnOpen: TNotifyEvent;
+    function GetAbout: string;
     function GetAsJSON: TJSONStringType;
+    procedure SetAbout(AValue: string);
     procedure SetAsJSON(const AValue: TJSONStringType);
   protected
     procedure InternalCheckFieldDefs;
@@ -68,6 +70,7 @@
     procedure Edit(AJSON: TJSONObject); overload;
     procedure Delete(AJSON: TJSONArray); overload;
     procedure Delete(AJSON: TJSONObject); overload;
+    property About: string read GetAbout write SetAbout stored False;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property AsJSON: TJSONStringType read GetAsJSON write SetAsJSON;
     property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
@@ -78,6 +81,7 @@
 
   TJDOQuery = class(TJDOCustomQuery)
   published
+    property About;
     property DateAsString;
     property OnExecute;
     property OnOpen;

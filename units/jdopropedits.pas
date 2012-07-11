@@ -2,7 +2,7 @@
   JDO property editors unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -22,10 +22,17 @@ unit JDOPropEdits;
 interface
 
 uses
-  JDO, SQLdb, PropEdits, Classes, SysUtils, SrcEditorIntf, CodeToolManager,
-  CodeCache;
+  JDO, frmJDOAbout, SQLdb, PropEdits, Classes, SysUtils, SrcEditorIntf,
+  CodeToolManager, CodeCache;
 
 type
+  TJDOAboutPropertyEditor = class(TStringProperty)
+  public
+    procedure Edit; override;
+    function GetAttributes: TPropertyAttributes; override;
+    function GetValue: AnsiString; override;
+  end;
+
   TJDOConnectorTypePropertyEditor = class(TStringPropertyEditor)
   public
     function GetAttributes: TPropertyAttributes; override;
@@ -122,6 +129,23 @@ begin
     Exit;
   for I := 0 to High(ConnUnitNames) do
     CodeToolBoss.RemoveUnitFromAllUsesSections(VCode, ConnUnitNames[I]);
+end;
+
+{ TJDOAboutPropertyEditor }
+
+procedure TJDOAboutPropertyEditor.Edit;
+begin
+  TfrJDOAbout.Execute;
+end;
+
+function TJDOAboutPropertyEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paReadOnly, paDialog];
+end;
+
+function TJDOAboutPropertyEditor.GetValue: AnsiString;
+begin
+  Result := '(About)';
 end;
 
 { TJDOConnectorTypePropertyEditor }

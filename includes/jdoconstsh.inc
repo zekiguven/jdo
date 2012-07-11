@@ -2,7 +2,7 @@
   JDOConsts interface include
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -16,6 +16,10 @@
 *)
 
 const
+  VERSION = '6.15'; // RT version
+  AUTHOR_LINK = 'https://github.com/silvioprog/';
+  PROJECT_LINK = 'https://github.com/silvioprog/jdo/';
+  PROJECT_DESCRIPTION = 'JSON Data Objects (JDO)';
   CR = #13;
   LF = #10;
   CRLF = CR + LF;

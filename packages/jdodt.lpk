@@ -10,7 +10,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\includes;..\resources"/>
-        <OtherUnitFiles Value="..\units;..\brokers"/>
+        <OtherUnitFiles Value="..\units;..\brokers;..\ideintf"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
@@ -22,25 +22,33 @@
     </CompilerOptions>
     <Description Value="JSON Data Objects designtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="2" Build="2"/>
-    <Files Count="4">
+    <Version Release="2" Build="3"/>
+    <Files Count="6">
       <Item1>
-        <Filename Value="..\resources\jdoreg.lrs"/>
-        <Type Value="LRS"/>
+        <Filename Value="..\ideintf\frmjdoabout.pas"/>
+        <UnitName Value="frmjdoabout"/>
       </Item1>
       <Item2>
-        <Filename Value="..\units\jdocompedits.pas"/>
-        <UnitName Value="JDOCompEdits"/>
+        <Filename Value="..\ideintf\frmjdoabout.lfm"/>
+        <Type Value="LFM"/>
       </Item2>
       <Item3>
-        <Filename Value="..\units\jdopropedits.pas"/>
-        <UnitName Value="JDOPropEdits"/>
+        <Filename Value="..\resources\jdoreg.lrs"/>
+        <Type Value="LRS"/>
       </Item3>
       <Item4>
+        <Filename Value="..\units\jdocompedits.pas"/>
+        <UnitName Value="JDOCompEdits"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\units\jdopropedits.pas"/>
+        <UnitName Value="JDOPropEdits"/>
+      </Item5>
+      <Item6>
         <Filename Value="..\units\jdoreg.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="JDOReg"/>
-      </Item4>
+      </Item6>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">

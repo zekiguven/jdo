@@ -2,7 +2,7 @@
   JDODataBase implementation include
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -71,6 +71,17 @@ function TJDOCustomDataBase.GetConfiguration: string;
 begin
   Result := FConfig.Configuration;
 end;
+
+function TJDOCustomDataBase.GetAbout: string;
+begin
+  Result := '';
+end;
+
+{$HINTS OFF}
+procedure TJDOCustomDataBase.SetAbout(AValue: string);
+begin
+end;
+{$HINTS ON}
 
 procedure TJDOCustomDataBase.SetConfiguration(const AValue: string);
 begin

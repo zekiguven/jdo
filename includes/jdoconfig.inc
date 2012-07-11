@@ -2,7 +2,7 @@
   JDOConfig implementation include
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -51,6 +51,17 @@ function TJDOCustomConfigurator.GetValues(AName: string): string;
 begin
   Result := FConfigFile.Values[AName];
 end;
+
+function TJDOCustomConfigurator.GetAbout: string;
+begin
+  Result := '';
+end;
+
+{$HINTS OFF}
+procedure TJDOCustomConfigurator.SetAbout(AValue: string);
+begin
+end;
+{$HINTS ON}
 
 procedure TJDOCustomConfigurator.SetConfiguration(const AValue: string);
 begin

@@ -2,7 +2,7 @@
   JDO register components unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -33,6 +33,7 @@ procedure Register;
 begin
   RegisterComponents('JDO', [TJDODataBase, TJDOQuery, TJDOSQL,
     TJDOConfigurator]);
+  RegisterPropertyEditor(TypeInfo(string), nil, 'About', TJDOAboutPropertyEditor);
   RegisterComponentEditor(TJDOConfigurator, TJDOConfiguratorComponentEditor);
   RegisterComponentEditor(TJDOSQL, TJDOSQLComponentEditor);
   RegisterComponentEditor(TJDODataBase, TJDODataBaseComponentEditor);

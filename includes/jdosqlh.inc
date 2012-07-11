@@ -2,7 +2,7 @@
   JDOSQL interface include
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -23,7 +23,7 @@
 
   TJDOComposeEvent = procedure(const AStatementType: TJDOStatementType) of object;
 
-  TJDOCustomSQL = class(TComponent)
+  TJDOCustomSQL = class(TComponent, IJDOAboutComponent)
   private
     FLike: string;
     FOnCompose: TJDOComposeEvent;
@@ -37,8 +37,10 @@
     FTableAlias: string;
     FTableName: string;
     FWhere: string;
+    function GetAbout: string;
     procedure InternalCheckFieldDefs(const ACount: Integer);
     procedure InternalCheckServerIndexDefs(const ACount: Integer);
+    procedure SetAbout(AValue: string);
     procedure SetQuery(AValue: TSQLQuery);
   protected
     procedure CheckTableName;
@@ -60,6 +62,7 @@
     procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle;
       const ALineBreak: ShortString = SP);
     procedure Like(const AField: string; const ACaseInsensitive: Boolean = False);
+    property About: string read GetAbout write SetAbout stored False;
     property OrderBy: string read FOrderBy write FOrderBy;
     property Ordered: Boolean read FOrdered write FOrdered default True;
     property Where: string read FWhere write FWhere;
@@ -74,6 +77,7 @@
 
   TJDOSQL = class(TJDOCustomSQL)
   published
+    property About;
     property OrderBy;
     property Ordered;
     property Where;

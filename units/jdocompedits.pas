@@ -2,7 +2,7 @@
   JDO component editors unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  https://github.com/silvioprog/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
@@ -22,10 +22,19 @@ unit JDOCompEdits;
 interface
 
 uses
-  JDO, JDOPropEdits, ComponentEditors, PropEdits, Dialogs, Controls;
+  JDO, JDOPropEdits, frmJDOAbout, ComponentEditors, PropEdits, Dialogs, Controls;
 
 type
-  TJDOConfiguratorComponentEditor = class(TDefaultComponentEditor)
+  TJDODefaultComponentEditor = class(TDefaultComponentEditor)
+  protected
+    procedure DoShowEditor; virtual;
+  public
+    procedure ExecuteVerb(AIndex: Integer); override;
+    function GetVerb(AIndex: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
+  TJDOConfiguratorComponentEditor = class(TJDODefaultComponentEditor)
   private
     procedure DoOpenDialog;
   public
@@ -34,7 +43,7 @@ type
     function GetVerbCount: Integer; override;
   end;
 
-  TJDODataBaseComponentEditor = class(TDefaultComponentEditor)
+  TJDODataBaseComponentEditor = class(TJDODefaultComponentEditor)
   private
     procedure DoOpenDialog;
   public
@@ -43,14 +52,14 @@ type
     function GetVerbCount: Integer; override;
   end;
 
-  TJDOSQLComponentEditor = class(TDefaultComponentEditor)
+  TJDOSQLComponentEditor = class(TJDODefaultComponentEditor)
   public
     procedure ExecuteVerb(AIndex: Integer); override;
     function GetVerb(AIndex: Integer): string; override;
     function GetVerbCount: Integer; override;
   end;
 
-  TJDOQueryComponentEditor = class(TDefaultComponentEditor)
+  TJDOQueryComponentEditor = class(TJDODefaultComponentEditor)
   private
     procedure DoOpenDialog;
     procedure DoSaveDialog;
@@ -61,6 +70,34 @@ type
   end;
 
 implementation
+
+{ TJDODefaultComponentEditor }
+
+procedure TJDODefaultComponentEditor.DoShowEditor;
+begin
+  TfrJDOAbout.Execute;
+end;
+
+procedure TJDODefaultComponentEditor.ExecuteVerb(AIndex: Integer);
+begin
+  if AIndex = 0 then
+    DoShowEditor
+  else
+    inherited;
+end;
+
+function TJDODefaultComponentEditor.GetVerb(AIndex: Integer): string;
+begin
+  if AIndex = 0 then
+    Result := 'About JDO ...'
+  else
+    Result := inherited;
+end;
+
+function TJDODefaultComponentEditor.GetVerbCount: Integer;
+begin
+  Result := inherited GetVerbCount + 1;
+end;
 
 { TJDOConfiguratorComponentEditor }
 
