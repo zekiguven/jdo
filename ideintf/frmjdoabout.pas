@@ -22,7 +22,7 @@ unit frmjdoabout;
 interface
 
 uses
-  JDO, Classes, SysUtils, Forms, Controls, Graphics, ExtCtrls, StdCtrls;
+  JDO, Classes, SysUtils, Forms, Controls, Graphics, ExtCtrls, StdCtrls, LCLIntf;
 
 type
   TfrJDOAbout = class(TForm)
@@ -38,8 +38,11 @@ type
     pnBody: TPanel;
   protected
     procedure KeyPress(var Key: Char); override;
+    procedure LinkMouseEnter(ASender: TObject);
+    procedure LinkMouseLeave(ASender: TObject);
+    procedure LinkClick(ASender: TObject);
   public
-    class function Execute: boolean;
+    class function Execute: Boolean;
     constructor Create(AOwner: TComponent); override;
   end;
 
@@ -50,6 +53,12 @@ implementation
 constructor TfrJDOAbout.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  lbAuthorLink.OnMouseEnter := @LinkMouseEnter;
+  lbAuthorLink.OnMouseLeave := @LinkMouseLeave;
+  lbAuthorLink.OnClick := @LinkClick;
+  lbHomePageLink.OnMouseEnter := @LinkMouseEnter;
+  lbHomePageLink.OnMouseLeave := @LinkMouseLeave;
+  lbHomePageLink.OnClick := @LinkClick;
   ActiveControl := btOK;
   KeyPreview := True;
   lbCaption.Caption := Format(PROJECT_DESCRIPTION + ' v%s', [VERSION]);
@@ -59,8 +68,6 @@ begin
   lbHomePageLink.Cursor := crHandPoint;
   lbAuthorLink.Font.Color := clBlue;
   lbHomePageLink.Font.Color := clBlue;
-  lbAuthorLink.Font.Style := [fsUnderline];
-  lbHomePageLink.Font.Style := [fsUnderline];
 end;
 
 procedure TfrJDOAbout.KeyPress(var Key: Char);
@@ -73,7 +80,40 @@ begin
   end;
 end;
 
-class function TfrJDOAbout.Execute: boolean;
+procedure TfrJDOAbout.LinkMouseEnter(ASender: TObject);
+var
+  VLabel: TCustomLabel;
+begin
+  if ASender is TCustomLabel then
+  begin
+    VLabel := ASender as TCustomLabel;
+    VLabel.Font.Style := [fsUnderline];
+  end;
+end;
+
+procedure TfrJDOAbout.LinkMouseLeave(ASender: TObject);
+var
+  VLabel: TCustomLabel;
+begin
+  if ASender is TCustomLabel then
+  begin
+    VLabel := ASender as TCustomLabel;
+    VLabel.Font.Style := [];
+  end;
+end;
+
+procedure TfrJDOAbout.LinkClick(ASender: TObject);
+var
+  VLabel: TCustomLabel;
+begin
+  if ASender is TCustomLabel then
+  begin
+    VLabel := ASender as TCustomLabel;
+    OpenURL(VLabel.Caption);
+  end;
+end;
+
+class function TfrJDOAbout.Execute: Boolean;
 begin
   with Self.Create(nil) do
     try
