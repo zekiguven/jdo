@@ -22,19 +22,20 @@ unit JDOCompEdits;
 interface
 
 uses
-  JDO, JDOPropEdits, frmJDOAbout, ComponentEditors, PropEdits, Dialogs, Controls;
+  JDO, JDOPropEdits, frmJDOAbout, ComponentEditors, FieldsEditor, PropEdits,
+  Dialogs, Controls;
 
 type
-  TJDODefaultComponentEditor = class(TDefaultComponentEditor)
+  TJDOComponentEditor = class(TComponentEditor)
   protected
-    procedure DoShowAbout; virtual;
+    procedure DoShowAbout;
   public
     procedure ExecuteVerb(AIndex: Integer); override;
     function GetVerb(AIndex: Integer): string; override;
     function GetVerbCount: Integer; override;
   end;
 
-  TJDOConfiguratorComponentEditor = class(TJDODefaultComponentEditor)
+  TJDOConfiguratorComponentEditor = class(TJDOComponentEditor)
   private
     procedure DoOpenDialog;
   public
@@ -43,7 +44,7 @@ type
     function GetVerbCount: Integer; override;
   end;
 
-  TJDODataBaseComponentEditor = class(TJDODefaultComponentEditor)
+  TJDODataBaseComponentEditor = class(TJDOComponentEditor)
   private
     procedure DoOpenDialog;
   public
@@ -52,15 +53,16 @@ type
     function GetVerbCount: Integer; override;
   end;
 
-  TJDOSQLComponentEditor = class(TJDODefaultComponentEditor)
+  TJDOSQLComponentEditor = class(TJDOComponentEditor)
   public
     procedure ExecuteVerb(AIndex: Integer); override;
     function GetVerb(AIndex: Integer): string; override;
     function GetVerbCount: Integer; override;
   end;
 
-  TJDOQueryComponentEditor = class(TJDODefaultComponentEditor)
+  TJDOQueryComponentEditor = class(TFieldsComponentEditor)
   private
+    procedure DoShowAbout;
     procedure DoOpenDialog;
     procedure DoSaveDialog;
   public
@@ -69,34 +71,33 @@ type
     function GetVerbCount: Integer; override;
   end;
 
+const
+  VERB_ABOUT = 'About JDO ...';
+
 implementation
 
-{ TJDODefaultComponentEditor }
+{ TJDOComponentEditor }
 
-procedure TJDODefaultComponentEditor.DoShowAbout;
+procedure TJDOComponentEditor.DoShowAbout;
 begin
   TfrJDOAbout.Execute;
 end;
 
-procedure TJDODefaultComponentEditor.ExecuteVerb(AIndex: Integer);
+procedure TJDOComponentEditor.ExecuteVerb(AIndex: Integer);
 begin
   if AIndex = 0 then
-    DoShowAbout
-  else
-    inherited;
+    DoShowAbout;
 end;
 
-function TJDODefaultComponentEditor.GetVerb(AIndex: Integer): string;
+function TJDOComponentEditor.GetVerb(AIndex: Integer): string;
 begin
   if AIndex = 0 then
-    Result := 'About JDO ...'
-  else
-    Result := inherited;
+    Result := VERB_ABOUT;
 end;
 
-function TJDODefaultComponentEditor.GetVerbCount: Integer;
+function TJDOComponentEditor.GetVerbCount: Integer;
 begin
-  Result := inherited GetVerbCount + 1;
+  Result := 1;
 end;
 
 { TJDOConfiguratorComponentEditor }
@@ -143,7 +144,7 @@ end;
 
 function TJDOConfiguratorComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 3;
+  Result := inherited GetVerbCount + 2;
 end;
 
 { TJDODataBaseComponentEditor }
@@ -198,7 +199,7 @@ end;
 
 function TJDODataBaseComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 3;
+  Result := inherited GetVerbCount + 2;
 end;
 
 { TJDOSQLComponentEditor }
@@ -266,10 +267,15 @@ end;
 
 function TJDOSQLComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 7;
+  Result := inherited GetVerbCount + 6;
 end;
 
 { TJDOQueryComponentEditor }
+
+procedure TJDOQueryComponentEditor.DoShowAbout;
+begin
+  TfrJDOAbout.Execute;
+end;
 
 procedure TJDOQueryComponentEditor.DoOpenDialog;
 var
@@ -316,8 +322,9 @@ procedure TJDOQueryComponentEditor.ExecuteVerb(AIndex: Integer);
 begin
   case AIndex of
     0: inherited;
-    2: DoOpenDialog;
-    3: DoSaveDialog;
+    2: DoShowAbout;
+    4: DoOpenDialog;
+    5: DoSaveDialog;
   end;
 end;
 
@@ -326,14 +333,16 @@ begin
   case AIndex of
     0: Result := inherited GetVerb(AIndex);
     1: Result := SMenuSep;
-    2: Result := SLoadJSONFileMsg;
-    3: Result := SSaveJSONFileMsg;
+    2: Result := VERB_ABOUT;
+    3: Result := SMenuSep;
+    4: Result := SLoadJSONFileMsg;
+    5: Result := SSaveJSONFileMsg;
   end;
 end;
 
 function TJDOQueryComponentEditor.GetVerbCount: Integer;
 begin
-  Result := 4;
+  Result := inherited GetVerbCount + 5;
 end;
 
 end.
