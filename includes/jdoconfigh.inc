@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-  EJDOConfig = class(EJDOException);
+  EJDOConfig = class(EJDO);
 
   TJDOCustomConfigurator = class(TComponent, IJDOAboutComponent)
   private

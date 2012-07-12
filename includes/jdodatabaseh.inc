@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-  EJDODataBase = class(EJDOException);
+  EJDODataBase = class(EJDO);
 
   TJDOCustomDataBase = class(TSQLConnector, IJDOAboutComponent)
   private

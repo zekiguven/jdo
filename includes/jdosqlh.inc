@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-  EJDOSQL = class(EJDOException);
+  EJDOSQL = class(EJDO);
 
   TJDOPutTypes = (ptBegin, ptMiddle, ptEnd);
 

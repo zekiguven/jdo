@@ -37,7 +37,7 @@ type
     property About: string read GetAbout write SetAbout stored False;
   end;
 
-  EJDOException = class(Exception)
+  EJDO = class(Exception)
   public
     constructor Create(AInstance: TObject; const AMsg: string);
     constructor CreateFmt(AInstance: TObject; const AMsg: string;
@@ -52,12 +52,12 @@ type
 
 implementation
 
-constructor EJDOException.Create(AInstance: TObject; const AMsg: string);
+constructor EJDO.Create(AInstance: TObject; const AMsg: string);
 begin
   inherited CreateFmt(ERROR_MASK, [AInstance.ClassName, AMsg]);
 end;
 
-constructor EJDOException.CreateFmt(AInstance: TObject; const AMsg: string;
+constructor EJDO.CreateFmt(AInstance: TObject; const AMsg: string;
   const AArgs: array of const);
 begin
   inherited CreateFmt(Format(ERROR_MASK, [AInstance.ClassName, AMsg]), AArgs);

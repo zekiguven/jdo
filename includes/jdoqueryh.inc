@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-  EJDOQuery = class(EJDOException);
+  EJDOQuery = class(EJDO);
 
   TJDOCustomQuery = class(TSQLQuery, IJDOAboutComponent)
   private
