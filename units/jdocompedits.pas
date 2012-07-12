@@ -27,7 +27,7 @@ uses
 type
   TJDODefaultComponentEditor = class(TDefaultComponentEditor)
   protected
-    procedure DoShowEditor; virtual;
+    procedure DoShowAbout; virtual;
   public
     procedure ExecuteVerb(AIndex: Integer); override;
     function GetVerb(AIndex: Integer): string; override;
@@ -73,7 +73,7 @@ implementation
 
 { TJDODefaultComponentEditor }
 
-procedure TJDODefaultComponentEditor.DoShowEditor;
+procedure TJDODefaultComponentEditor.DoShowAbout;
 begin
   TfrJDOAbout.Execute;
 end;
@@ -81,7 +81,7 @@ end;
 procedure TJDODefaultComponentEditor.ExecuteVerb(AIndex: Integer);
 begin
   if AIndex = 0 then
-    DoShowEditor
+    DoShowAbout
   else
     inherited;
 end;
