@@ -59,14 +59,22 @@ uses
   sqlite3def,
 {$ENDIF}
   IBConnection,
+{$IFDEF JDO_HASMYSQL4CONNECTION}
   mysql40conn,
+{$ENDIF}
+{$IFDEF JDO_HASORACLECONNECTION}
+  oracleconnection,
+{$ENDIF}
+{$IFDEF JDO_HASPQCONNECTION}
+  pqconnection,
+{$ENDIF}
+{$IFDEF JDO_HASSQLITE3CONNECTION}
+  sqlite3conn,
+{$ENDIF}
   mysql41conn,
   mysql50conn,
   mysql51conn,
-  odbcconn,
-  oracleconnection,
-  pqconnection,
-  sqlite3conn;
+  odbcconn;
 
 const
   ConnUnitNames: array[0..10] of string = ('IBConnection', 'MySQL40Conn',
@@ -92,8 +100,10 @@ begin
     Exit;
   if SameText(ATypeName, TIBConnectionDef.TypeName) then
     VUnit := 'IBConnection';
+{$IFDEF JDO_HASMYSQL4CONNECTION}
   if SameText(ATypeName, TMySQL40ConnectionDef.TypeName) then
     VUnit := 'MySQL40Conn';
+{$ENDIF}
   if SameText(ATypeName, TMySQL41ConnectionDef.TypeName) then
     VUnit := 'MySQL41Conn';
   if SameText(ATypeName, TMySQL50ConnectionDef.TypeName) then
@@ -106,12 +116,18 @@ begin
 {$ENDIF}
   if SameText(ATypeName, TODBCConnectionDef.TypeName) then
     VUnit := 'ODBCConn';
+{$IFDEF HASORACLECONNECTION}
   if SameText(ATypeName, TOracleConnectionDef.TypeName) then
     VUnit := 'OracleConnection';
+{$ENDIF}
+{$IFDEF JDO_HASPQCONNECTION}
   if SameText(ATypeName, TPQConnectionDef.TypeName) then
     VUnit := 'PQConnection';
+{$ENDIF}
+{$IFDEF JDO_HASSQLITE3CONNECTION}
   if SameText(ATypeName, TSQLite3ConnectionDef.TypeName) then
     VUnit := 'SQLite3Conn';
+{$ENDIF}
 {$IFDEF JDO_NEW_FPC}
   if SameText(ATypeName, TMSSQLConnectionDef.TypeName) then
     VUnit := 'MSSQLConn';
@@ -158,7 +174,9 @@ end;
 procedure TJDOConnectorTypePropertyEditor.GetValues(AProc: TGetStrProc);
 begin
   AProc(TIBConnectionDef.TypeName);
+{$IFDEF JDO_HASMYSQL4CONNECTION}
   AProc(TMySQL40ConnectionDef.TypeName);
+{$ENDIF}
   AProc(TMySQL41ConnectionDef.TypeName);
   AProc(TMySQL50ConnectionDef.TypeName);
   AProc(TMySQL51ConnectionDef.TypeName);
@@ -166,9 +184,15 @@ begin
   AProc(TMySQL55ConnectionDef.TypeName);
 {$ENDIF}
   AProc(TODBCConnectionDef.TypeName);
+{$IFDEF HASORACLECONNECTION}
   AProc(TOracleConnectionDef.TypeName);
+{$ENDIF}
+{$IFDEF JDO_HASPQCONNECTION}
   AProc(TPQConnectionDef.TypeName);
+{$ENDIF}
+{$IFDEF JDO_HASSQLITE3CONNECTION}
   AProc(TSQLite3ConnectionDef.TypeName);
+{$ENDIF}
 {$IFDEF JDO_NEW_FPC}
   AProc(TMSSQLConnectionDef.TypeName);
 {$ENDIF}
