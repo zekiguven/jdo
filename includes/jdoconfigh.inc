@@ -27,7 +27,7 @@
     FTarget: TComponent;
     function GetAbout: string;
     function GetValues(AName: string): string;
-    procedure SetAbout(AValue: string);
+    procedure SetAbout({%H-}AValue: string);
     procedure SetConfiguration(const AValue: string);
     procedure SetTarget(AValue: TComponent);
   protected

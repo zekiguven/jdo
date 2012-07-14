@@ -40,7 +40,7 @@
     function GetAbout: string;
     procedure InternalCheckFieldDefs(const ACount: Integer);
     procedure InternalCheckServerIndexDefs(const ACount: Integer);
-    procedure SetAbout(AValue: string);
+    procedure SetAbout({%H-}AValue: string);
     procedure SetQuery(AValue: TSQLQuery);
   protected
     procedure CheckTableName;

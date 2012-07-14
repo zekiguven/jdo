@@ -57,11 +57,9 @@ begin
   Result := '';
 end;
 
-{$HINTS OFF}
 procedure TJDOCustomConfigurator.SetAbout(AValue: string);
 begin
 end;
-{$HINTS ON}
 
 procedure TJDOCustomConfigurator.SetConfiguration(const AValue: string);
 begin

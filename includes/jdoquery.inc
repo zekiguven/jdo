@@ -366,11 +366,9 @@ begin
   Result := '';
 end;
 
-{$HINTS OFF}
 procedure TJDOCustomQuery.SetAbout(AValue: string);
 begin
 end;
-{$HINTS ON}
 
 procedure TJDOCustomQuery.Apply(const ARetaining: Boolean);
 var

@@ -32,12 +32,10 @@ procedure Register;
 
 implementation
 
-{$HINTS OFF}
-procedure OpenToolProc(ASender: TObject);
+procedure OpenToolProc({%H-}ASender: TObject);
 begin
   TfrJDOTool.Execute;
 end;
-{$HINTS ON}
 
 procedure Register;
 begin

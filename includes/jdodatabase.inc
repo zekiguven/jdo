@@ -77,11 +77,9 @@ begin
   Result := '';
 end;
 
-{$HINTS OFF}
 procedure TJDOCustomDataBase.SetAbout(AValue: string);
 begin
 end;
-{$HINTS ON}
 
 procedure TJDOCustomDataBase.SetConfiguration(const AValue: string);
 begin

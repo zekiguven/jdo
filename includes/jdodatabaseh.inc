@@ -27,7 +27,7 @@
 {$ENDIF}
     function GetAbout: string;
     function GetConfiguration: string;
-    procedure SetAbout(AValue: string);
+    procedure SetAbout({%H-}AValue: string);
     procedure SetConfiguration(const AValue: string);
   protected
     procedure Loaded; override;

@@ -24,7 +24,7 @@
     FOnOpen: TNotifyEvent;
     function GetAbout: string;
     function GetAsJSON: TJSONStringType;
-    procedure SetAbout(AValue: string);
+    procedure SetAbout({%H-}AValue: string);
     procedure SetAsJSON(const AValue: TJSONStringType);
   protected
     procedure InternalCheckFieldDefs;

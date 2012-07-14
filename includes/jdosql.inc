@@ -59,11 +59,9 @@ begin
   Result := '';
 end;
 
-{$HINTS OFF}
 procedure TJDOCustomSQL.SetAbout(AValue: string);
 begin
 end;
-{$HINTS ON}
 
 procedure TJDOCustomSQL.InternalCheckServerIndexDefs(const ACount: Integer);
 begin
