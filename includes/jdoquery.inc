@@ -288,6 +288,9 @@ var
   VArray: TJSONArray;
   VParser: TJSONParser;
 begin
+  if not Assigned(AStream) then
+    Exit;
+  AStream.Position := 0;
   VParser := TJSONParser.Create(AStream);
   try
     VArray := VParser.Parse as TJSONArray;
@@ -363,7 +366,7 @@ end;
 
 function TJDOCustomQuery.GetAbout: string;
 begin
-  Result := '';
+  Result := ES;
 end;
 
 procedure TJDOCustomQuery.SetAbout(AValue: string);

@@ -132,7 +132,7 @@ begin
   if SameText(ATypeName, TMSSQLConnectionDef.TypeName) then
     VUnit := 'MSSQLConn';
 {$ENDIF}
-  CodeToolBoss.AddUnitToMainUsesSection(VCode, VUnit, '');
+  CodeToolBoss.AddUnitToMainUsesSection(VCode, VUnit, ES);
 end;
 
 procedure RemoveAllConnUnit;

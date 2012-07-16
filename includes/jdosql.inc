@@ -56,7 +56,7 @@ end;
 
 function TJDOCustomSQL.GetAbout: string;
 begin
-  Result := '';
+  Result := ES;
 end;
 
 procedure TJDOCustomSQL.SetAbout(AValue: string);

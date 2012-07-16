@@ -54,7 +54,7 @@ end;
 
 function TJDOCustomConfigurator.GetAbout: string;
 begin
-  Result := '';
+  Result := ES;
 end;
 
 procedure TJDOCustomConfigurator.SetAbout(AValue: string);

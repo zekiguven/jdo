@@ -74,7 +74,7 @@ end;
 
 function TJDOCustomDataBase.GetAbout: string;
 begin
-  Result := '';
+  Result := ES;
 end;
 
 procedure TJDOCustomDataBase.SetAbout(AValue: string);
