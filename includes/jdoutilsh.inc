@@ -15,17 +15,17 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-function TimeOf(AData: TJSONData): TTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateOf(AData: TJSONData): TDate;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateTimeOf(AData: TJSONData): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function TimeOf(AData: TJSONData; const ADefValue: TTime): TTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateOf(AData: TJSONData; const ADefValue: TDate): TDate;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DateTimeOf(AData: TJSONData; const ADefValue: TDateTime): TDateTime;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function NextIndexName(var AFields: string; const ADelimiter: Char = SC): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function IndexNamesCount(const AFields: string; const ADelimiter: Char = SC): Integer;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function StrToHex(const AStr: string): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function HexToStr(const AHex: string): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function TimeOf(AData: TJSONData): TTime;
+function DateOf(AData: TJSONData): TDate;
+function DateTimeOf(AData: TJSONData): TDateTime;
+function TimeOf(AData: TJSONData; const ADefValue: TTime): TTime;
+function DateOf(AData: TJSONData; const ADefValue: TDate): TDate;
+function DateTimeOf(AData: TJSONData; const ADefValue: TDateTime): TDateTime;
+function NextIndexName(var AFields: string; const ADelimiter: Char = SC): string;
+function IndexNamesCount(const AFields: string; const ADelimiter: Char = SC): Integer;
+function StrToHex(const AStr: string): string;
+function HexToStr(const AHex: string): string;
 {$IFDEF JDO_CRYPT}
-function CryptStr(const AStr, AKey: string): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
-function DeCryptStr(const AStr, AKey: string): string;{$IFDEF JDO_INLINE}inline;{$ENDIF}
+function CryptStr(const AStr, AKey: string): string;
+function DeCryptStr(const AStr, AKey: string): string;
 {$ENDIF}

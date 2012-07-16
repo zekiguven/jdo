@@ -84,7 +84,7 @@ procedure TJDOCustomSQL.PrepareCols(const AStatementType: TJDOStatementType;
   out ACols, AValues: string);
 
   procedure GetValues(out S: TStrings; out IxDef: TIndexDef;
-    const C: Integer; const ValPK: Boolean); inline;
+    const C: Integer; const ValPK: Boolean);
   var
     I: Integer;
   begin
