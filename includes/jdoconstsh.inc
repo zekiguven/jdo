@@ -16,10 +16,10 @@
 *)
 
 const
-  VERSION = '6.15'; // RT version
+  VERSION = '6.16'; // RT version
   AUTHOR_LINK = 'https://github.com/silvioprog/';
   PROJECT_LINK = 'https://github.com/silvioprog/jdo/';
-  PROJECT_DESCRIPTION = 'JSON Data Objects (JDO)';
+  PROJECT_DESCRIPTION = 'JSON Data Objects';
   CR = #13;
   LF = #10;
   CRLF = CR + LF;

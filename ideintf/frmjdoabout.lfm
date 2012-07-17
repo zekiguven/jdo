@@ -265,7 +265,9 @@ object frJDOAbout: TfrJDOAbout
       Top = 61
       Width = 1
       BorderSpacing.Left = 10
+      Font.Style = [fsBold]
       ParentColor = False
+      ParentFont = False
     end
     object lbAuthor: TLabel
       AnchorSideLeft.Control = lbHomePage
@@ -274,10 +276,12 @@ object frJDOAbout: TfrJDOAbout
       Left = 27
       Height = 14
       Top = 112
-      Width = 38
+      Width = 43
       BorderSpacing.Top = 20
       Caption = 'Author:'
+      Font.Style = [fsBold]
       ParentColor = False
+      ParentFont = False
     end
     object lbHomePage: TLabel
       AnchorSideLeft.Control = gbLicense
@@ -286,16 +290,18 @@ object frJDOAbout: TfrJDOAbout
       Left = 27
       Height = 14
       Top = 136
-      Width = 59
+      Width = 68
       BorderSpacing.Top = 10
       Caption = 'Home page:'
+      Font.Style = [fsBold]
       ParentColor = False
+      ParentFont = False
     end
     object lbAuthorLink: TLabel
       AnchorSideLeft.Control = lbHomePageLink
       AnchorSideTop.Control = lbAuthor
       AnchorSideTop.Side = asrCenter
-      Left = 96
+      Left = 105
       Height = 1
       Top = 119
       Width = 1
@@ -306,7 +312,7 @@ object frJDOAbout: TfrJDOAbout
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = lbHomePage
       AnchorSideTop.Side = asrCenter
-      Left = 96
+      Left = 105
       Height = 1
       Top = 143
       Width = 1
