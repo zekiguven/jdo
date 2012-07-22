@@ -23,14 +23,16 @@ interface
 
 uses
   Forms, StdCtrls, ComCtrls, EditBtn, ExtCtrls, SysUtils, Controls, Dialogs,
-  Spin, ActnList, StdActns, Menus, XMLPropStorage, SynHighlighterSQL, SynMemo,
-  JDO, jdoideintf;
+  Spin, ActnList, StdActns, Menus, Buttons, XMLPropStorage, SynHighlighterSQL,
+  SynMemo, JDO, jdoideintf;
 
 type
   TfrJDOTool = class(TForm)
     alEdit: TActionList;
-    btGenSQL: TButton;
+    btClose: TBitBtn;
+    btGenSQL: TBitBtn;
     cbTableName: TComboBox;
+    cbFormated: TCheckBox;
     edInsert: TSynMemo;
     edDelete: TSynMemo;
     acSelAll: TEditSelectAll;
@@ -44,6 +46,7 @@ type
     n1: TMenuItem;
     miCopy: TMenuItem;
     miSelAll: TMenuItem;
+    pnBotton: TPanel;
     pmEdit: TPopupMenu;
     sql: TJDOSQL;
     pnTop: TPanel;
