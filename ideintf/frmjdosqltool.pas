@@ -29,6 +29,7 @@ uses
 type
   TfrJDOSQLTool = class(TForm)
     alEdit: TActionList;
+    btExecSQL: TBitBtn;
     btClose: TBitBtn;
     btGenSQL: TBitBtn;
     cbTableName: TComboBox;
