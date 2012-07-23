@@ -1,5 +1,5 @@
 (*
-  JDO Tool menu inft unit
+  JDO menu inft unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
   https://github.com/silvioprog/jdo/
@@ -22,25 +22,25 @@ unit jdomenuintf;
 interface
 
 uses
-  frmjdotool, MenuIntf;
+  frmjdosqltool, MenuIntf;
 
 const
-  JDO_TOOL_MENU_NAME = 'JDOToolMenu';
-  JDO_TOOL_MENU_DESCRIPTION = 'JDO Tool';
+  JDO_SQL_TOOL_MENU_NAME = 'JDOSQLToolMenu';
+  JDO_SQL_TOOL_MENU_DESCRIPTION = 'JDO SQL Tool';
 
 procedure Register;
 
 implementation
 
-procedure OpenToolProc({%H-}ASender: TObject);
+procedure OpenSQLToolProc({%H-}ASender: TObject);
 begin
-  TfrJDOTool.Execute;
+  TfrJDOSQLTool.Execute;
 end;
 
 procedure Register;
 begin
-  RegisterIDEMenuCommand(mnuTools, JDO_TOOL_MENU_NAME, JDO_TOOL_MENU_DESCRIPTION,
-    nil, @OpenToolProc, nil, 'jdotool');
+  RegisterIDEMenuCommand(mnuTools, JDO_SQL_TOOL_MENU_NAME,
+    JDO_SQL_TOOL_MENU_DESCRIPTION, nil, @OpenSQLToolProc, nil, 'jdosqltool');
 end;
 
 end.

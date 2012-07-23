@@ -25,11 +25,11 @@
     <Version Release="1" Build="2"/>
     <Files Count="4">
       <Item1>
-        <Filename Value="..\ideintf\frmjdotool.pas"/>
-        <UnitName Value="frmjdotool"/>
+        <Filename Value="..\ideintf\frmjdosqltool.pas"/>
+        <UnitName Value="frmjdosqltool"/>
       </Item1>
       <Item2>
-        <Filename Value="..\ideintf\frmjdotool.lfm"/>
+        <Filename Value="..\ideintf\frmjdosqltool.lfm"/>
         <Type Value="LFM"/>
       </Item2>
       <Item3>

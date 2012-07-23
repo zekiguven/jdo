@@ -1,9 +1,9 @@
-object frJDOTool: TfrJDOTool
+object frJDOSQLTool: TfrJDOSQLTool
   Left = 255
   Height = 480
   Top = 131
   Width = 630
-  Caption = 'JDO Tool'
+  Caption = 'JDO SQL Tool'
   ClientHeight = 480
   ClientWidth = 630
   Icon.Data = {

@@ -1,5 +1,5 @@
 (*
-  JDO Tool unit
+  JDO SQL Tool unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
   https://github.com/silvioprog/jdo/
@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-unit frmjdotool;
+unit frmjdosqltool;
 
 {$I jdo.inc}
 
@@ -27,7 +27,7 @@ uses
   XMLPropStorage, SynHighlighterSQL, SynMemo;
 
 type
-  TfrJDOTool = class(TForm)
+  TfrJDOSQLTool = class(TForm)
     alEdit: TActionList;
     btClose: TBitBtn;
     btGenSQL: TBitBtn;
@@ -80,29 +80,26 @@ const
   SEmptyConfig = 'Please specify a configuration.';
   SEmptyTableName = 'Please specify a table name.';
 
-var
-  frJDOTool: TfrJDOTool;
-
 implementation
 
 {$R *.lfm}
 
-procedure TfrJDOTool.edConfigEditingDone(Sender: TObject);
+procedure TfrJDOSQLTool.edConfigEditingDone(Sender: TObject);
 begin
   db.Configuration := edConfig.Text;
 end;
 
-procedure TfrJDOTool.FormCreate(Sender: TObject);
+procedure TfrJDOSQLTool.FormCreate(Sender: TObject);
 begin
   xml.FileName := GetExpertsConfigFileName;
 end;
 
-procedure TfrJDOTool.FormShow(Sender: TObject);
+procedure TfrJDOSQLTool.FormShow(Sender: TObject);
 begin
   sql.Query := db.Query;
 end;
 
-procedure TfrJDOTool.Validate(const AExp: Boolean; const AMsg: string;
+procedure TfrJDOSQLTool.Validate(const AExp: Boolean; const AMsg: string;
   const AControl: TWinControl);
 begin
   if not AExp then
@@ -114,7 +111,7 @@ begin
   end;
 end;
 
-class procedure TfrJDOTool.Execute;
+class procedure TfrJDOSQLTool.Execute;
 begin
   with Self.Create(nil) do
   try
@@ -124,7 +121,7 @@ begin
   end;
 end;
 
-procedure TfrJDOTool.cbTableNameGetItems(Sender: TObject);
+procedure TfrJDOSQLTool.cbTableNameGetItems(Sender: TObject);
 var
   item: string;
 begin
@@ -135,12 +132,12 @@ begin
   cbTableName.ItemIndex := cbTableName.Items.IndexOf(item);
 end;
 
-procedure TfrJDOTool.edConfigAcceptFileName(Sender: TObject; Var Value: String);
+procedure TfrJDOSQLTool.edConfigAcceptFileName(Sender: TObject; Var Value: String);
 begin
   db.Configuration := Value;
 end;
 
-procedure TfrJDOTool.btGenSQLClick(Sender: TObject);
+procedure TfrJDOSQLTool.btGenSQLClick(Sender: TObject);
 var
   wrap: Integer;
 begin
@@ -172,18 +169,18 @@ begin
   end;
 end;
 
-procedure TfrJDOTool.acSelAllExecute(Sender: TObject);
+procedure TfrJDOSQLTool.acSelAllExecute(Sender: TObject);
 begin
   if ActiveControl is TSynMemo then
     (ActiveControl as TSynMemo).SelectAll;
 end;
 
-procedure TfrJDOTool.cbTableNameEditingDone(Sender: TObject);
+procedure TfrJDOSQLTool.cbTableNameEditingDone(Sender: TObject);
 begin
   sql.TableName := cbTableName.Text;
 end;
 
-procedure TfrJDOTool.edTableAliasEditingDone(Sender: TObject);
+procedure TfrJDOSQLTool.edTableAliasEditingDone(Sender: TObject);
 begin
   sql.TableAlias := edTableAlias.Text;
 end;

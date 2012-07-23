@@ -1,4 +1,4 @@
-jdotool.png
+jdosqltool.png
 tjdoconfigurator.png
 tjdosql.png
 tjdodatabase.png
