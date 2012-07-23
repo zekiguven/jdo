@@ -31,7 +31,10 @@ implementation
 
 function GetExpertsConfigPath: string;
 begin
-  Result := IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath);
+  if Assigned(LazarusIDE) then
+    Result := IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath)
+  else
+    Result := '';
 end;
 
 function GetExpertsConfigFileName: string;
