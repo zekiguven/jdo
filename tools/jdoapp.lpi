@@ -52,12 +52,12 @@
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="jdoconsts.pas"/>
+        <Filename Value="jdocmdconsts.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="jdoconsts"/>
+        <UnitName Value="JDOCMDConsts"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="9"/>
-        <CursorPos X="23" Y="18"/>
+        <TopLine Value="1"/>
+        <CursorPos X="6" Y="18"/>
         <UsageCount Value="36"/>
       </Unit1>
     </Units>
@@ -104,4 +104,5 @@
       </Item3>
     </Exceptions>
   </Debugging>
+  <EditorMacros Count="0"/>
 </CONFIG>

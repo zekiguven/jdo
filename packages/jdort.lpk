@@ -19,60 +19,24 @@
     </CompilerOptions>
     <Description Value="JSON Data Objects runtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="6" Build="16"/>
-    <Files Count="13">
+    <Version Release="6" Build="17"/>
+    <Files Count="4">
       <Item1>
         <Filename Value="..\includes\jdo.inc"/>
         <Type Value="Include"/>
       </Item1>
       <Item2>
-        <Filename Value="..\includes\jdoconfig.inc"/>
-        <Type Value="Include"/>
-      </Item2>
-      <Item3>
-        <Filename Value="..\includes\jdoconfigh.inc"/>
-        <Type Value="Include"/>
-      </Item3>
-      <Item4>
-        <Filename Value="..\includes\jdoconstsh.inc"/>
-        <Type Value="Include"/>
-      </Item4>
-      <Item5>
-        <Filename Value="..\includes\jdodatabase.inc"/>
-        <Type Value="Include"/>
-      </Item5>
-      <Item6>
-        <Filename Value="..\includes\jdodatabaseh.inc"/>
-        <Type Value="Include"/>
-      </Item6>
-      <Item7>
-        <Filename Value="..\includes\jdoquery.inc"/>
-        <Type Value="Include"/>
-      </Item7>
-      <Item8>
-        <Filename Value="..\includes\jdoqueryh.inc"/>
-        <Type Value="Include"/>
-      </Item8>
-      <Item9>
-        <Filename Value="..\includes\jdosql.inc"/>
-        <Type Value="Include"/>
-      </Item9>
-      <Item10>
-        <Filename Value="..\includes\jdosqlh.inc"/>
-        <Type Value="Include"/>
-      </Item10>
-      <Item11>
-        <Filename Value="..\includes\jdoutils.inc"/>
-        <Type Value="Include"/>
-      </Item11>
-      <Item12>
-        <Filename Value="..\includes\jdoutilsh.inc"/>
-        <Type Value="Include"/>
-      </Item12>
-      <Item13>
         <Filename Value="..\units\jdo.pas"/>
         <UnitName Value="JDO"/>
-      </Item13>
+      </Item2>
+      <Item3>
+        <Filename Value="..\units\jdoconsts.pas"/>
+        <UnitName Value="JDOConsts"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\units\jdoutils.pas"/>
+        <UnitName Value="JDOUtils"/>
+      </Item4>
     </Files>
     <Type Value="RunTimeOnly"/>
     <RequiredPkgs Count="1">

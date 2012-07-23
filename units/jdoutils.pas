@@ -1,5 +1,5 @@
 (*
-  JDOUtils implementation include
+  JDOUtils unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
   https://github.com/silvioprog/jdo/
@@ -14,6 +14,35 @@
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
+
+unit JDOUtils;
+
+{$i jdo.inc}
+
+interface
+
+uses
+{$IFDEF JDO_CRYPT}
+  BlowFish,
+{$ENDIF}
+  JDOConsts, Classes, SysUtils, FPJSON;
+
+function TimeOf(AData: TJSONData): TTime;
+function DateOf(AData: TJSONData): TDate;
+function DateTimeOf(AData: TJSONData): TDateTime;
+function TimeOf(AData: TJSONData; const ADefValue: TTime): TTime;
+function DateOf(AData: TJSONData; const ADefValue: TDate): TDate;
+function DateTimeOf(AData: TJSONData; const ADefValue: TDateTime): TDateTime;
+function NextIndexName(var AFields: string; const ADelimiter: Char = SC): string;
+function IndexNamesCount(const AFields: string; const ADelimiter: Char = SC): Integer;
+function StrToHex(const AStr: string): string;
+function HexToStr(const AHex: string): string;
+{$IFDEF JDO_CRYPT}
+function CryptStr(const AStr, AKey: string): string;
+function DeCryptStr(const AStr, AKey: string): string;
+{$ENDIF}
+
+implementation
 
 function TimeOf(AData: TJSONData): TTime;
 begin
@@ -102,7 +131,7 @@ var
 begin
   Result:= ES;
   for I := 1 to Length(AHex) div 2 do
-    Result := Result + Char(StrToInt('$' + Copy(AHex, (I - 1) * 2 + 1, 2)));
+    Result := Result + Char(StrToInt(DS + Copy(AHex, (I - 1) * 2 + 1, 2)));
 end;
 
 {$IFDEF JDO_CRYPT}
@@ -138,3 +167,5 @@ begin
   end;
 end;
 {$ENDIF}
+
+end.

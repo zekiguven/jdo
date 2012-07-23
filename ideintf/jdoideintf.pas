@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-unit jdoideintf;
+unit JDOIDEIntf;
 
 {$I jdo.inc}
 

@@ -15,7 +15,7 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-unit jdoconsts;
+unit JDOCMDConsts;
 
 {$mode objfpc}{$H+}
 {$codepage utf8}

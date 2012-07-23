@@ -22,8 +22,8 @@ unit JDOCompEdits;
 interface
 
 uses
-  JDO, JDOPropEdits, frmJDOAbout, ComponentEditors, FieldsEditor, PropEdits,
-  Dialogs, Controls;
+  JDO, JDOConsts, JDOPropEdits, frmJDOAbout, ComponentEditors, FieldsEditor,
+  PropEdits, Dialogs, Controls;
 
 type
   TJDOComponentEditor = class(TComponentEditor)

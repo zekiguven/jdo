@@ -22,8 +22,8 @@ unit JDOPropEdits;
 interface
 
 uses
-  JDO, frmJDOAbout, SQLdb, PropEdits, Classes, SysUtils, SrcEditorIntf,
-  CodeToolManager, CodeCache;
+  JDO, JDOConsts, frmJDOAbout, SQLdb, PropEdits, Classes, SysUtils,
+  SrcEditorIntf, CodeToolManager, CodeCache;
 
 type
   TJDOAboutPropertyEditor = class(TStringProperty)

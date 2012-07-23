@@ -1,5 +1,5 @@
 (*
-  JDOConsts interface include
+  JDOConsts unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
   https://github.com/silvioprog/jdo/
@@ -15,8 +15,14 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
+unit JDOConsts;
+
+{$i jdo.inc}
+
+interface
+
 const
-  VERSION = '6.16'; // RT version
+  VERSION = '6.17'; // RT version
   AUTHOR_LINK = 'https://github.com/silvioprog/';
   PROJECT_LINK = 'https://github.com/silvioprog/jdo/';
   PROJECT_DESCRIPTION = 'JSON Data Objects';
@@ -25,6 +31,7 @@ const
   CRLF = CR + LF;
   ES = '';
   SP = #32;
+  DS = #36; // $
   PT = #37; // %
   AK = #42; // *
   CO = #58; // :
@@ -84,3 +91,7 @@ const
   SEmptyTableError = 'Empty table.';
   SEmptyObjectError = 'Empty object.';
   SPrimaryKeyNotFound = 'Primary key not found.';
+
+implementation
+
+end.

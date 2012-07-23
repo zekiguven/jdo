@@ -6,7 +6,6 @@
 *.bak*
 *.exe
 *.dll
-*.bat
 *.dbg
 jdodt.pas
 jdort.pas

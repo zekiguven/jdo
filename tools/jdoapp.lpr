@@ -21,20 +21,21 @@ program jdoapp;
 
 uses
   JDO,
-  jdoconsts,
-  getopts,
+  JDOConsts,
+  JDOCMDConsts,
+  GetOpts,
   SysUtils,
   IBConnection,
-  mysql40conn,
-  mysql41conn,
-  mysql50conn,
-  mysql51conn,
-  mysql55conn,
-  odbcconn,
-  oracleconnection,
-  pqconnection,
-  sqlite3conn,
-  mssqlconn;
+  MYSQL40Conn,
+  MYSQL41Conn,
+  MYSQL50Conn,
+  MYSQL51Conn,
+  MYSQL55Conn,
+  ODBCConn,
+  Oracleconnection,
+  PQConnection,
+  SQLite3Conn,
+  MSSQLConn;
 
   procedure valopt(const exp: boolean; const opt: char);
   begin

@@ -22,7 +22,8 @@ unit frmjdoabout;
 interface
 
 uses
-  JDO, Classes, SysUtils, Forms, Controls, Graphics, ExtCtrls, StdCtrls, LCLIntf;
+  JDOConsts, Classes, SysUtils, Forms, Controls, Graphics, ExtCtrls, StdCtrls,
+  LCLIntf;
 
 type
   TfrJDOAbout = class(TForm)

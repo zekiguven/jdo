@@ -22,9 +22,9 @@ unit frmjdotool;
 interface
 
 uses
-  Forms, StdCtrls, ComCtrls, EditBtn, ExtCtrls, SysUtils, Controls, Dialogs,
-  Spin, ActnList, StdActns, Menus, Buttons, XMLPropStorage, SynHighlighterSQL,
-  SynMemo, JDO, jdoideintf;
+  JDO, JDOConsts, JDOIDEIntf, Forms, StdCtrls, ComCtrls, EditBtn, ExtCtrls,
+  SysUtils, Controls, Dialogs, Spin, ActnList, StdActns, Menus, Buttons,
+  XMLPropStorage, SynHighlighterSQL, SynMemo;
 
 type
   TfrJDOTool = class(TForm)
