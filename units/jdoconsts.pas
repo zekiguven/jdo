@@ -72,6 +72,7 @@ const
   SGenUpdSQL = 'Generates SQL for update ...';
   SGenDelSQL = 'Generates SQL for delete ...';
   SGenAllSQL = 'Generates all SQL ...';
+  SSQLTool = 'JDO SQL Tool';
   SGenSQLConfirm = 'Generates SQL?';
   SSQLGeneratedMsg = 'SQL generated successfully!';
   SLoadJSONFileMsg = 'Load JSON from file ...';

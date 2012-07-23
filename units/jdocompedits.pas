@@ -22,8 +22,8 @@ unit JDOCompEdits;
 interface
 
 uses
-  JDO, JDOConsts, JDOPropEdits, frmJDOAbout, ComponentEditors, FieldsEditor,
-  PropEdits, Dialogs, Controls;
+  JDO, JDOConsts, JDOPropEdits, frmJDOAbout, frmJDOSQLTool, ComponentEditors,
+  FieldsEditor, PropEdits, Dialogs, Controls, Menus;
 
 type
   TJDOComponentEditor = class(TComponentEditor)
@@ -58,6 +58,7 @@ type
     procedure ExecuteVerb(AIndex: Integer); override;
     function GetVerb(AIndex: Integer): string; override;
     function GetVerbCount: Integer; override;
+    procedure PrepareItem(AIndex: Integer; const AItem: TMenuItem); override;
   end;
 
   TJDOQueryComponentEditor = class(TFieldsComponentEditor)
@@ -249,6 +250,7 @@ begin
           VHook.Modified(Self);
         ShowMessage(SSQLGeneratedMsg);
       end;
+    8: TfrJDOSQLTool.Execute;
   end;
 end;
 
@@ -262,12 +264,26 @@ begin
     4: Result := SGenUpdSQL;
     5: Result := SGenDelSQL;
     6: Result := SGenAllSQL;
+    7: Result := SMenuSep;
+    8: Result := SSQLTool;
   end;
 end;
 
 function TJDOSQLComponentEditor.GetVerbCount: Integer;
 begin
-  Result := inherited GetVerbCount + 6;
+  Result := inherited GetVerbCount + 8;
+end;
+
+procedure TJDOSQLComponentEditor.PrepareItem(AIndex: Integer;
+  const AItem: TMenuItem);
+var
+  VSQL: TJDOSQL;
+begin
+  if AIndex in [2..6] then
+  begin
+    VSQL := GetComponent as TJDOSQL;
+    AItem.Enabled := Assigned(VSQL.Query) and Assigned(VSQL.Query.DataBase);
+  end;
 end;
 
 { TJDOQueryComponentEditor }
@@ -325,6 +341,7 @@ begin
     2: DoShowAbout;
     4: DoOpenDialog;
     5: DoSaveDialog;
+    7: TfrJDOSQLTool.Execute;
   end;
 end;
 
@@ -337,12 +354,14 @@ begin
     3: Result := SMenuSep;
     4: Result := SLoadJSONFileMsg;
     5: Result := SSaveJSONFileMsg;
+    6: Result := SMenuSep;
+    7: Result := SSQLTool;
   end;
 end;
 
 function TJDOQueryComponentEditor.GetVerbCount: Integer;
 begin
-  Result := inherited GetVerbCount + 5;
+  Result := inherited GetVerbCount + 7;
 end;
 
 end.
