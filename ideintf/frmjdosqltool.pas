@@ -15,20 +15,22 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-unit frmjdosqltool;
+unit frmJDOSQLTool;
 
 {$I jdo.inc}
 
 interface
 
 uses
-  JDO, JDOConsts, JDOIDEIntf, DB, Forms, StdCtrls, ComCtrls, EditBtn, ExtCtrls,
-  SysUtils, Controls, Dialogs, Spin, ActnList, StdActns, Menus, Buttons,
-  XMLPropStorage, DBGrids, SynHighlighterSQL, SynMemo;
+  JDO, JDOConsts, JDOIDEIntf, frmJDOSQLToolParams, DB, Forms, StdCtrls,
+  ComCtrls, EditBtn, ExtCtrls, SysUtils, Controls, Dialogs, Spin, ActnList,
+  StdActns, Menus, Buttons, XMLPropStorage, DBGrids, SynHighlighterSQL, SynMemo;
 
 type
   TfrJDOSQLTool = class(TForm)
     alEdit: TActionList;
+    btCommit: TBitBtn;
+    btRollback: TBitBtn;
     btExecSQL: TBitBtn;
     btClose: TBitBtn;
     btGenSQL: TBitBtn;
@@ -66,8 +68,10 @@ type
     tsDelete: TTabSheet;
     xml: TXMLPropStorage;
     procedure acSelAllExecute(Sender: TObject);
+    procedure btCommitClick(Sender: TObject);
     procedure btExecSQLClick(Sender: TObject);
     procedure btGenSQLClick(Sender: TObject);
+    procedure btRollbackClick(Sender: TObject);
     procedure cbTableNameEditingDone(Sender: TObject);
     procedure cbTableNameGetItems(Sender: TObject);
     procedure edConfigAcceptFileName(Sender: TObject; Var Value: String);
@@ -179,21 +183,32 @@ begin
   end;
 end;
 
+procedure TfrJDOSQLTool.btRollbackClick(Sender: TObject);
+begin
+  db.Rollback(False);
+end;
+
 procedure TfrJDOSQLTool.acSelAllExecute(Sender: TObject);
 begin
   if ActiveControl is TSynMemo then
     (ActiveControl as TSynMemo).SelectAll;
 end;
 
+procedure TfrJDOSQLTool.btCommitClick(Sender: TObject);
+begin
+  db.Commit(False);
+end;
+
 procedure TfrJDOSQLTool.btExecSQLClick(Sender: TObject);
 begin
   Validate(edConfig.Text <> ES, SEmptyConfig, edConfig);
-  Validate(cbTableName.Text <> ES, SEmptyTableName, cbTableName);
 
   { *** TEMPORARY FOR TESTS *** }
+  db.Query.Close;
   db.Query.SQL.Text := edSelect.Text;
 
-  { TODO: check for params ... }
+  if db.Query.Params.Count > 0 then
+    TfrJDOSQLToolParams.Execute(db.Query.Params);
 
   db.Query.Open;
 end;

@@ -23,24 +23,32 @@
     <Description Value="JSON Data Objects experts package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
     <Version Release="1" Build="2"/>
-    <Files Count="4">
+    <Files Count="6">
       <Item1>
         <Filename Value="..\ideintf\frmjdosqltool.pas"/>
-        <UnitName Value="frmjdosqltool"/>
+        <UnitName Value="frmJDOSQLTool"/>
       </Item1>
       <Item2>
         <Filename Value="..\ideintf\frmjdosqltool.lfm"/>
         <Type Value="LFM"/>
       </Item2>
       <Item3>
-        <Filename Value="..\ideintf\jdoideintf.pas"/>
-        <UnitName Value="jdoideintf"/>
+        <Filename Value="..\ideintf\frmjdosqltoolparams.pas"/>
+        <UnitName Value="frmJDOSQLToolParams"/>
       </Item3>
       <Item4>
+        <Filename Value="..\ideintf\frmjdosqltoolparams.lfm"/>
+        <Type Value="LFM"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\ideintf\jdoideintf.pas"/>
+        <UnitName Value="JDOIDEIntf"/>
+      </Item5>
+      <Item6>
         <Filename Value="..\ideintf\jdomenuintf.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="jdomenuintf"/>
-      </Item4>
+      </Item6>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">
