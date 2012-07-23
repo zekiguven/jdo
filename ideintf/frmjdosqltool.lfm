@@ -66,7 +66,7 @@ object frJDOSQLTool: TfrJDOSQLTool
       inline edSelect: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 330
+        Height = 225
         Top = 0
         Width = 622
         Align = alClient
@@ -539,6 +539,26 @@ object frJDOSQLTool: TfrJDOSQLTool
             MouseActionsCollapsed = <>
           end
         end
+      end
+      object grResult: TDBGrid
+        Left = 0
+        Height = 100
+        Top = 230
+        Width = 622
+        Align = alBottom
+        Color = clWindow
+        Columns = <>
+        DataSource = dsResult
+        TabOrder = 1
+      end
+      object sp1: TSplitter
+        Cursor = crVSplit
+        Left = 0
+        Height = 5
+        Top = 225
+        Width = 622
+        Align = alBottom
+        ResizeAnchor = akBottom
       end
     end
     object tsInsert: TTabSheet
@@ -2202,7 +2222,6 @@ object frJDOSQLTool: TfrJDOSQLTool
       Align = alRight
       BorderSpacing.Around = 4
       Caption = '&Execute'
-      Enabled = False
       Glyph.Data = {
         36040000424D3604000000000000360000002800000010000000100000000100
         2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
@@ -2239,6 +2258,7 @@ object frJDOSQLTool: TfrJDOSQLTool
         FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
         FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
       }
+      OnClick = btExecSQLClick
       TabOrder = 1
     end
   end
@@ -2274,11 +2294,11 @@ object frJDOSQLTool: TfrJDOSQLTool
     TableNameAttri.FrameEdges = sfeAround
     VariableAttri.FrameEdges = sfeAround
     SQLDialect = sqlSybase
-    left = 112
+    left = 152
     top = 128
   end
   object alEdit: TActionList
-    left = 160
+    left = 196
     top = 128
     object acCopy: TEditCopy
       Category = 'Edit'
@@ -2295,7 +2315,7 @@ object frJDOSQLTool: TfrJDOSQLTool
     end
   end
   object pmEdit: TPopupMenu
-    left = 208
+    left = 244
     top = 128
     object miCopy: TMenuItem
       Action = acCopy
@@ -2309,7 +2329,11 @@ object frJDOSQLTool: TfrJDOSQLTool
   end
   object xml: TXMLPropStorage
     StoredValues = <>
-    left = 256
+    left = 292
+    top = 128
+  end
+  object dsResult: TDatasource
+    left = 109
     top = 128
   end
 end
