@@ -285,6 +285,7 @@ begin
     edUpdate.Text := db.Query.UpdateSQL.Text;
     edDelete.Text := db.Query.DeleteSQL.Text;
   end;
+  pcClientChange(Sender);
   HideAllResults;
 end;
 
