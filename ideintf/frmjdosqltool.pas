@@ -57,6 +57,10 @@ type
     imList: TImageList;
     lbWrap: TLabel;
     edWrap: TSpinEdit;
+    edInsertStatistics: TMemo;
+    edUpdateStatistics: TMemo;
+    edDeleteStatistics: TMemo;
+    edSelectStatistics: TMemo;
     miSelectAll: TMenuItem;
     n2: TMenuItem;
     miDelete: TMenuItem;
@@ -68,6 +72,9 @@ type
     pnBotton: TPanel;
     pmEdit: TPopupMenu;
     sp1: TSplitter;
+    sp2: TSplitter;
+    sp3: TSplitter;
+    sp4: TSplitter;
     sql: TJDOSQL;
     pnTop: TPanel;
     lbConfig: TLabel;
@@ -92,10 +99,18 @@ type
     procedure edConfigEditingDone(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+  private
+    FBeginExec: TDateTime;
+    FEndExec: TDateTime;
+    procedure ShowResult(AEdit: TCustomMemo; ASplitter: TSplitter;
+      AGrid: TCustomDBGrid);
+    procedure HideResult(AEdit: TCustomMemo; ASplitter: TSplitter;
+      AGrid: TCustomDBGrid);
+    procedure HideAllResults;
   public
+    class procedure Execute;
     procedure Validate(const AExp: Boolean; const AMsg: string;
       const AControl: TWinControl);
-    class procedure Execute;
   end;
 
 const
@@ -136,6 +151,39 @@ begin
     ShowMessage(AMsg);
     Abort;
   end;
+end;
+
+procedure TfrJDOSQLTool.ShowResult(AEdit: TCustomMemo; ASplitter: TSplitter;
+  AGrid: TCustomDBGrid);
+begin
+  AEdit.Clear;
+  AEdit.Lines.Add('Rows affected: ' + IntToStr(db.Query.RowsAffected));
+  AEdit.Lines.Add('Execution time: ' +
+    FormatDateTime('hh:nn:ss:zzz', FEndExec - FBeginExec));
+  AEdit.Height := 48;
+  AEdit.Show;
+  if Assigned(AGrid) then
+    AGrid.Show;
+  if Assigned(ASplitter) then
+    ASplitter.Show;
+end;
+
+procedure TfrJDOSQLTool.HideResult(AEdit: TCustomMemo; ASplitter: TSplitter;
+  AGrid: TCustomDBGrid);
+begin
+  AEdit.Hide;
+  if Assigned(ASplitter) then
+    ASplitter.Hide;
+  if Assigned(AGrid) then
+    AGrid.Hide;
+end;
+
+procedure TfrJDOSQLTool.HideAllResults;
+begin
+  HideResult(edSelectStatistics, sp1, grResult);
+  HideResult(edInsertStatistics, sp2, nil);
+  HideResult(edUpdateStatistics, sp3, nil);
+  HideResult(edDeleteStatistics, sp4, nil);
 end;
 
 class procedure TfrJDOSQLTool.Execute;
@@ -194,11 +242,13 @@ begin
     edUpdate.Text := db.Query.UpdateSQL.Text;
     edDelete.Text := db.Query.DeleteSQL.Text;
   end;
+  HideAllResults;
 end;
 
 procedure TfrJDOSQLTool.acRollbackExecute(Sender: TObject);
 begin
   db.Rollback(False);
+  HideAllResults;
 end;
 
 procedure TfrJDOSQLTool.acExecSQLExecute(Sender: TObject);
@@ -211,28 +261,41 @@ begin
         if Trim(edSelect.Text) = ES then
           Exit;
         db.Query.SQL.Text := edSelect.Text;
+        FBeginExec := Now;
         db.Query.Open;
+        FEndExec := Now;
+        ShowResult(edSelectStatistics, sp1, grResult);
+        grResult.Height := (tsSelect.Height div 2) + 10;
       end;
     1:
       begin
         if Trim(edInsert.Text) = ES then
           Exit;
         db.Query.SQL.Text := edInsert.Text;
+        FBeginExec := Now;
         db.Query.Execute;
+        FEndExec := Now;
+        ShowResult(edInsertStatistics, sp2, nil);
       end;
     2:
       begin
         if Trim(edUpdate.Text) = ES then
           Exit;
         db.Query.SQL.Text := edUpdate.Text;
+        FBeginExec := Now;
         db.Query.Execute;
+        FEndExec := Now;
+        ShowResult(edUpdateStatistics, sp3, nil);
       end;
     3:
       begin
         if Trim(edDelete.Text) = ES then
           Exit;
         db.Query.SQL.Text := edDelete.Text;
+        FBeginExec := Now;
         db.Query.Execute;
+        FEndExec := Now;
+        ShowResult(edDeleteStatistics, sp4, nil);
       end;
   end;
 end;
@@ -240,6 +303,7 @@ end;
 procedure TfrJDOSQLTool.acCommitExecute(Sender: TObject);
 begin
   db.Commit(False);
+  HideAllResults;
 end;
 
 procedure TfrJDOSQLTool.cbTableNameEditingDone(Sender: TObject);

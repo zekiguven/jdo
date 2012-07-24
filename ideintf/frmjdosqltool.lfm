@@ -66,7 +66,7 @@ object frJDOSQLTool: TfrJDOSQLTool
       inline edSelect: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 162
+        Height = 177
         Top = 0
         Width = 622
         Align = alClient
@@ -541,35 +541,47 @@ object frJDOSQLTool: TfrJDOSQLTool
       end
       object grResult: TDBGrid
         Left = 0
-        Height = 163
-        Top = 167
+        Height = 100
+        Top = 182
         Width = 622
         Align = alBottom
         Color = clWindow
         Columns = <>
         DataSource = dsResult
         TabOrder = 1
+        Visible = False
       end
       object sp1: TSplitter
         Cursor = crVSplit
         Left = 0
         Height = 5
-        Top = 162
+        Top = 177
         Width = 622
         Align = alBottom
         ResizeAnchor = akBottom
+        Visible = False
+      end
+      object edSelectStatistics: TMemo
+        Left = 0
+        Height = 48
+        Top = 282
+        Width = 622
+        Align = alBottom
+        ReadOnly = True
+        TabOrder = 3
+        Visible = False
       end
     end
     object tsInsert: TTabSheet
       Caption = 'Insert'
-      ClientHeight = 216
-      ClientWidth = 429
+      ClientHeight = 330
+      ClientWidth = 622
       inline edInsert: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 216
+        Height = 277
         Top = 0
-        Width = 429
+        Width = 622
         Align = alClient
         Font.Height = -13
         Font.Name = 'Courier New'
@@ -1005,7 +1017,6 @@ object frJDOSQLTool: TfrJDOSQLTool
           end>
         MouseActions = <>
         MouseSelActions = <>
-        ReadOnly = True
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
             Width = 24
@@ -1040,18 +1051,38 @@ object frJDOSQLTool: TfrJDOSQLTool
             MouseActionsCollapsed = <>
           end
         end
+      end
+      object edInsertStatistics: TMemo
+        Left = 0
+        Height = 48
+        Top = 282
+        Width = 622
+        Align = alBottom
+        ReadOnly = True
+        TabOrder = 1
+        Visible = False
+      end
+      object sp2: TSplitter
+        Cursor = crVSplit
+        Left = 0
+        Height = 5
+        Top = 277
+        Width = 622
+        Align = alBottom
+        ResizeAnchor = akBottom
+        Visible = False
       end
     end
     object tsUpdate: TTabSheet
       Caption = 'Update'
-      ClientHeight = 216
-      ClientWidth = 429
+      ClientHeight = 330
+      ClientWidth = 622
       inline edUpdate: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 216
+        Height = 277
         Top = 0
-        Width = 429
+        Width = 622
         Align = alClient
         Font.Height = -13
         Font.Name = 'Courier New'
@@ -1487,7 +1518,6 @@ object frJDOSQLTool: TfrJDOSQLTool
           end>
         MouseActions = <>
         MouseSelActions = <>
-        ReadOnly = True
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
             Width = 24
@@ -1523,17 +1553,37 @@ object frJDOSQLTool: TfrJDOSQLTool
           end
         end
       end
+      object edUpdateStatistics: TMemo
+        Left = 0
+        Height = 48
+        Top = 282
+        Width = 622
+        Align = alBottom
+        ReadOnly = True
+        TabOrder = 1
+        Visible = False
+      end
+      object sp3: TSplitter
+        Cursor = crVSplit
+        Left = 0
+        Height = 5
+        Top = 277
+        Width = 622
+        Align = alBottom
+        ResizeAnchor = akBottom
+        Visible = False
+      end
     end
     object tsDelete: TTabSheet
       Caption = 'Delete'
-      ClientHeight = 216
-      ClientWidth = 429
+      ClientHeight = 330
+      ClientWidth = 622
       inline edDelete: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 216
+        Height = 277
         Top = 0
-        Width = 429
+        Width = 622
         Align = alClient
         Font.Height = -13
         Font.Name = 'Courier New'
@@ -1969,7 +2019,6 @@ object frJDOSQLTool: TfrJDOSQLTool
           end>
         MouseActions = <>
         MouseSelActions = <>
-        ReadOnly = True
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
             Width = 24
@@ -2004,6 +2053,26 @@ object frJDOSQLTool: TfrJDOSQLTool
             MouseActionsCollapsed = <>
           end
         end
+      end
+      object edDeleteStatistics: TMemo
+        Left = 0
+        Height = 48
+        Top = 282
+        Width = 622
+        Align = alBottom
+        ReadOnly = True
+        TabOrder = 1
+        Visible = False
+      end
+      object sp4: TSplitter
+        Cursor = crVSplit
+        Left = 0
+        Height = 5
+        Top = 277
+        Width = 622
+        Align = alBottom
+        ResizeAnchor = akBottom
+        Visible = False
       end
     end
   end
