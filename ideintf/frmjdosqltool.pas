@@ -22,13 +22,17 @@ unit frmJDOSQLTool;
 interface
 
 uses
-  JDO, JDOConsts, JDOIDEIntf, frmJDOSQLToolParams, DB, Forms, StdCtrls,
-  ComCtrls, EditBtn, ExtCtrls, SysUtils, Controls, Dialogs, Spin, ActnList,
-  StdActns, Menus, Buttons, XMLPropStorage, DBGrids, SynHighlighterSQL, SynMemo;
+  JDO, JDOConsts, JDOIDEIntf, DB, Forms, StdCtrls, ComCtrls, EditBtn, ExtCtrls,
+  SysUtils, Controls, Dialogs, Spin, ActnList, StdActns, Menus, Buttons,
+  XMLPropStorage, DBGrids, SynHighlighterSQL, SynMemo;
 
 type
   TfrJDOSQLTool = class(TForm)
-    alEdit: TActionList;
+    acGenAllSQL: TAction;
+    acExecSQL: TAction;
+    acCommit: TAction;
+    acRollback: TAction;
+    alTool: TActionList;
     btCommit: TBitBtn;
     btRollback: TBitBtn;
     btExecSQL: TBitBtn;
@@ -37,20 +41,30 @@ type
     cbTableName: TComboBox;
     cbFormated: TCheckBox;
     dsResult: TDatasource;
+    acCut: TEditCut;
+    acDelete: TEditDelete;
+    acPaste: TEditPaste;
+    acSelectAll: TEditSelectAll;
+    acUndo: TEditUndo;
     grResult: TDBGrid;
     edInsert: TSynMemo;
     edDelete: TSynMemo;
-    acSelAll: TEditSelectAll;
     acCopy: TEditCopy;
     edUpdate: TSynMemo;
     edTableAlias: TEdit;
     edConfig: TFileNameEdit;
     db: TJDODataBase;
+    imList: TImageList;
     lbWrap: TLabel;
     edWrap: TSpinEdit;
+    miSelectAll: TMenuItem;
+    n2: TMenuItem;
+    miDelete: TMenuItem;
+    miPaste: TMenuItem;
+    miCut: TMenuItem;
+    miUndo: TMenuItem;
     n1: TMenuItem;
     miCopy: TMenuItem;
-    miSelAll: TMenuItem;
     pnBotton: TPanel;
     pmEdit: TPopupMenu;
     sp1: TSplitter;
@@ -67,11 +81,10 @@ type
     tsUpdate: TTabSheet;
     tsDelete: TTabSheet;
     xml: TXMLPropStorage;
-    procedure acSelAllExecute(Sender: TObject);
-    procedure btCommitClick(Sender: TObject);
-    procedure btExecSQLClick(Sender: TObject);
-    procedure btGenSQLClick(Sender: TObject);
-    procedure btRollbackClick(Sender: TObject);
+    procedure acCommitExecute(Sender: TObject);
+    procedure acExecSQLExecute(Sender: TObject);
+    procedure acGenAllSQLExecute(Sender: TObject);
+    procedure acRollbackExecute(Sender: TObject);
     procedure cbTableNameEditingDone(Sender: TObject);
     procedure cbTableNameGetItems(Sender: TObject);
     procedure edConfigAcceptFileName(Sender: TObject; Var Value: String);
@@ -97,11 +110,6 @@ implementation
 uses
   pqconnection;
 
-procedure TfrJDOSQLTool.edConfigEditingDone(Sender: TObject);
-begin
-  db.Configuration := edConfig.Text;
-end;
-
 procedure TfrJDOSQLTool.FormCreate(Sender: TObject);
 begin
   xml.FileName := GetExpertsConfigFileName;
@@ -111,6 +119,11 @@ end;
 procedure TfrJDOSQLTool.FormShow(Sender: TObject);
 begin
   sql.Query := db.Query;
+end;
+
+procedure TfrJDOSQLTool.edConfigEditingDone(Sender: TObject);
+begin
+  db.Configuration := edConfig.Text;
 end;
 
 procedure TfrJDOSQLTool.Validate(const AExp: Boolean; const AMsg: string;
@@ -151,7 +164,7 @@ begin
   db.Configuration := Value;
 end;
 
-procedure TfrJDOSQLTool.btGenSQLClick(Sender: TObject);
+procedure TfrJDOSQLTool.acGenAllSQLExecute(Sender: TObject);
 var
   wrap: Integer;
 begin
@@ -183,34 +196,50 @@ begin
   end;
 end;
 
-procedure TfrJDOSQLTool.btRollbackClick(Sender: TObject);
+procedure TfrJDOSQLTool.acRollbackExecute(Sender: TObject);
 begin
   db.Rollback(False);
 end;
 
-procedure TfrJDOSQLTool.acSelAllExecute(Sender: TObject);
-begin
-  if ActiveControl is TSynMemo then
-    (ActiveControl as TSynMemo).SelectAll;
-end;
-
-procedure TfrJDOSQLTool.btCommitClick(Sender: TObject);
-begin
-  db.Commit(False);
-end;
-
-procedure TfrJDOSQLTool.btExecSQLClick(Sender: TObject);
+procedure TfrJDOSQLTool.acExecSQLExecute(Sender: TObject);
 begin
   Validate(edConfig.Text <> ES, SEmptyConfig, edConfig);
-
-  { *** TEMPORARY FOR TESTS *** }
   db.Query.Close;
-  db.Query.SQL.Text := edSelect.Text;
+  case pcClient.TabIndex of
+    0:
+      begin
+        if Trim(edSelect.Text) = ES then
+          Exit;
+        db.Query.SQL.Text := edSelect.Text;
+        db.Query.Open;
+      end;
+    1:
+      begin
+        if Trim(edInsert.Text) = ES then
+          Exit;
+        db.Query.SQL.Text := edInsert.Text;
+        db.Query.Execute;
+      end;
+    2:
+      begin
+        if Trim(edUpdate.Text) = ES then
+          Exit;
+        db.Query.SQL.Text := edUpdate.Text;
+        db.Query.Execute;
+      end;
+    3:
+      begin
+        if Trim(edDelete.Text) = ES then
+          Exit;
+        db.Query.SQL.Text := edDelete.Text;
+        db.Query.Execute;
+      end;
+  end;
+end;
 
-  if db.Query.Params.Count > 0 then
-    TfrJDOSQLToolParams.Execute(db.Query.Params);
-
-  db.Query.Open;
+procedure TfrJDOSQLTool.acCommitExecute(Sender: TObject);
+begin
+  db.Commit(False);
 end;
 
 procedure TfrJDOSQLTool.cbTableNameEditingDone(Sender: TObject);
