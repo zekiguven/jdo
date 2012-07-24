@@ -59,6 +59,7 @@ object frJDOSQLTool: TfrJDOSQLTool
     Align = alClient
     TabIndex = 0
     TabOrder = 1
+    OnChange = pcClientChange
     object tsSelect: TTabSheet
       Caption = 'Select'
       ClientHeight = 330
@@ -504,6 +505,7 @@ object frJDOSQLTool: TfrJDOSQLTool
           end>
         MouseActions = <>
         MouseSelActions = <>
+        OnChange = edSelectChange
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
             Width = 24
@@ -1017,6 +1019,7 @@ object frJDOSQLTool: TfrJDOSQLTool
           end>
         MouseActions = <>
         MouseSelActions = <>
+        OnChange = edInsertChange
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
             Width = 24
@@ -1518,6 +1521,7 @@ object frJDOSQLTool: TfrJDOSQLTool
           end>
         MouseActions = <>
         MouseSelActions = <>
+        OnChange = edUpdateChange
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
             Width = 24
@@ -2019,6 +2023,7 @@ object frJDOSQLTool: TfrJDOSQLTool
           end>
         MouseActions = <>
         MouseSelActions = <>
+        OnChange = edDeleteChange
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
             Width = 24
@@ -2472,6 +2477,7 @@ object frJDOSQLTool: TfrJDOSQLTool
     object acExecSQL: TAction
       Category = 'SQL'
       Caption = 'E&xecute'
+      Enabled = False
       Hint = 'Execute'
       ImageIndex = 7
       OnExecute = acExecSQLExecute
@@ -2480,6 +2486,7 @@ object frJDOSQLTool: TfrJDOSQLTool
     object acCommit: TAction
       Category = 'SQL'
       Caption = '&Commit'
+      Enabled = False
       Hint = 'Commit'
       ImageIndex = 8
       OnExecute = acCommitExecute
@@ -2488,6 +2495,7 @@ object frJDOSQLTool: TfrJDOSQLTool
     object acRollback: TAction
       Category = 'SQL'
       Caption = '&Rollback'
+      Enabled = False
       Hint = 'Rollback'
       ImageIndex = 9
       OnExecute = acRollbackExecute

@@ -95,10 +95,15 @@ type
     procedure cbTableNameEditingDone(Sender: TObject);
     procedure cbTableNameGetItems(Sender: TObject);
     procedure edConfigAcceptFileName(Sender: TObject; Var Value: String);
+    procedure edDeleteChange(Sender: TObject);
+    procedure edInsertChange(Sender: TObject);
+    procedure edSelectChange(Sender: TObject);
     procedure edTableAliasEditingDone(Sender: TObject);
     procedure edConfigEditingDone(Sender: TObject);
+    procedure edUpdateChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure pcClientChange(Sender: TObject);
   private
     FBeginExec: TDateTime;
     FEndExec: TDateTime;
@@ -107,6 +112,7 @@ type
     procedure HideResult(AEdit: TCustomMemo; ASplitter: TSplitter;
       AGrid: TCustomDBGrid);
     procedure HideAllResults;
+    procedure UpdateExecAction(AEdit: TCustomSynMemo);
   public
     class procedure Execute;
     procedure Validate(const AExp: Boolean; const AMsg: string;
@@ -136,9 +142,24 @@ begin
   sql.Query := db.Query;
 end;
 
+procedure TfrJDOSQLTool.pcClientChange(Sender: TObject);
+begin
+  case pcClient.TabIndex of
+    0: UpdateExecAction(edSelect);
+    1: UpdateExecAction(edInsert);
+    2: UpdateExecAction(edUpdate);
+    3: UpdateExecAction(edDelete);
+  end;
+end;
+
 procedure TfrJDOSQLTool.edConfigEditingDone(Sender: TObject);
 begin
   db.Configuration := edConfig.Text;
+end;
+
+procedure TfrJDOSQLTool.edUpdateChange(Sender: TObject);
+begin
+  UpdateExecAction(edUpdate);
 end;
 
 procedure TfrJDOSQLTool.Validate(const AExp: Boolean; const AMsg: string;
@@ -188,6 +209,11 @@ begin
   HideResult(edDeleteStatistics, sp4, nil);
 end;
 
+procedure TfrJDOSQLTool.UpdateExecAction(AEdit: TCustomSynMemo);
+begin
+  acExecSQL.Enabled := Trim(AEdit.Text) <> ES;
+end;
+
 class procedure TfrJDOSQLTool.Execute;
 begin
   with Self.Create(nil) do
@@ -212,6 +238,21 @@ end;
 procedure TfrJDOSQLTool.edConfigAcceptFileName(Sender: TObject; Var Value: String);
 begin
   db.Configuration := Value;
+end;
+
+procedure TfrJDOSQLTool.edDeleteChange(Sender: TObject);
+begin
+  UpdateExecAction(edDelete);
+end;
+
+procedure TfrJDOSQLTool.edInsertChange(Sender: TObject);
+begin
+  UpdateExecAction(edInsert);
+end;
+
+procedure TfrJDOSQLTool.edSelectChange(Sender: TObject);
+begin
+  UpdateExecAction(edSelect);
 end;
 
 procedure TfrJDOSQLTool.acGenAllSQLExecute(Sender: TObject);
@@ -250,12 +291,16 @@ end;
 procedure TfrJDOSQLTool.acRollbackExecute(Sender: TObject);
 begin
   db.Rollback(False);
+  acCommit.Enabled := False;
+  acRollback.Enabled := False;
   HideAllResults;
 end;
 
 procedure TfrJDOSQLTool.acExecSQLExecute(Sender: TObject);
 begin
   Validate(edConfig.Text <> ES, SEmptyConfig, edConfig);
+  acCommit.Enabled := True;
+  acRollback.Enabled := True;
   db.Query.Close;
   case pcClient.TabIndex of
     0:
@@ -304,6 +349,8 @@ end;
 procedure TfrJDOSQLTool.acCommitExecute(Sender: TObject);
 begin
   db.Commit(False);
+  acCommit.Enabled := False;
+  acRollback.Enabled := False;
   HideAllResults;
 end;
 
