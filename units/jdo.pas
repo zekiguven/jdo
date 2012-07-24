@@ -263,6 +263,9 @@ type
   TJDOCustomDataBase = class(TSQLConnector, IJDOAboutComponent)
   private
     FConfig: TJDOConfigurator;
+    FOnCommit: TNotifyEvent;
+    FOnRollback: TNotifyEvent;
+    FOnStartTransaction: TNotifyEvent;
     FQuery: TJDOQuery;
 {$IFDEF JDO_CRYPT}
     FCryptKey: string;
@@ -291,6 +294,10 @@ type
 {$ENDIF}
     property Configuration: string read GetConfiguration write SetConfiguration;
     property Query: TJDOQuery read FQuery;
+    property OnStartTransaction: TNotifyEvent read FOnStartTransaction
+      write FOnStartTransaction;
+    property OnCommit: TNotifyEvent read FOnCommit write FOnCommit;
+    property OnRollback: TNotifyEvent read FOnRollback write FOnRollback;
   end;
 
   { TJDODataBase }
@@ -302,6 +309,9 @@ type
     property CryptKey;
 {$ENDIF}
     property Configuration;
+    property OnStartTransaction;
+    property OnCommit;
+    property OnRollback;
   end;
 
 implementation
@@ -1554,6 +1564,8 @@ begin
   if (not ANativeError) and Transaction.Active then
     Exit;
   Transaction.StartTransaction;
+  if Assigned(FOnStartTransaction) then
+    FOnStartTransaction(Self);
 end;
 
 procedure TJDOCustomDataBase.RestartTransaction;
@@ -1561,6 +1573,8 @@ begin
   if Transaction.Active then
     Transaction.Rollback;
   Transaction.StartTransaction;
+  if Assigned(FOnStartTransaction) then
+    FOnStartTransaction(Self);
 end;
 
 procedure TJDOCustomDataBase.Commit(const ARetaining: Boolean);
@@ -1569,6 +1583,8 @@ begin
     Transaction.CommitRetaining
   else
     Transaction.Commit;
+  if Assigned(FOnCommit) then
+    FOnCommit(Self);
 end;
 
 procedure TJDOCustomDataBase.Rollback(const ARetaining: Boolean);
@@ -1577,6 +1593,8 @@ begin
     Transaction.RollbackRetaining
   else
     Transaction.Rollback;
+  if Assigned(FOnRollback) then
+    FOnRollback(Self);
 end;
 
 end.
