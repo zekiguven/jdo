@@ -267,7 +267,6 @@ begin
         db.Query.Open;
         FEndExec := Now;
         ShowResult(edSelectStatistics, sp1, grResult);
-        grResult.Height := (tsSelect.Height div 2) + 10;
       end;
     1:
       begin

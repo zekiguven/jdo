@@ -66,7 +66,7 @@ object frJDOSQLTool: TfrJDOSQLTool
       inline edSelect: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 177
+        Height = 77
         Top = 0
         Width = 622
         Align = alClient
@@ -541,8 +541,8 @@ object frJDOSQLTool: TfrJDOSQLTool
       end
       object grResult: TDBGrid
         Left = 0
-        Height = 100
-        Top = 182
+        Height = 200
+        Top = 82
         Width = 622
         Align = alBottom
         Color = clWindow
@@ -555,7 +555,7 @@ object frJDOSQLTool: TfrJDOSQLTool
         Cursor = crVSplit
         Left = 0
         Height = 5
-        Top = 177
+        Top = 77
         Width = 622
         Align = alBottom
         ResizeAnchor = akBottom
