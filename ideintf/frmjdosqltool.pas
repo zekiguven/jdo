@@ -24,7 +24,7 @@ interface
 uses
   JDO, JDOConsts, JDOIDEIntf, DB, Forms, StdCtrls, ComCtrls, EditBtn, ExtCtrls,
   SysUtils, Controls, Dialogs, Spin, ActnList, StdActns, Menus, Buttons,
-  XMLPropStorage, DBGrids, SynHighlighterSQL, SynMemo;
+  XMLPropStorage, DBGrids, SynHighlighterSQL, SynMemo, SynCompletion;
 
 type
   TfrJDOSQLTool = class(TForm)
@@ -83,6 +83,7 @@ type
     pcClient: TPageControl;
     sqlsyn: TSynSQLSyn;
     edSelect: TSynMemo;
+    scSQL: TSynCompletion;
     tsSelect: TTabSheet;
     tsInsert: TTabSheet;
     tsUpdate: TTabSheet;
@@ -145,10 +146,26 @@ end;
 procedure TfrJDOSQLTool.pcClientChange(Sender: TObject);
 begin
   case pcClient.TabIndex of
-    0: UpdateExecAction(edSelect);
-    1: UpdateExecAction(edInsert);
-    2: UpdateExecAction(edUpdate);
-    3: UpdateExecAction(edDelete);
+    0:
+      begin
+        UpdateExecAction(edSelect);
+        scSQL.Editor := edSelect;
+      end;
+    1:
+      begin
+        UpdateExecAction(edInsert);
+        scSQL.Editor := edInsert;
+      end;
+    2:
+      begin
+        UpdateExecAction(edUpdate);
+        scSQL.Editor := edUpdate;
+      end;
+    3:
+      begin
+        UpdateExecAction(edDelete);
+        scSQL.Editor := edDelete;
+      end;
   end;
 end;
 
