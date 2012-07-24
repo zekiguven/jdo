@@ -548,7 +548,7 @@ object frJDOSQLTool: TfrJDOSQLTool
         Color = clWindow
         Columns = <>
         DataSource = dsResult
-        TabOrder = 1
+        TabOrder = 2
         Visible = False
       end
       object sp1: TSplitter
