@@ -157,10 +157,12 @@ procedure TfrJDOSQLTool.ShowResult(AEdit: TCustomMemo; ASplitter: TSplitter;
   AGrid: TCustomDBGrid);
 begin
   AEdit.Clear;
-  AEdit.Lines.Add('Rows affected: ' + IntToStr(db.Query.RowsAffected));
+  if pcClient.TabIndex = 0 then
+    AEdit.Lines.Add('Records: ' + IntToStr(db.Query.RecordCount))
+  else
+    AEdit.Lines.Add('Rows affected: ' + IntToStr(db.Query.RowsAffected));
   AEdit.Lines.Add('Execution time: ' +
     FormatDateTime('hh:nn:ss:zzz', FEndExec - FBeginExec));
-  AEdit.Height := 48;
   AEdit.Show;
   if Assigned(AGrid) then
     AGrid.Show;
