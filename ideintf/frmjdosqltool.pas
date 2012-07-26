@@ -317,50 +317,70 @@ end;
 procedure TfrJDOSQLTool.acExecSQLExecute(Sender: TObject);
 begin
   Validate(edConfig.Text <> ES, SEmptyConfig, edConfig);
-  acCommit.Enabled := True;
-  acRollback.Enabled := True;
   db.Query.Close;
-  case pcClient.TabIndex of
-    0:
-      begin
-        if Trim(edSelect.Text) = ES then
-          Exit;
-        db.Query.SQL.Text := edSelect.Text;
-        FBeginExec := Now;
-        db.Query.Open;
-        FEndExec := Now;
-        ShowResult(edSelectStatistics, sp1, grResult);
-      end;
-    1:
-      begin
-        if Trim(edInsert.Text) = ES then
-          Exit;
-        db.Query.SQL.Text := edInsert.Text;
-        FBeginExec := Now;
-        db.Query.Execute;
-        FEndExec := Now;
-        ShowResult(edInsertStatistics, sp2, nil);
-      end;
-    2:
-      begin
-        if Trim(edUpdate.Text) = ES then
-          Exit;
-        db.Query.SQL.Text := edUpdate.Text;
-        FBeginExec := Now;
-        db.Query.Execute;
-        FEndExec := Now;
-        ShowResult(edUpdateStatistics, sp3, nil);
-      end;
-    3:
-      begin
-        if Trim(edDelete.Text) = ES then
-          Exit;
-        db.Query.SQL.Text := edDelete.Text;
-        FBeginExec := Now;
-        db.Query.Execute;
-        FEndExec := Now;
-        ShowResult(edDeleteStatistics, sp4, nil);
-      end;
+  db.StartTransaction(False);
+  try
+    case pcClient.TabIndex of
+      0:
+        begin
+          if Trim(edSelect.Text) = ES then
+            Exit;
+          if edSelect.SelAvail then
+            db.Query.SQL.Text := edSelect.SelText
+          else
+            db.Query.SQL.Text := edSelect.Text;
+          FBeginExec := Now;
+          db.Query.Open;
+          FEndExec := Now;
+          ShowResult(edSelectStatistics, sp1, grResult);
+        end;
+      1:
+        begin
+          if Trim(edInsert.Text) = ES then
+            Exit;
+          if edInsert.SelAvail then
+            db.Query.SQL.Text := edInsert.SelText
+          else
+            db.Query.SQL.Text := edInsert.Text;
+          FBeginExec := Now;
+          db.Query.Execute;
+          FEndExec := Now;
+          ShowResult(edInsertStatistics, sp2, nil);
+        end;
+      2:
+        begin
+          if Trim(edUpdate.Text) = ES then
+            Exit;
+          if edUpdate.SelAvail then
+            db.Query.SQL.Text := edUpdate.SelText
+          else
+            db.Query.SQL.Text := edUpdate.Text;
+          FBeginExec := Now;
+          db.Query.Execute;
+          FEndExec := Now;
+          ShowResult(edUpdateStatistics, sp3, nil);
+        end;
+      3:
+        begin
+          if Trim(edDelete.Text) = ES then
+            Exit;
+          if edDelete.SelAvail then
+            db.Query.SQL.Text := edDelete.SelText
+          else
+            db.Query.SQL.Text := edDelete.Text;
+          FBeginExec := Now;
+          db.Query.Execute;
+          FEndExec := Now;
+          ShowResult(edDeleteStatistics, sp4, nil);
+        end;
+    end;
+    acCommit.Enabled := True;
+    btRollback.Enabled := True;
+  except
+    db.Rollback(False);
+    acCommit.Enabled := False;
+    btRollback.Enabled := False;
+    raise;
   end;
 end;
 
