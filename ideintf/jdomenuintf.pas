@@ -22,7 +22,7 @@ unit jdomenuintf;
 interface
 
 uses
-  frmjdosqltool, MenuIntf;
+  frmjdosqltool, MenuIntf, IDECommands, LCLType, Classes;
 
 const
   JDO_SQL_TOOL_MENU_NAME = 'JDOSQLToolMenu';
@@ -38,9 +38,17 @@ begin
 end;
 
 procedure Register;
+var
+  VKey: TIDEShortCut;
+  VCmd: TIDECommand;
+  VCat: TIDECommandCategory;
 begin
+  VKey := IDEShortCut(VK_J, [ssCtrl, ssShift], VK_UNKNOWN, []);
+  VCat := IDECommandList.FindCategoryByName(CommandCategoryCustomName);
+  VCmd := RegisterIDECommand(VCat, JDO_SQL_TOOL_MENU_NAME,
+    JDO_SQL_TOOL_MENU_DESCRIPTION, VKey, nil, @OpenSQLToolProc);
   RegisterIDEMenuCommand(mnuTools, JDO_SQL_TOOL_MENU_NAME,
-    JDO_SQL_TOOL_MENU_DESCRIPTION, nil, @OpenSQLToolProc, nil, 'jdosqltool');
+    JDO_SQL_TOOL_MENU_DESCRIPTION, nil, @OpenSQLToolProc, VCmd, 'jdosqltool');
 end;
 
 end.
