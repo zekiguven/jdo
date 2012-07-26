@@ -2545,6 +2545,7 @@ object frJDOSQLTool: TfrJDOSQLTool
     end
   end
   object pmEdit: TPopupMenu
+    Images = imList
     left = 264
     top = 128
     object miUndo: TMenuItem
@@ -2574,7 +2575,7 @@ object frJDOSQLTool: TfrJDOSQLTool
   end
   object xml: TXMLPropStorage
     StoredValues = <>
-    left = 304
+    left = 344
     top = 128
   end
   object dsResult: TDatasource
@@ -2582,7 +2583,7 @@ object frJDOSQLTool: TfrJDOSQLTool
     top = 128
   end
   object imList: TImageList
-    left = 344
+    left = 304
     top = 128
     Bitmap = {
       4C690A0000001000000010000000000000000000000000000000000000000000
