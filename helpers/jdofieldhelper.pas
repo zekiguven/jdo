@@ -30,15 +30,19 @@ type
     function GetAsChar: Char;
     function GetAsDate: TDate;
     function GetAsJSON: TJSONStringType;
+    function GetAsLowerString: string;
     function GetAsSmallInt: SmallInt;
     function GetAsTime: TTime;
     function GetAsTrimString: string;
+    function GetAsUpperString: string;
     procedure SetAsChar(AValue: Char);
     procedure SetAsDate(AValue: TDate);
     procedure SetAsJSON(AValue: TJSONStringType);
+    procedure SetAsLowerString(AValue: string);
     procedure SetAsSmallInt(AValue: SmallInt);
     procedure SetAsTime(AValue: TTime);
     procedure SetAsTrimString(AValue: string);
+    procedure SetAsUpperString(AValue: string);
   public
     property AsChar: Char read GetAsChar write SetAsChar;
     property AsSmallInt: SmallInt read GetAsSmallInt write SetAsSmallInt;
@@ -46,6 +50,8 @@ type
     property AsDate: TDate read GetAsDate write SetAsDate;
     property AsJSON: TJSONStringType read GetAsJSON write SetAsJSON;
     property AsTrimString: string read GetAsTrimString write SetAsTrimString;
+    property AsLowerString: string read GetAsLowerString write SetAsLowerString;
+    property AsUpperString: string read GetAsUpperString write SetAsUpperString;
   end;
 
 implementation
@@ -65,6 +71,11 @@ begin
   Result := StringToJSONString(AsString);
 end;
 
+function TJDOFieldHelper.GetAsLowerString: string;
+begin
+  Result := LowerCase(AsString);
+end;
+
 function TJDOFieldHelper.GetAsSmallInt: SmallInt;
 begin
   Result := AsInteger;
@@ -78,6 +89,11 @@ end;
 function TJDOFieldHelper.GetAsTrimString: string;
 begin
   Result := Trim(AsString);
+end;
+
+function TJDOFieldHelper.GetAsUpperString: string;
+begin
+  Result := UpperCase(AsString);
 end;
 
 procedure TJDOFieldHelper.SetAsChar(AValue: Char);
@@ -95,6 +111,11 @@ begin
   AsString := JSONStringToString(AValue);
 end;
 
+procedure TJDOFieldHelper.SetAsLowerString(AValue: string);
+begin
+  AsString := LowerCase(AValue);
+end;
+
 procedure TJDOFieldHelper.SetAsSmallInt(AValue: SmallInt);
 begin
   AsInteger := AValue;
@@ -108,6 +129,11 @@ end;
 procedure TJDOFieldHelper.SetAsTrimString(AValue: string);
 begin
   AsString := Trim(AValue);
+end;
+
+procedure TJDOFieldHelper.SetAsUpperString(AValue: string);
+begin
+  AsString := UpperCase(AValue);
 end;
 
 end.
