@@ -344,12 +344,12 @@ end;
 {$IFDEF JDO_CRYPT}
 class function TJDOCustomConfigurator.Crypt(const AStr, AKey: string): string;
 begin
-  Result := StrToHex(CryptStr(AStr, AKey));
+  Result := StrToHex(EncryptStr(AStr, AKey));
 end;
 
 class function TJDOCustomConfigurator.DeCrypt(const AStr, AKey: string): string;
 begin
-  Result := DeCryptStr(HexToStr(AStr), AKey);
+  Result := DecryptStr(HexToStr(AStr), AKey);
 end;
 {$ENDIF}
 
