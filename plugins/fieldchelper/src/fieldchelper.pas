@@ -1,23 +1,15 @@
 (*
-  JDOFieldHelper unit
+  FieldCHelper unit
   Copyright (C) 2012-2014 Silvio Clecio.
-
-  https://github.com/silvioprog/jdo/
-
-  All contributors:
-  Plase see the file CONTRIBUTORS, included in this distribution.
-
-  See the file LICENSE, included in this distribution,
-  for details about the copyright.
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-unit JDOFieldHelper;
+unit FieldCHelper;
 
-{$i jdo.inc}
+{$mode objfpc}{$H+}
 
 interface
 
@@ -25,7 +17,7 @@ uses
   DB, FPJSON, SysUtils;
 
 type
-  TJDOFieldHelper = class helper for TField
+  TFieldCHelper = class helper for TField
   private
     function GetAsChar: Char;
     function GetAsDate: TDate;
@@ -56,82 +48,82 @@ type
 
 implementation
 
-function TJDOFieldHelper.GetAsChar: Char;
+function TFieldCHelper.GetAsChar: Char;
 begin
   Result := PChar(AsString)^;
 end;
 
-function TJDOFieldHelper.GetAsDate: TDate;
+function TFieldCHelper.GetAsDate: TDate;
 begin
   Result := Trunc(AsDateTime);
 end;
 
-function TJDOFieldHelper.GetAsJSON: TJSONStringType;
+function TFieldCHelper.GetAsJSON: TJSONStringType;
 begin
   Result := StringToJSONString(AsString);
 end;
 
-function TJDOFieldHelper.GetAsLowerString: string;
+function TFieldCHelper.GetAsLowerString: string;
 begin
   Result := LowerCase(AsString);
 end;
 
-function TJDOFieldHelper.GetAsSmallInt: SmallInt;
+function TFieldCHelper.GetAsSmallInt: SmallInt;
 begin
   Result := AsInteger;
 end;
 
-function TJDOFieldHelper.GetAsTime: TTime;
+function TFieldCHelper.GetAsTime: TTime;
 begin
   Result := Frac(AsDateTime);
 end;
 
-function TJDOFieldHelper.GetAsTrimString: string;
+function TFieldCHelper.GetAsTrimString: string;
 begin
   Result := Trim(AsString);
 end;
 
-function TJDOFieldHelper.GetAsUpperString: string;
+function TFieldCHelper.GetAsUpperString: string;
 begin
   Result := UpperCase(AsString);
 end;
 
-procedure TJDOFieldHelper.SetAsChar(AValue: Char);
+procedure TFieldCHelper.SetAsChar(AValue: Char);
 begin
   AsString := AValue;
 end;
 
-procedure TJDOFieldHelper.SetAsDate(AValue: TDate);
+procedure TFieldCHelper.SetAsDate(AValue: TDate);
 begin
   AsDateTime := AValue;
 end;
 
-procedure TJDOFieldHelper.SetAsJSON(AValue: TJSONStringType);
+procedure TFieldCHelper.SetAsJSON(AValue: TJSONStringType);
 begin
   AsString := JSONStringToString(AValue);
 end;
 
-procedure TJDOFieldHelper.SetAsLowerString(AValue: string);
+procedure TFieldCHelper.SetAsLowerString(AValue: string);
 begin
   AsString := LowerCase(AValue);
 end;
 
-procedure TJDOFieldHelper.SetAsSmallInt(AValue: SmallInt);
+procedure TFieldCHelper.SetAsSmallInt(AValue: SmallInt);
 begin
   AsInteger := AValue;
 end;
 
-procedure TJDOFieldHelper.SetAsTime(AValue: TTime);
+procedure TFieldCHelper.SetAsTime(AValue: TTime);
 begin
   AsDateTime := AValue;
 end;
 
-procedure TJDOFieldHelper.SetAsTrimString(AValue: string);
+procedure TFieldCHelper.SetAsTrimString(AValue: string);
 begin
   AsString := Trim(AValue);
 end;
 
-procedure TJDOFieldHelper.SetAsUpperString(AValue: string);
+procedure TFieldCHelper.SetAsUpperString(AValue: string);
 begin
   AsString := UpperCase(AValue);
 end;

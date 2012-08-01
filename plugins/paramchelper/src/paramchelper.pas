@@ -1,23 +1,15 @@
 (*
-  JDOParamHelper unit
+  ParamCHelper unit
   Copyright (C) 2012-2014 Silvio Clecio.
-
-  https://github.com/silvioprog/jdo/
-
-  All contributors:
-  Plase see the file CONTRIBUTORS, included in this distribution.
-
-  See the file LICENSE, included in this distribution,
-  for details about the copyright.
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *)
 
-unit JDOParamHelper;
+unit ParamCHelper;
 
-{$i jdo.inc}
+{$mode objfpc}{$H+}
 
 interface
 
@@ -25,7 +17,7 @@ uses
   DB, FPJSON, SysUtils;
 
 type
-  TJDOParamHelper = class helper for TParam
+  TParamCHelper = class helper for TParam
   private
     function GetAsChar: Char;
     function GetAsJSON: TJSONStringType;
@@ -50,62 +42,62 @@ type
 
 implementation
 
-function TJDOParamHelper.GetAsChar: Char;
+function TParamCHelper.GetAsChar: Char;
 begin
   Result := PChar(AsString)^;
 end;
 
-function TJDOParamHelper.GetAsJSON: TJSONStringType;
+function TParamCHelper.GetAsJSON: TJSONStringType;
 begin
   Result := StringToJSONString(AsString);
 end;
 
-function TJDOParamHelper.GetAsLowerString: string;
+function TParamCHelper.GetAsLowerString: string;
 begin
   Result := LowerCase(AsString);
 end;
 
-function TJDOParamHelper.GetAsSmallInt: SmallInt;
+function TParamCHelper.GetAsSmallInt: SmallInt;
 begin
   Result := AsInteger;
 end;
 
-function TJDOParamHelper.GetAsTrimString: string;
+function TParamCHelper.GetAsTrimString: string;
 begin
   Result := Trim(AsString);
 end;
 
-function TJDOParamHelper.GetAsUpperString: string;
+function TParamCHelper.GetAsUpperString: string;
 begin
   Result := UpperCase(AsString);
 end;
 
-procedure TJDOParamHelper.SetAsChar(AValue: Char);
+procedure TParamCHelper.SetAsChar(AValue: Char);
 begin
   AsString := AValue;
 end;
 
-procedure TJDOParamHelper.SetAsJSON(AValue: TJSONStringType);
+procedure TParamCHelper.SetAsJSON(AValue: TJSONStringType);
 begin
   AsString := JSONStringToString(AValue);
 end;
 
-procedure TJDOParamHelper.SetAsLowerString(AValue: string);
+procedure TParamCHelper.SetAsLowerString(AValue: string);
 begin
   AsString := LowerCase(AValue);
 end;
 
-procedure TJDOParamHelper.SetAsSmallInt(AValue: SmallInt);
+procedure TParamCHelper.SetAsSmallInt(AValue: SmallInt);
 begin
   AsInteger := AValue;
 end;
 
-procedure TJDOParamHelper.SetAsTrimString(AValue: string);
+procedure TParamCHelper.SetAsTrimString(AValue: string);
 begin
   AsString := Trim(AValue);
 end;
 
-procedure TJDOParamHelper.SetAsUpperString(AValue: string);
+procedure TParamCHelper.SetAsUpperString(AValue: string);
 begin
   AsString := UpperCase(AValue);
 end;

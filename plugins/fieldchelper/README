@@ -1,0 +1,11 @@
+Field Class Helper plugin
+=========================
+
+Extends the TField class with new methods and properties.
+
+Installation
+============
+
+1. Open the package "fieldchelperpl.lpk", in the dialog that opens, click in "Use >>" and "Add to Project";
+
+Enjoy!
