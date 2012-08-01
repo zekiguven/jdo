@@ -51,7 +51,7 @@
       </Item6>
     </Files>
     <Type Value="RunAndDesignTime"/>
-    <RequiredPkgs Count="3">
+    <RequiredPkgs Count="4">
       <Item1>
         <PackageName Value="CodeTools"/>
       </Item1>
@@ -59,8 +59,11 @@
         <PackageName Value="IDEIntf"/>
       </Item2>
       <Item3>
-        <PackageName Value="SynEdit"/>
+        <PackageName Value="JDORT"/>
       </Item3>
+      <Item4>
+        <PackageName Value="SynEdit"/>
+      </Item4>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
