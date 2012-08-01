@@ -38,8 +38,8 @@ function IndexNamesCount(const AFields: string; const ADelimiter: Char = SC): In
 function StrToHex(const AStr: string): string;
 function HexToStr(const AHex: string): string;
 {$IFDEF JDO_CRYPT}
-function CryptStr(const AStr, AKey: string): string;
-function DeCryptStr(const AStr, AKey: string): string;
+function EncryptStr(const AStr, AKey: string): string;
+function DecryptStr(const AStr, AKey: string): string;
 {$ENDIF}
 
 implementation
@@ -135,7 +135,7 @@ begin
 end;
 
 {$IFDEF JDO_CRYPT}
-function CryptStr(const AStr, AKey: string): string;
+function EncryptStr(const AStr, AKey: string): string;
 var
   VInput: TStringStream;
   VBF: TBlowFishEncryptStream;
@@ -151,7 +151,7 @@ begin
   end;
 end;
 
-function DeCryptStr(const AStr, AKey: string): string;
+function DecryptStr(const AStr, AKey: string): string;
 var
   VOutput: TStringStream;
   VBF: TBlowFishDeCryptStream;
