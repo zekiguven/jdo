@@ -37,7 +37,6 @@
         <UnitName Value="JDOUtils"/>
       </Item4>
     </Files>
-    <Type Value="RunTimeOnly"/>
     <RequiredPkgs Count="1">
       <Item1>
         <PackageName Value="FCL"/>
