@@ -14,11 +14,12 @@ unit FieldCHelper;
 interface
 
 uses
-  DB, FPJSON, SysUtils;
+  JDOUtils, DB, FPJSON, SysUtils;
 
 type
   TFieldCHelper = class helper for TField
   private
+    function GetAsBase64: string;
     function GetAsChar: Char;
     function GetAsDate: TDate;
     function GetAsJSON: TJSONStringType;
@@ -27,6 +28,7 @@ type
     function GetAsTime: TTime;
     function GetAsTrimString: string;
     function GetAsUpperString: string;
+    procedure SetAsBase64(AValue: string);
     procedure SetAsChar(AValue: Char);
     procedure SetAsDate(AValue: TDate);
     procedure SetAsJSON(AValue: TJSONStringType);
@@ -44,9 +46,15 @@ type
     property AsTrimString: string read GetAsTrimString write SetAsTrimString;
     property AsLowerString: string read GetAsLowerString write SetAsLowerString;
     property AsUpperString: string read GetAsUpperString write SetAsUpperString;
+    property AsBase64: string read GetAsBase64 write SetAsBase64;
   end;
 
 implementation
+
+function TFieldCHelper.GetAsBase64: string;
+begin
+  Result := StrToBase64(AsString);
+end;
 
 function TFieldCHelper.GetAsChar: Char;
 begin
@@ -86,6 +94,11 @@ end;
 function TFieldCHelper.GetAsUpperString: string;
 begin
   Result := UpperCase(AsString);
+end;
+
+procedure TFieldCHelper.SetAsBase64(AValue: string);
+begin
+  AsString := Base64ToStr(AValue);
 end;
 
 procedure TFieldCHelper.SetAsChar(AValue: Char);

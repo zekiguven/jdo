@@ -28,6 +28,10 @@ begin
 
       WriteLn('AsTrimString: ', '-', q.Field('dummy').AsTrimString, '-');
 
+      q.Next;
+
+      WriteLn('AsBase64: ', q.Field('dummy').AsBase64);
+
       db.Commit(False);
     except
       db.Rollback(False);
