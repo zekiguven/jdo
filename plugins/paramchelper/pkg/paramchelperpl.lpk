@@ -30,7 +30,7 @@
     <Type Value="RunTimeOnly"/>
     <RequiredPkgs Count="1">
       <Item1>
-        <PackageName Value="FCL"/>
+        <PackageName Value="JDORT"/>
       </Item1>
     </RequiredPkgs>
     <UsageOptions>
