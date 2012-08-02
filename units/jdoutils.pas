@@ -25,7 +25,7 @@ uses
 {$IFDEF JDO_CRYPT}
   BlowFish,
 {$ENDIF}
-  JDOConsts, Classes, SysUtils, FPJSON;
+  JDOConsts, Classes, SysUtils, FPJSON, Base64;
 
 function TimeOf(AData: TJSONData): TTime;
 function DateOf(AData: TJSONData): TDate;
@@ -41,6 +41,12 @@ function HexToStr(const AHex: string): string;
 function EncryptStr(const AStr, AKey: string): string;
 function DecryptStr(const AStr, AKey: string): string;
 {$ENDIF}
+function StrToBase64(S: string): string;
+function Base64ToStr(const S: string;
+  const AMode: TBase64DecodingMode = bdmMIME): string;
+function FileToBase64(const AFileName: TFileName): string;
+procedure Base64ToFile(const S: string; const AFileName: TFileName;
+  const AMode: TBase64DecodingMode = bdmMIME);
 
 implementation
 
@@ -167,5 +173,90 @@ begin
   end;
 end;
 {$ENDIF}
+
+function StrToBase64(S: string): string;
+var
+  VSrcStream, VDestStream: TStringStream;
+begin
+  VSrcStream := TStringStream.Create(S);
+  try
+    VDestStream := TStringStream.Create('');
+    try
+      with TBase64EncodingStream.Create(VDestStream) do
+        try
+          CopyFrom(VSrcStream, VSrcStream.Size);
+        finally
+          Free;
+        end;
+      Result := VDestStream.DataString;
+    finally
+      VDestStream.Free;
+    end;
+  finally
+    VSrcStream.Free;
+  end;
+end;
+
+function Base64ToStr(const S: string; const AMode: TBase64DecodingMode): string;
+var
+  VDecoder: TBase64DecodingStream;
+  VSrcStream, VDestStream: TStringStream;
+begin
+  VSrcStream := TStringStream.Create(S);
+  try
+    VDestStream := TStringStream.Create('');
+    try
+      VDecoder := TBase64DecodingStream.Create(VSrcStream, AMode);
+      VDestStream.CopyFrom(VDecoder, VDecoder.Size);
+    finally
+      VDecoder.Free;
+    end;
+    Result := VDestStream.DataString;
+  finally
+    VDestStream.Free;
+    VSrcStream.Free;
+  end;
+end;
+
+function FileToBase64(const AFileName: TFileName): string;
+var
+  VFile: TFileStream;
+  VStream: TStringStream;
+begin
+  VFile := TFileStream.Create(AFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    VStream := TStringStream.Create('');
+    with TBase64EncodingStream.Create(VStream) do
+      try
+        CopyFrom(VFile, VFile.Size);
+      finally
+        Free;
+      end;
+    Result := VStream.DataString;
+  finally
+    VStream.Free;
+    VFile.free;
+  end;
+end;
+
+procedure Base64ToFile(const S: string; const AFileName: TFileName;
+  const AMode: TBase64DecodingMode);
+var
+  VFile: TFileStream;
+  VStream: TStringStream;
+  VDecoder: TBase64DecodingStream;
+begin
+  VFile := TFileStream.Create(AFileName, fmCreate);
+  try
+    VStream := TStringStream.Create(S);
+    VStream.Position := 0;
+    VDecoder := TBase64DecodingStream.Create(VStream, AMode);
+    VFile.CopyFrom(VDecoder, VDecoder.Size);
+  finally
+    VDecoder.Free;
+    VStream.Free;
+    VFile.Free;
+  end;
+end;
 
 end.
