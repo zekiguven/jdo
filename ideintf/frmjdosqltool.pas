@@ -32,7 +32,9 @@ type
     acExecSQL: TAction;
     acCommit: TAction;
     acRollback: TAction;
+    acExport: TAction;
     alTool: TActionList;
+    btExport: TBitBtn;
     btCommit: TBitBtn;
     btRollback: TBitBtn;
     btExecSQL: TBitBtn;

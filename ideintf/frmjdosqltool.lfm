@@ -49,6 +49,7 @@ object frJDOSQLTool: TfrJDOSQLTool
   OnShow = FormShow
   Position = poDesktopCenter
   SessionProperties = 'edConfig.FileName;edWrap.Value'
+  ShowHint = True
   LCLVersion = '1.1'
   object pcClient: TPageControl
     Left = 0
@@ -550,6 +551,8 @@ object frJDOSQLTool: TfrJDOSQLTool
         Color = clWindow
         Columns = <>
         DataSource = dsResult
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
+        ReadOnly = True
         TabOrder = 2
         Visible = False
       end
@@ -2214,6 +2217,7 @@ object frJDOSQLTool: TfrJDOSQLTool
       Caption = '&Formated'
       Enabled = False
       TabOrder = 4
+      Visible = False
     end
   end
   object pnBotton: TPanel
@@ -2238,7 +2242,7 @@ object frJDOSQLTool: TfrJDOSQLTool
       Caption = '&Close'
       Kind = bkClose
       ModalResult = 11
-      TabOrder = 4
+      TabOrder = 5
     end
     object btGenSQL: TBitBtn
       Left = 5
@@ -2427,6 +2431,18 @@ object frJDOSQLTool: TfrJDOSQLTool
       }
       TabOrder = 3
     end
+    object btExport: TBitBtn
+      Left = 406
+      Height = 26
+      Top = 5
+      Width = 59
+      Action = acExport
+      Align = alLeft
+      AutoSize = True
+      BorderSpacing.Around = 4
+      TabOrder = 4
+      Visible = False
+    end
   end
   object db: TJDODataBase
     Connected = False
@@ -2543,6 +2559,12 @@ object frJDOSQLTool: TfrJDOSQLTool
       Hint = 'Select all'
       ImageIndex = 4
       ShortCut = 16449
+    end
+    object acExport: TAction
+      Category = 'SQL'
+      Caption = '&Export'
+      Hint = 'Export'
+      ShortCut = 16453
     end
   end
   object pmEdit: TPopupMenu
