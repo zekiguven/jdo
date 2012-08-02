@@ -14,17 +14,19 @@ unit ParamCHelper;
 interface
 
 uses
-  DB, FPJSON, SysUtils;
+  JDOUtils, DB, FPJSON, SysUtils;
 
 type
   TParamCHelper = class helper for TParam
   private
+    function GetAsBase64: string;
     function GetAsChar: Char;
     function GetAsJSON: TJSONStringType;
     function GetAsLowerString: string;
     function GetAsSmallInt: SmallInt;
     function GetAsTrimString: string;
     function GetAsUpperString: string;
+    procedure SetAsBase64(AValue: string);
     procedure SetAsChar(AValue: Char);
     procedure SetAsJSON(AValue: TJSONStringType);
     procedure SetAsLowerString(AValue: string);
@@ -38,9 +40,15 @@ type
     property AsTrimString: string read GetAsTrimString write SetAsTrimString;
     property AsLowerString: string read GetAsLowerString write SetAsLowerString;
     property AsUpperString: string read GetAsUpperString write SetAsUpperString;
+    property AsBase64: string read GetAsBase64 write SetAsBase64;
   end;
 
 implementation
+
+function TParamCHelper.GetAsBase64: string;
+begin
+  Result := StrToBase64(AsString);
+end;
 
 function TParamCHelper.GetAsChar: Char;
 begin
@@ -70,6 +78,11 @@ end;
 function TParamCHelper.GetAsUpperString: string;
 begin
   Result := UpperCase(AsString);
+end;
+
+procedure TParamCHelper.SetAsBase64(AValue: string);
+begin
+  AsString := Base64ToStr(AValue);
 end;
 
 procedure TParamCHelper.SetAsChar(AValue: Char);

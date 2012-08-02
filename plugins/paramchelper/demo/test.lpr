@@ -17,9 +17,17 @@ begin
     db.StartTransaction(True);
     try
       q.SQL.Text := 'select * from t1 where dummy = :dummy';
+
       q.Param('dummy').AsTrimString := '  Dummy / string 1  ';
       q.Open;
       WriteLn(q.AsJSON);
+      q.Close;
+
+      q.Param('dummy').AsBase64 := 'ICBEdW1teSBzdHJpbmcgMiAg';
+      q.Open;
+      WriteLn(q.AsJSON);
+      q.Close;
+
       db.Commit(False);
     except
       db.Rollback(False);
