@@ -24,7 +24,7 @@ interface
 
 const
   le = LineEnding;
-  sversion = '1.0';
+  sversion = '1.1';
   sdate = {$i %date%};
   scpu = {$i %fpctargetcpu%};
   sabout =
