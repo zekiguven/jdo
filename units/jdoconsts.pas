@@ -22,7 +22,7 @@ unit JDOConsts;
 interface
 
 const
-  VERSION = '0.8.0'; // RT version
+  VERSION = '0.8.2'; // RT version
   AUTHOR_LINK = 'https://github.com/silvioprog/';
   PROJECT_LINK = 'https://github.com/silvioprog/jdo/';
   PROJECT_DESCRIPTION = 'JSON Data Objects';
