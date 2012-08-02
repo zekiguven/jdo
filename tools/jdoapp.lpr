@@ -61,6 +61,9 @@ var
   isquery: boolean = False;
   cfg, tablename, fout, tablealias, ck, query: string;
   stmts: set of TJDOStatementType = [];
+
+{$R *.res}
+
 begin
   if ParamCount = 0 then
   begin
