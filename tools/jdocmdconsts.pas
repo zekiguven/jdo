@@ -42,6 +42,7 @@ const
     '  -a    Specifies an alias for the main table' + le +
     '  -j    Generates a JSON string or file' + le +
     '  -k    Specifies a key to decrypt the configuration' + le +
+    '  -q    Specifies a SQL statement and run it in a query (JSON formated JSON output)' + le +
     '  -v    Shows version' + le +
     '  -h    Shows this help' + le + le +
     '  (*)   Required option';

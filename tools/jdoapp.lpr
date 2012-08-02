@@ -25,6 +25,7 @@ uses
   JDOCMDConsts,
   GetOpts,
   SysUtils,
+  FPJSON,
   IBConnection,
   MYSQL40Conn,
   MYSQL41Conn,
@@ -54,9 +55,11 @@ uses
 var
   db: TJDODataBase;
   sql: TJDOSQL;
+  a: TJSONArray;
   c: char;
   json: boolean = False;
-  cfg, tablename, fout, tablealias, ck: string;
+  isquery: boolean = False;
+  cfg, tablename, fout, tablealias, ck, query: string;
   stmts: set of TJDOStatementType = [];
 begin
   if ParamCount = 0 then
@@ -68,7 +71,7 @@ begin
 
   c := #0;
   repeat
-    c := GetOpt('c:t:siudo:a:jk:vh');
+    c := GetOpt('c:t:siudo:a:jk:q:vh');
     case c of
       'c': cfg := OptArg;
       't': tablename := OptArg;
@@ -80,6 +83,7 @@ begin
       'a': tablealias := OptArg;
       'j': json := True;
       'k': ck := OptArg;
+      'q': query := Trim(OptArg);
       'v':
         begin
           WriteLn(sversion);
@@ -94,8 +98,11 @@ begin
     end;
   until c = EndOfOptions;
 
+  isquery := query <> ES;
+
   valopt(cfg <> ES, 'c');
-  valopt(tablename <> ES, 't');
+  if not isquery then
+    valopt(tablename <> ES, 't');
 
   db := TJDODataBase.Create(nil);
   sql := TJDOSQL.Create(db, db.Query, tablename);
@@ -103,6 +110,22 @@ begin
     try
       db.CryptKey := ck;
       db.Configuration := cfg;
+
+      // Execute query
+      if isquery then
+      begin
+        db.Query.SQL.Text := query;
+        db.Query.Open;
+        db.Commit(False);
+        try
+          a := TJSONArray.Create;
+          db.Query.GetJSON(a);
+          WriteLn(a.FormatJSON);
+        finally
+          a.Free;
+        end;
+        Exit;
+      end;
 
       // Create FieldDefs
       db.Query.SQL.Text := SQL_SELECT_TOKEN + SP + AK + SP +
@@ -158,7 +181,10 @@ begin
       end;
     except
       on e: Exception do
+      begin
+        db.Rollback(False);
         WriteLn(e.ClassName, ': ', e.Message);
+      end;
     end;
   finally
     db.Free;
