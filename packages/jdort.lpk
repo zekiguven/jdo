@@ -9,7 +9,7 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <IncludeFiles Value="..\includes"/>
-        <OtherUnitFiles Value="..\units;..\plugins"/>
+        <OtherUnitFiles Value="..\helpers;..\units"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
@@ -19,23 +19,31 @@
     <Description Value="JSON Data Objects runtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
     <Version Release="8" Build="2"/>
-    <Files Count="4">
+    <Files Count="6">
       <Item1>
-        <Filename Value="..\includes\jdo.inc"/>
-        <Type Value="Include"/>
+        <Filename Value="..\helpers\jdofieldhelper.pas"/>
+        <UnitName Value="JDOFieldHelper"/>
       </Item1>
       <Item2>
-        <Filename Value="..\units\jdo.pas"/>
-        <UnitName Value="JDO"/>
+        <Filename Value="..\helpers\jdoparamhelper.pas"/>
+        <UnitName Value="JDOParamHelper"/>
       </Item2>
       <Item3>
-        <Filename Value="..\units\jdoconsts.pas"/>
-        <UnitName Value="JDOConsts"/>
+        <Filename Value="..\includes\jdo.inc"/>
+        <Type Value="Include"/>
       </Item3>
       <Item4>
+        <Filename Value="..\units\jdo.pas"/>
+        <UnitName Value="JDO"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\units\jdoconsts.pas"/>
+        <UnitName Value="JDOConsts"/>
+      </Item5>
+      <Item6>
         <Filename Value="..\units\jdoutils.pas"/>
         <UnitName Value="JDOUtils"/>
-      </Item4>
+      </Item6>
     </Files>
     <RequiredPkgs Count="1">
       <Item1>

@@ -4,7 +4,7 @@ program test;
 
 uses
   JDO,
-  FieldCHelper,
+  JDOFieldHelper,
   sqlite3conn;
 
 var

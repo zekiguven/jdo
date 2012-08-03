@@ -4,7 +4,7 @@ program test;
 
 uses
   JDO,
-  ParamCHelper,
+  JDOParamHelper,
   sqlite3conn;
 
 var
