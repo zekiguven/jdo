@@ -104,7 +104,9 @@ type
     procedure edTableAliasEditingDone(Sender: TObject);
     procedure edConfigEditingDone(Sender: TObject);
     procedure edUpdateChange(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure pcClientChange(Sender: TObject);
   private
@@ -130,14 +132,18 @@ implementation
 
 {$R *.lfm}
 
-{ *** TEMPORARY FOR TESTS *** }
-uses
-  pqconnection;
+var
+  _Form: TfrJDOSQLTool;
 
 procedure TfrJDOSQLTool.FormCreate(Sender: TObject);
 begin
   xml.FileName := GetExpertsConfigFileName;
   dsResult.DataSet := db.Query;
+end;
+
+procedure TfrJDOSQLTool.FormDestroy(Sender: TObject);
+begin
+  _Form := nil;
 end;
 
 procedure TfrJDOSQLTool.FormShow(Sender: TObject);
@@ -179,6 +185,12 @@ end;
 procedure TfrJDOSQLTool.edUpdateChange(Sender: TObject);
 begin
   UpdateExecAction(edUpdate);
+end;
+
+procedure TfrJDOSQLTool.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+  CloseAction := caFree;
 end;
 
 procedure TfrJDOSQLTool.Validate(const AExp: Boolean; const AMsg: string;
@@ -235,12 +247,9 @@ end;
 
 class procedure TfrJDOSQLTool.Execute;
 begin
-  with Self.Create(nil) do
-  try
-    ShowModal;
-  finally
-    Free;
-  end;
+  if not Assigned(_Form) then
+    _Form := Self.Create(nil);
+  _Form.Show;
 end;
 
 procedure TfrJDOSQLTool.cbTableNameGetItems(Sender: TObject);

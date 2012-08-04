@@ -45,7 +45,9 @@ object frJDOSQLTool: TfrJDOSQLTool
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
+  OnClose = FormClose
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poDesktopCenter
   SessionProperties = 'edConfig.FileName;edWrap.Value'
