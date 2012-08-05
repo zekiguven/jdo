@@ -42,7 +42,7 @@
         <UnitName Value="jdomenuintf"/>
       </Item4>
     </Files>
-    <Type Value="RunAndDesignTime"/>
+    <Type Value="DesignTime"/>
     <RequiredPkgs Count="2">
       <Item1>
         <PackageName Value="JDODT"/>

@@ -50,8 +50,8 @@
         <UnitName Value="JDOReg"/>
       </Item6>
     </Files>
-    <Type Value="RunAndDesignTime"/>
-    <RequiredPkgs Count="4">
+    <Type Value="DesignTime"/>
+    <RequiredPkgs Count="3">
       <Item1>
         <PackageName Value="CodeTools"/>
       </Item1>
@@ -59,11 +59,8 @@
         <PackageName Value="IDEIntf"/>
       </Item2>
       <Item3>
-        <PackageName Value="JDORT"/>
-      </Item3>
-      <Item4>
         <PackageName Value="SynEdit"/>
-      </Item4>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
