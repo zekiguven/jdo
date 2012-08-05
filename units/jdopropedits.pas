@@ -26,6 +26,9 @@ uses
   SrcEditorIntf, CodeToolManager, CodeCache;
 
 type
+
+  { TJDOAboutPropertyEditor }
+
   TJDOAboutPropertyEditor = class(TStringProperty)
   public
     procedure Edit; override;
@@ -33,12 +36,16 @@ type
     function GetValue: AnsiString; override;
   end;
 
+  { TJDOConnectorTypePropertyEditor }
+
   TJDOConnectorTypePropertyEditor = class(TStringPropertyEditor)
   public
     function GetAttributes: TPropertyAttributes; override;
     procedure GetValues(AProc: TGetStrProc); override;
     procedure SetValue(const ANewValue: AnsiString); override;
   end;
+
+  { TJDOTableNamePropertyEditor }
 
   TJDOTableNamePropertyEditor = class(TStringPropertyEditor)
   public

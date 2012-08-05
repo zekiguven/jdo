@@ -26,12 +26,17 @@ uses
   FieldsEditor, PropEdits, Dialogs, Controls, Menus,sysutils;
 
 type
+
+  { TJDOComponentEditor }
+
   TJDOComponentEditor = class(TComponentEditor)
   public
     procedure ExecuteVerb(AIndex: Integer); override;
     function GetVerb(AIndex: Integer): string; override;
     function GetVerbCount: Integer; override;
   end;
+
+  { TJDOConfiguratorComponentEditor }
 
   TJDOConfiguratorComponentEditor = class(TJDOComponentEditor)
   private
@@ -42,6 +47,8 @@ type
     function GetVerbCount: Integer; override;
   end;
 
+  { TJDODataBaseComponentEditor }
+
   TJDODataBaseComponentEditor = class(TJDOComponentEditor)
   private
     procedure DoOpenDialog;
@@ -51,6 +58,8 @@ type
     function GetVerbCount: Integer; override;
   end;
 
+  { TJDOSQLComponentEditor }
+
   TJDOSQLComponentEditor = class(TJDOComponentEditor)
   public
     procedure ExecuteVerb(AIndex: Integer); override;
@@ -58,6 +67,8 @@ type
     function GetVerbCount: Integer; override;
     procedure PrepareItem(AIndex: Integer; const AItem: TMenuItem); override;
   end;
+
+  { TJDOQueryComponentEditor }
 
   TJDOQueryComponentEditor = class(TFieldsComponentEditor)
   private
