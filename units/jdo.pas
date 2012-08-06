@@ -988,6 +988,7 @@ begin
     DataSetToJSON(Self, AJSON, FDateAsString);
   finally
     GotoBookmark(VBookMark);
+    FreeBookmark(VBookmark);
     EnableControls;
   end;
 end;
@@ -1362,6 +1363,7 @@ begin
       end;
   finally
     GotoBookmark(VBookMark);
+    FreeBookmark(VBookmark);
   end;
 end;
 
@@ -1390,6 +1392,7 @@ begin
       end;
   finally
     GotoBookmark(VBookMark);
+    FreeBookmark(VBookmark);
   end;
 end;
 
@@ -1425,6 +1428,7 @@ begin
   finally
     if not IsEmpty then
       GotoBookmark(VBookMark);
+    FreeBookmark(VBookmark);
   end;
 end;
 
@@ -1448,6 +1452,7 @@ begin
   finally
     if not IsEmpty then
       GotoBookmark(VBookMark);
+    FreeBookmark(VBookmark);
   end;
 end;
 
