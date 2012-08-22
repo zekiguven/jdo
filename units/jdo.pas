@@ -17,7 +17,7 @@
 
 unit JDO;
 
-{$I jdo.inc}
+{$i jdo.inc}
 
 interface
 
@@ -98,8 +98,8 @@ type
     procedure Configure;
     property About: string read GetAbout write SetAbout stored False;
 {$IFDEF JDO_CRYPT}
-    class function Crypt(const AStr, AKey: string): string;
-    class function DeCrypt(const AStr, AKey: string): string;
+    class function Encrypt(const AStr, AKey: string): string;
+    class function Decrypt(const AStr, AKey: string): string;
     property CryptKey: string read FCryptKey write FCryptKey;
 {$ENDIF}
     property Configuration: string read FConfiguration write SetConfiguration;
@@ -342,12 +342,12 @@ begin
 end;
 
 {$IFDEF JDO_CRYPT}
-class function TJDOCustomConfigurator.Crypt(const AStr, AKey: string): string;
+class function TJDOCustomConfigurator.Encrypt(const AStr, AKey: string): string;
 begin
   Result := StrToHex(EncryptStr(AStr, AKey));
 end;
 
-class function TJDOCustomConfigurator.DeCrypt(const AStr, AKey: string): string;
+class function TJDOCustomConfigurator.Decrypt(const AStr, AKey: string): string;
 begin
   Result := DecryptStr(HexToStr(AStr), AKey);
 end;
@@ -427,7 +427,7 @@ begin
 {$IFDEF JDO_CRYPT}
     begin
       if FCryptKey <> ES then
-        VValue := Trim(DeCrypt(VValue, FCryptKey));
+        VValue := Trim(Decrypt(VValue, FCryptKey));
 {$ENDIF}
       SetPropValue(FTarget, VPropName, VValue);
 {$IFDEF JDO_CRYPT}
