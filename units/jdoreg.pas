@@ -32,7 +32,7 @@ implementation
 procedure Register;
 begin
   RegisterComponents('JDO', [TJDODataBase, TJDOQuery, TJDOSQL,
-    TJDOConfigurator, TJDOAutoCommit]);
+    TJDOConfigurator]);
   RegisterPropertyEditor(TypeInfo(string), TJDOConfigurator,
     'About', TJDOAboutPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDOSQL,
@@ -41,13 +41,10 @@ begin
     'About', TJDOAboutPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDODataBase,
     'About', TJDOAboutPropertyEditor);
-  RegisterPropertyEditor(TypeInfo(string), TJDOAutoCommit,
-    'About', TJDOAboutPropertyEditor);
   RegisterComponentEditor(TJDOConfigurator, TJDOConfiguratorComponentEditor);
   RegisterComponentEditor(TJDOSQL, TJDOSQLComponentEditor);
   RegisterComponentEditor(TJDODataBase, TJDODataBaseComponentEditor);
   RegisterComponentEditor(TJDOQuery, TJDOQueryComponentEditor);
-  RegisterComponentEditor(TJDOAutoCommit, TJDOComponentEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDOConfigurator,
     'Configuration', TFileNamePropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDODataBase,

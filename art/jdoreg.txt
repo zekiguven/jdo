@@ -3,4 +3,3 @@ tjdoconfigurator.png
 tjdosql.png
 tjdodatabase.png
 tjdoquery.png
-tjdoautocommit.png

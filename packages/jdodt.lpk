@@ -22,7 +22,7 @@
     </CompilerOptions>
     <Description Value="JSON Data Objects designtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="3"/>
+    <Version Release="2" Build="6"/>
     <Files Count="6">
       <Item1>
         <Filename Value="..\ideintf\frmjdoabout.pas"/>
