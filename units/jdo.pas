@@ -308,10 +308,8 @@ type
 
   TJDOCustomAutoCommit = class(TComponent, IJDOAboutComponent)
   private
+    FEventList: TFPList;
     FDataBase: TDatabase;
-    FDataSetOldAfterCancel: TDataSetNotifyEvent;
-    FDataSetOldAfterDelete: TDataSetNotifyEvent;
-    FDataSetOldAfterPost: TDataSetNotifyEvent;
     FRetaining: Boolean;
     function GetAbout: string;
     procedure SetAbout({%H-}AValue: string);
@@ -320,15 +318,6 @@ type
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent;
       Operation: TOperation); override;
-    procedure DataSetAfterPost(ADataSet: TDataSet);
-    procedure DataSetAfterDelete(ADataSet: TDataSet);
-    procedure DataSetAfterCancel(ADataSet: TDataSet);
-    property DataSetOldAfterPost: TDataSetNotifyEvent read FDataSetOldAfterPost
-      write FDataSetOldAfterPost;
-    property DataSetOldAfterDelete: TDataSetNotifyEvent read FDataSetOldAfterDelete
-      write FDataSetOldAfterDelete;
-    property DataSetOldAfterCancel: TDataSetNotifyEvent read FDataSetOldAfterCancel
-      write FDataSetOldAfterCancel;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -357,6 +346,25 @@ type
     function GetDataSetCount: LongInt; override;
   end;
 
+  TAutoCommitEventHandler = class
+  private
+    FDataSetOldAfterCancel: TDataSetNotifyEvent;
+    FDataSetOldAfterDelete: TDataSetNotifyEvent;
+    FDataSetOldAfterPost: TDataSetNotifyEvent;
+    FRetaining: Boolean;
+  public
+    procedure DataSetAfterPost(ADataSet: TDataSet);
+    procedure DataSetAfterDelete(ADataSet: TDataSet);
+    procedure DataSetAfterCancel(ADataSet: TDataSet);
+    property DataSetOldAfterPost: TDataSetNotifyEvent read FDataSetOldAfterPost
+      write FDataSetOldAfterPost;
+    property DataSetOldAfterDelete: TDataSetNotifyEvent read FDataSetOldAfterDelete
+      write FDataSetOldAfterDelete;
+    property DataSetOldAfterCancel: TDataSetNotifyEvent read FDataSetOldAfterCancel
+      write FDataSetOldAfterCancel;
+    property Retaining: Boolean read FRetaining write FRetaining;
+  end;
+
 { TDataBaseEx }
 
 function TDataBaseEx.GetDataset(AIndex: LongInt): TDataSet;
@@ -367,6 +375,59 @@ end;
 function TDataBaseEx.GetDataSetCount: LongInt;
 begin
   Result := inherited GetDataSetCount;
+end;
+
+{ TAutoCommitEventHandler }
+
+procedure TAutoCommitEventHandler.DataSetAfterPost(ADataSet: TDataSet);
+var
+  VDataSet: TBufDataset;
+  VTrans: TSQLTransaction;
+begin
+  VDataSet := TBufDataset(ADataSet);
+  VDataSet.ApplyUpdates(0);
+  VTrans := TSQLTransaction(VDataSet.Transaction);
+  if Assigned(VTrans) then
+    if FRetaining then
+      VTrans.CommitRetaining
+    else
+      VTrans.Commit;
+  if Assigned(FDataSetOldAfterPost) then
+    FDataSetOldAfterPost(ADataSet);
+end;
+
+procedure TAutoCommitEventHandler.DataSetAfterDelete(ADataSet: TDataSet);
+var
+  VDataSet: TBufDataset;
+  VTrans: TSQLTransaction;
+begin
+  VDataSet := TBufDataset(ADataSet);
+  VDataSet.ApplyUpdates(0);
+  VTrans := TSQLTransaction(VDataSet.Transaction);
+  if Assigned(VTrans) then
+    if FRetaining then
+      VTrans.CommitRetaining
+    else
+      VTrans.Commit;
+  if Assigned(FDataSetOldAfterDelete) then
+    FDataSetOldAfterDelete(ADataSet);
+end;
+
+procedure TAutoCommitEventHandler.DataSetAfterCancel(ADataSet: TDataSet);
+var
+  VDataSet: TBufDataset;
+  VTrans: TSQLTransaction;
+begin
+  VDataSet := TBufDataset(ADataSet);
+  VDataSet.CancelUpdates;
+  VTrans := TSQLTransaction(VDataSet.Transaction);
+  if Assigned(VTrans) then
+    if FRetaining then
+      VTrans.RollbackRetaining
+    else
+      VTrans.Rollback;
+  if Assigned(FDataSetOldAfterCancel) then
+    FDataSetOldAfterCancel(ADataSet);
 end;
 
 { EJDO }
@@ -1632,6 +1693,7 @@ end;
 constructor TJDOCustomAutoCommit.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FEventList := TFPList.Create;
   FRetaining := True;
 end;
 
@@ -1639,6 +1701,7 @@ destructor TJDOCustomAutoCommit.Destroy;
 begin
   UnMapDataSets;
   DataBase := nil;
+  FEventList.Free;
   inherited Destroy;
 end;
 
@@ -1671,6 +1734,7 @@ var
   I: LongInt;
   VDataSet: TDataSet;
   VDataBase: TDataBaseEx;
+  VEventHandler: TAutoCommitEventHandler;
 begin
   if (csDesigning in ComponentState) or (not Assigned(FDataBase)) then
     Exit;
@@ -1678,12 +1742,15 @@ begin
   for I := 0 to Pred(VDataBase.GetDataSetCount) do
   begin
     VDataSet := VDataBase.GetDataset(I);
-    FDataSetOldAfterPost := VDataSet.AfterPost;
-    FDataSetOldAfterDelete := VDataSet.AfterDelete;
-    FDataSetOldAfterCancel := VDataSet.AfterCancel;
-    VDataSet.AfterPost := @DataSetAfterPost;
-    VDataSet.AfterDelete := @DataSetAfterDelete;
-    VDataSet.AfterCancel := @DataSetAfterCancel;
+    VEventHandler := TAutoCommitEventHandler.Create;
+    VEventHandler.Retaining := FRetaining;
+    VEventHandler.DataSetOldAfterPost := VDataSet.AfterPost;
+    VEventHandler.DataSetOldAfterDelete := VDataSet.AfterDelete;
+    VEventHandler.DataSetOldAfterCancel := VDataSet.AfterCancel;
+    VDataSet.AfterPost := @VEventHandler.DataSetAfterPost;
+    VDataSet.AfterDelete := @VEventHandler.DataSetAfterDelete;
+    VDataSet.AfterCancel := @VEventHandler.DataSetAfterCancel;
+    FEventList.Add(VEventHandler);
   end;
 end;
 
@@ -1692,6 +1759,7 @@ var
   I: LongInt;
   VDataSet: TDataSet;
   VDataBase: TDataBaseEx;
+  VEventHandler: TAutoCommitEventHandler;
 begin
   if not Assigned(FDataBase) then
     Exit;
@@ -1702,58 +1770,15 @@ begin
     VDataSet.AfterPost := nil;
     VDataSet.AfterDelete := nil;
     VDataSet.AfterCancel := nil;
-    if Assigned(FDataSetOldAfterPost) then
-      VDataSet.AfterPost := FDataSetOldAfterPost;
-    if Assigned(FDataSetOldAfterDelete) then
-      VDataSet.AfterDelete := FDataSetOldAfterDelete;
-    if Assigned(FDataSetOldAfterCancel) then
-      VDataSet.AfterCancel := FDataSetOldAfterCancel;
+    VEventHandler := TAutoCommitEventHandler(FEventList[I]);
+    if Assigned(VEventHandler.DataSetOldAfterPost) then
+      VDataSet.AfterPost := VEventHandler.DataSetOldAfterPost;
+    if Assigned(VEventHandler.DataSetOldAfterDelete) then
+      VDataSet.AfterDelete := VEventHandler.DataSetOldAfterDelete;
+    if Assigned(VEventHandler.DataSetOldAfterCancel) then
+      VDataSet.AfterCancel := VEventHandler.DataSetOldAfterCancel;
+    VEventHandler.Free;
   end;
-end;
-
-procedure TJDOCustomAutoCommit.DataSetAfterPost(ADataSet: TDataSet);
-var
-  VTrans: TSQLTransaction;
-begin
-  TBufDataset(ADataSet).ApplyUpdates(0);
-  VTrans := TSQLConnection(FDataBase).Transaction;
-  if Assigned(VTrans) then
-    if FRetaining then
-      VTrans.CommitRetaining
-    else
-      VTrans.Commit;
-  if Assigned(FDataSetOldAfterPost) then
-    FDataSetOldAfterPost(ADataSet);
-end;
-
-procedure TJDOCustomAutoCommit.DataSetAfterDelete(ADataSet: TDataSet);
-var
-  VTrans: TSQLTransaction;
-begin
-  TBufDataset(ADataSet).ApplyUpdates(0);
-  VTrans := TSQLConnection(FDataBase).Transaction;
-  if Assigned(VTrans) then
-    if FRetaining then
-      VTrans.CommitRetaining
-    else
-      VTrans.Commit;
-  if Assigned(FDataSetOldAfterDelete) then
-    FDataSetOldAfterDelete(ADataSet);
-end;
-
-procedure TJDOCustomAutoCommit.DataSetAfterCancel(ADataSet: TDataSet);
-var
-  VTrans: TSQLTransaction;
-begin
-  TBufDataset(ADataSet).CancelUpdates;
-  VTrans := TSQLConnection(FDataBase).Transaction;
-  if Assigned(VTrans) then
-    if FRetaining then
-      VTrans.RollbackRetaining
-    else
-      VTrans.Rollback;
-  if Assigned(FDataSetOldAfterCancel) then
-    FDataSetOldAfterCancel(ADataSet);
 end;
 
 procedure TJDOCustomAutoCommit.Notification(AComponent: TComponent;
