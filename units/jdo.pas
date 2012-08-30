@@ -23,7 +23,7 @@ interface
 
 uses
   JDOConsts, JDOUtils, Classes, SysUtils, SQLdb, DB, TypInfo, Variants,
-  FPJSON, JSONParser, DBConst;
+  FPJSON, JSONParser, BufDataset, DBConst;
 
 type
   TJDOPutTypes = (ptBegin, ptMiddle, ptEnd);
@@ -304,7 +304,70 @@ type
     property Configuration;
   end;
 
+  { TJDOCustomAutoCommit }
+
+  TJDOCustomAutoCommit = class(TComponent, IJDOAboutComponent)
+  private
+    FDataBase: TDatabase;
+    FDataSetOldAfterCancel: TDataSetNotifyEvent;
+    FDataSetOldAfterDelete: TDataSetNotifyEvent;
+    FDataSetOldAfterPost: TDataSetNotifyEvent;
+    FRetaining: Boolean;
+    function GetAbout: string;
+    procedure SetAbout({%H-}AValue: string);
+    procedure SetDataBase(AValue: TDatabase);
+  protected
+    procedure Loaded; override;
+    procedure Notification(AComponent: TComponent;
+      Operation: TOperation); override;
+    procedure DataSetAfterPost(ADataSet: TDataSet);
+    procedure DataSetAfterDelete(ADataSet: TDataSet);
+    procedure DataSetAfterCancel(ADataSet: TDataSet);
+    property DataSetOldAfterPost: TDataSetNotifyEvent read FDataSetOldAfterPost
+      write FDataSetOldAfterPost;
+    property DataSetOldAfterDelete: TDataSetNotifyEvent read FDataSetOldAfterDelete
+      write FDataSetOldAfterDelete;
+    property DataSetOldAfterCancel: TDataSetNotifyEvent read FDataSetOldAfterCancel
+      write FDataSetOldAfterCancel;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure MapDataSets;
+    procedure UnMapDataSets;
+    property About: string read GetAbout write SetAbout stored False;
+    property DataBase: TDatabase read FDataBase write SetDataBase;
+    property Retaining: Boolean read FRetaining write FRetaining;
+  end;
+
+  { TJDOAutoCommit }
+
+  TJDOAutoCommit = class(TJDOCustomAutoCommit)
+  published
+    property About;
+    property DataBase;
+    property Retaining;
+  end;
+
 implementation
+
+type
+  TDataBaseEx = class(TDatabase)
+  public
+    function GetDataset(AIndex: LongInt): TDataSet; override;
+    function GetDataSetCount: LongInt; override;
+  end;
+
+{ TDataBaseEx }
+
+function TDataBaseEx.GetDataset(AIndex: LongInt): TDataSet;
+begin
+  Result := inherited GetDataset(AIndex);
+end;
+
+function TDataBaseEx.GetDataSetCount: LongInt;
+begin
+  Result := inherited GetDataSetCount;
+end;
 
 { EJDO }
 
@@ -1562,6 +1625,147 @@ begin
     Transaction.RollbackRetaining
   else
     Transaction.Rollback;
+end;
+
+{ TJDOCustomAutoCommit }
+
+constructor TJDOCustomAutoCommit.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FRetaining := True;
+end;
+
+destructor TJDOCustomAutoCommit.Destroy;
+begin
+  UnMapDataSets;
+  DataBase := nil;
+  inherited Destroy;
+end;
+
+procedure TJDOCustomAutoCommit.Loaded;
+begin
+  MapDataSets;
+  inherited Loaded;
+end;
+
+function TJDOCustomAutoCommit.GetAbout: string;
+begin
+  Result := ES;
+end;
+
+procedure TJDOCustomAutoCommit.SetAbout(AValue: string);
+begin
+end;
+
+procedure TJDOCustomAutoCommit.SetDataBase(AValue: TDatabase);
+begin
+  if Assigned(FDataBase) then
+  begin
+    UnMapDataSets;
+    FDataBase.RemoveFreeNotification(Self);
+  end;
+  FDataBase := AValue;
+  if Assigned(FDataBase) then
+  begin
+    MapDataSets;
+    FDataBase.FreeNotification(Self);
+  end;
+end;
+
+procedure TJDOCustomAutoCommit.MapDataSets;
+var
+  I: LongInt;
+  VDS: TDataSet;
+  VDB: TDataBaseEx;
+begin
+  if csDesigning in ComponentState then
+    Exit;
+  VDB := TDataBaseEx(FDataBase);
+  for I := 0 to Pred(VDB.GetDataSetCount) do
+  begin
+    VDS := VDB.GetDataset(I);
+    FDataSetOldAfterPost := VDS.AfterPost;
+    FDataSetOldAfterDelete := VDS.AfterDelete;
+    FDataSetOldAfterCancel := VDS.AfterCancel;
+    VDS.AfterPost := @DataSetAfterPost;
+    VDS.AfterDelete := @DataSetAfterDelete;
+    VDS.AfterCancel := @DataSetAfterCancel;
+  end;
+end;
+
+procedure TJDOCustomAutoCommit.UnMapDataSets;
+var
+  I: LongInt;
+  VDS: TDataSet;
+  VDB: TDataBaseEx;
+begin
+  VDB := TDataBaseEx(FDataBase);
+  for I := 0 to Pred(VDB.GetDataSetCount) do
+  begin
+    VDS := VDB.GetDataset(I);
+    VDS.AfterPost := nil;
+    VDS.AfterDelete := nil;
+    VDS.AfterCancel := nil;
+    if Assigned(FDataSetOldAfterPost) then
+      VDS.AfterPost := FDataSetOldAfterPost;
+    if Assigned(FDataSetOldAfterDelete) then
+      VDS.AfterDelete := FDataSetOldAfterDelete;
+    if Assigned(FDataSetOldAfterCancel) then
+      VDS.AfterCancel := FDataSetOldAfterCancel;
+  end;
+end;
+
+procedure TJDOCustomAutoCommit.DataSetAfterPost(ADataSet: TDataSet);
+var
+  VTR: TSQLTransaction;
+begin
+  TBufDataset(ADataSet).ApplyUpdates(0);
+  VTR := TSQLConnection(FDataBase).Transaction;
+  if Assigned(VTR) then
+    if FRetaining then
+      VTR.CommitRetaining
+    else
+      VTR.Commit;
+  if Assigned(FDataSetOldAfterPost) then
+    FDataSetOldAfterPost(ADataSet);
+end;
+
+procedure TJDOCustomAutoCommit.DataSetAfterDelete(ADataSet: TDataSet);
+var
+  VTR: TSQLTransaction;
+begin
+  TBufDataset(ADataSet).ApplyUpdates(0);
+  VTR := TSQLConnection(FDataBase).Transaction;
+  if Assigned(VTR) then
+    if FRetaining then
+      VTR.CommitRetaining
+    else
+      VTR.Commit;
+  if Assigned(FDataSetOldAfterDelete) then
+    FDataSetOldAfterDelete(ADataSet);
+end;
+
+procedure TJDOCustomAutoCommit.DataSetAfterCancel(ADataSet: TDataSet);
+var
+  VTR: TSQLTransaction;
+begin
+  TBufDataset(ADataSet).CancelUpdates;
+  VTR := TSQLConnection(FDataBase).Transaction;
+  if Assigned(VTR) then
+    if FRetaining then
+      VTR.RollbackRetaining
+    else
+      VTR.Rollback;
+  if Assigned(FDataSetOldAfterCancel) then
+    FDataSetOldAfterCancel(ADataSet);
+end;
+
+procedure TJDOCustomAutoCommit.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FDataBase) then
+    FDataBase := nil;
 end;
 
 end.
