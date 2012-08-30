@@ -47,6 +47,7 @@ begin
   RegisterComponentEditor(TJDOSQL, TJDOSQLComponentEditor);
   RegisterComponentEditor(TJDODataBase, TJDODataBaseComponentEditor);
   RegisterComponentEditor(TJDOQuery, TJDOQueryComponentEditor);
+  RegisterComponentEditor(TJDOAutoCommit, TJDOComponentEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDOConfigurator,
     'Configuration', TFileNamePropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), TJDODataBase,

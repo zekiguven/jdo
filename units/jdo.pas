@@ -1644,8 +1644,8 @@ end;
 
 procedure TJDOCustomAutoCommit.Loaded;
 begin
-  MapDataSets;
   inherited Loaded;
+  MapDataSets;
 end;
 
 function TJDOCustomAutoCommit.GetAbout: string;
@@ -1660,104 +1660,98 @@ end;
 procedure TJDOCustomAutoCommit.SetDataBase(AValue: TDatabase);
 begin
   if Assigned(FDataBase) then
-  begin
     FDataBase.RemoveFreeNotification(Self);
-    UnMapDataSets;
-  end;
   FDataBase := AValue;
   if Assigned(FDataBase) then
-  begin
     FDataBase.FreeNotification(Self);
-    MapDataSets;
-  end;
 end;
 
 procedure TJDOCustomAutoCommit.MapDataSets;
 var
   I: LongInt;
-  VDS: TDataSet;
-  VDB: TDataBaseEx;
+  VDataSet: TDataSet;
+  VDataBase: TDataBaseEx;
 begin
   if (csDesigning in ComponentState) or (not Assigned(FDataBase)) then
     Exit;
-  VDB := TDataBaseEx(FDataBase);
-  for I := 0 to Pred(VDB.GetDataSetCount) do
+  VDataBase := TDataBaseEx(FDataBase);
+  for I := 0 to Pred(VDataBase.GetDataSetCount) do
   begin
-    VDS := VDB.GetDataset(I);
-    FDataSetOldAfterPost := VDS.AfterPost;
-    FDataSetOldAfterDelete := VDS.AfterDelete;
-    FDataSetOldAfterCancel := VDS.AfterCancel;
-    VDS.AfterPost := @DataSetAfterPost;
-    VDS.AfterDelete := @DataSetAfterDelete;
-    VDS.AfterCancel := @DataSetAfterCancel;
+    VDataSet := VDataBase.GetDataset(I);
+    FDataSetOldAfterPost := VDataSet.AfterPost;
+    FDataSetOldAfterDelete := VDataSet.AfterDelete;
+    FDataSetOldAfterCancel := VDataSet.AfterCancel;
+    VDataSet.AfterPost := @DataSetAfterPost;
+    VDataSet.AfterDelete := @DataSetAfterDelete;
+    VDataSet.AfterCancel := @DataSetAfterCancel;
   end;
 end;
 
 procedure TJDOCustomAutoCommit.UnMapDataSets;
 var
   I: LongInt;
-  VDS: TDataSet;
-  VDB: TDataBaseEx;
+  VDataSet: TDataSet;
+  VDataBase: TDataBaseEx;
 begin
   if not Assigned(FDataBase) then
     Exit;
-  VDB := TDataBaseEx(FDataBase);
-  for I := 0 to Pred(VDB.GetDataSetCount) do
+  VDataBase := TDataBaseEx(FDataBase);
+  for I := 0 to Pred(VDataBase.GetDataSetCount) do
   begin
-    VDS := VDB.GetDataset(I);
-    VDS.AfterPost := nil;
-    VDS.AfterDelete := nil;
-    VDS.AfterCancel := nil;
+    VDataSet := VDataBase.GetDataset(I);
+    VDataSet.AfterPost := nil;
+    VDataSet.AfterDelete := nil;
+    VDataSet.AfterCancel := nil;
     if Assigned(FDataSetOldAfterPost) then
-      VDS.AfterPost := FDataSetOldAfterPost;
+      VDataSet.AfterPost := FDataSetOldAfterPost;
     if Assigned(FDataSetOldAfterDelete) then
-      VDS.AfterDelete := FDataSetOldAfterDelete;
+      VDataSet.AfterDelete := FDataSetOldAfterDelete;
     if Assigned(FDataSetOldAfterCancel) then
-      VDS.AfterCancel := FDataSetOldAfterCancel;
+      VDataSet.AfterCancel := FDataSetOldAfterCancel;
   end;
 end;
 
 procedure TJDOCustomAutoCommit.DataSetAfterPost(ADataSet: TDataSet);
 var
-  VTR: TSQLTransaction;
+  VTrans: TSQLTransaction;
 begin
   TBufDataset(ADataSet).ApplyUpdates(0);
-  VTR := TSQLConnection(FDataBase).Transaction;
-  if Assigned(VTR) then
+  VTrans := TSQLConnection(FDataBase).Transaction;
+  if Assigned(VTrans) then
     if FRetaining then
-      VTR.CommitRetaining
+      VTrans.CommitRetaining
     else
-      VTR.Commit;
+      VTrans.Commit;
   if Assigned(FDataSetOldAfterPost) then
     FDataSetOldAfterPost(ADataSet);
 end;
 
 procedure TJDOCustomAutoCommit.DataSetAfterDelete(ADataSet: TDataSet);
 var
-  VTR: TSQLTransaction;
+  VTrans: TSQLTransaction;
 begin
   TBufDataset(ADataSet).ApplyUpdates(0);
-  VTR := TSQLConnection(FDataBase).Transaction;
-  if Assigned(VTR) then
+  VTrans := TSQLConnection(FDataBase).Transaction;
+  if Assigned(VTrans) then
     if FRetaining then
-      VTR.CommitRetaining
+      VTrans.CommitRetaining
     else
-      VTR.Commit;
+      VTrans.Commit;
   if Assigned(FDataSetOldAfterDelete) then
     FDataSetOldAfterDelete(ADataSet);
 end;
 
 procedure TJDOCustomAutoCommit.DataSetAfterCancel(ADataSet: TDataSet);
 var
-  VTR: TSQLTransaction;
+  VTrans: TSQLTransaction;
 begin
   TBufDataset(ADataSet).CancelUpdates;
-  VTR := TSQLConnection(FDataBase).Transaction;
-  if Assigned(VTR) then
+  VTrans := TSQLConnection(FDataBase).Transaction;
+  if Assigned(VTrans) then
     if FRetaining then
-      VTR.RollbackRetaining
+      VTrans.RollbackRetaining
     else
-      VTR.Rollback;
+      VTrans.Rollback;
   if Assigned(FDataSetOldAfterCancel) then
     FDataSetOldAfterCancel(ADataSet);
 end;
