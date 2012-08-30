@@ -1661,14 +1661,14 @@ procedure TJDOCustomAutoCommit.SetDataBase(AValue: TDatabase);
 begin
   if Assigned(FDataBase) then
   begin
-    UnMapDataSets;
     FDataBase.RemoveFreeNotification(Self);
+    UnMapDataSets;
   end;
   FDataBase := AValue;
   if Assigned(FDataBase) then
   begin
-    MapDataSets;
     FDataBase.FreeNotification(Self);
+    MapDataSets;
   end;
 end;
 
@@ -1678,7 +1678,7 @@ var
   VDS: TDataSet;
   VDB: TDataBaseEx;
 begin
-  if csDesigning in ComponentState then
+  if (csDesigning in ComponentState) or (not Assigned(FDataBase)) then
     Exit;
   VDB := TDataBaseEx(FDataBase);
   for I := 0 to Pred(VDB.GetDataSetCount) do
@@ -1699,6 +1699,8 @@ var
   VDS: TDataSet;
   VDB: TDataBaseEx;
 begin
+  if not Assigned(FDataBase) then
+    Exit;
   VDB := TDataBaseEx(FDataBase);
   for I := 0 to Pred(VDB.GetDataSetCount) do
   begin
