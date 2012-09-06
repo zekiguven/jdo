@@ -386,11 +386,11 @@ begin
         end;
     end;
     acCommit.Enabled := True;
-    btRollback.Enabled := True;
+    acRollback.Enabled := True;
   except
     db.Rollback(False);
     acCommit.Enabled := False;
-    btRollback.Enabled := False;
+    acRollback.Enabled := False;
     raise;
   end;
 end;
