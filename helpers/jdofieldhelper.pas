@@ -46,6 +46,8 @@ type
     procedure SetAsTrimString(AValue: string);
     procedure SetAsUpperString(AValue: string);
   public
+    procedure Show;
+    procedure Hide;
     property AsChar: Char read GetAsChar write SetAsChar;
     property AsSmallInt: SmallInt read GetAsSmallInt write SetAsSmallInt;
     property AsTime: TTime read GetAsTime write SetAsTime;
@@ -147,6 +149,16 @@ end;
 procedure TJDOFieldHelper.SetAsUpperString(AValue: string);
 begin
   AsString := UpperCase(AValue);
+end;
+
+procedure TJDOFieldHelper.Show;
+begin
+  Visible := True;
+end;
+
+procedure TJDOFieldHelper.Hide;
+begin
+  Visible := False;
 end;
 
 end.
