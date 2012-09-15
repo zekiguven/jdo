@@ -1,7 +1,7 @@
 JSON Data Objects (JDO) framework.
 Copyright (C) 2010-2012 Silvio Clecio.
 
-https://github.com/silvioprog/jdo
+https://github.com/silvioprog/jdo/
 
 All contributors:
 Plase see the file CONTRIBUTORS, included in this
@@ -13,7 +13,7 @@ for details about the copyright.
 DESCRIPTION
 ===========
 
-The JDO is a powerful object oriented framework for data
+JDO is a powerful object oriented framework for data
 persistance using JSON as comunication protocol. It's
 simple, with a short syntax and supports PostgreSQL,
 SQLite3, MySQL, Firebird, Oracle, MSSQL and ODBC.
@@ -22,10 +22,10 @@ WIKI
 ====
 
 See all documentation in:
-https://github.com/silvioprog/jdo/wiki
+https://github.com/silvioprog/jdo/wiki/
 
 SUPPORT, BUGS, CONTACT
 ======================
 
 Go to the project web site:
-https://github.com/silvioprog/jdo/issues
+https://github.com/silvioprog/jdo/issues/
