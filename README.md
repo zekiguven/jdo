@@ -3,7 +3,7 @@
 
 ##DESCRIPTION
 
-**[JDO](https://github.com/silvioprog/jdo)** is a powerful object oriented framework for data persistance using [JSON](http://json.org) as comunication protocol. It's simple, with a short syntax and supports [PostgreSQL](http://www.postgresql.org), [SQLite3](http://www.sqlite.org), [MySQL](http://www.mysql.com), [Firebird](http://www.firebirdsql.org), [Oracle](http://www.oracle.com), [MSSQL](http://www.microsoft.com/sql) and [ODBC](http://en.wikipedia.org/wiki/ODBC).
+**[JDO](http://silvioprog.github.com/jdo/)** is a powerful object oriented framework for data persistance using [JSON](http://json.org) as comunication protocol. It's simple, with a short syntax and supports [PostgreSQL](http://www.postgresql.org), [SQLite3](http://www.sqlite.org), [MySQL](http://www.mysql.com), [Firebird](http://www.firebirdsql.org), [Oracle](http://www.oracle.com), [MSSQL](http://www.microsoft.com/sql) and [ODBC](http://en.wikipedia.org/wiki/ODBC).
 
 ##LICENSE
 
