@@ -2,7 +2,7 @@
   JDO IDE inft unit
   Copyright (C) 2012-2014 Silvio Clecio.
 
-  https://github.com/silvioprog/jdo
+  http://silvioprog.github.com/jdo/
 
   All contributors:
   Plase see the file CONTRIBUTORS, included in this distribution.
