@@ -59,34 +59,38 @@ procedure RemoveAllConnUnit;
 implementation
 
 uses
-{$IFDEF JDO_NEW_FPC}
-  mysql55conn,
-  mssqlconn,
-{$ELSE}
-  sqlite3def,
+{$IFDEF HASIBCONNECTION}
+  ibconnection
 {$ENDIF}
-  IBConnection,
-{$IFDEF JDO_HASMYSQL4CONNECTION}
-  mysql40conn,
+{$IFDEF HASMSSQLCONNECTION}
+  // mssqlconn provide both MS SQL Server and Sybase ASE connectors.
+  , mssqlconn
 {$ENDIF}
-{$IFDEF JDO_HASORACLECONNECTION}
-  oracleconnection,
+  , odbcconn
+{$IFDEF HASPQCONNECTION}
+  , pqconnection
 {$ENDIF}
-{$IFDEF JDO_HASPQCONNECTION}
-  pqconnection,
+{$IFDEF HASORACLECONNECTION}
+  , oracleconnection
 {$ENDIF}
-{$IFDEF JDO_HASSQLITE3CONNECTION}
-  sqlite3conn,
+{$IFDEF HASMYSQL4CONNECTION}
+  , mysql40conn, mysql41conn
 {$ENDIF}
-  mysql41conn,
-  mysql50conn,
-  mysql51conn,
-  odbcconn;
+  , mysql50conn
+{$IFDEF HASMYSQL51CONNECTION}
+  , mysql51conn
+{$ENDIF}
+{$IFDEF HASMYSQL55CONNECTION}
+  , mysql55conn
+{$ENDIF}
+{$IFDEF HASSQLITE3CONNECTION}
+  , sqlite3conn
+{$ENDIF};
 
 const
-  ConnUnitNames: array[0..10] of string = ('IBConnection', 'MySQL40Conn',
-    'MySQL41Conn', 'MySQL50Conn', 'MySQL51Conn', 'MySQL55Conn', 'ODBCConn',
-    'OracleConnection', 'PQConnection', 'SQLite3Conn', 'MSSQLConn');
+  ConnUnitNames: array[0..11] of string = ('IBConnection', 'MSSQLConn',
+    'MSSQLConn', 'ODBCConn', 'PQConnection', 'OracleConnection', 'MySQL40Conn',
+    'MySQL41Conn', 'MySQL50Conn', 'MySQL51Conn', 'MySQL55Conn', 'SQLite3Conn');
 
 function CodeBuffer: TCodeBuffer;
 var
@@ -105,39 +109,47 @@ begin
   VCode := CodeBuffer;
   if VCode = nil then
     Exit;
+{$IFDEF HASIBCONNECTION}
   if SameText(ATypeName, TIBConnectionDef.TypeName) then
     VUnit := 'IBConnection';
-{$IFDEF JDO_HASMYSQL4CONNECTION}
-  if SameText(ATypeName, TMySQL40ConnectionDef.TypeName) then
-    VUnit := 'MySQL40Conn';
 {$ENDIF}
-  if SameText(ATypeName, TMySQL41ConnectionDef.TypeName) then
-    VUnit := 'MySQL41Conn';
-  if SameText(ATypeName, TMySQL50ConnectionDef.TypeName) then
-    VUnit := 'MySQL50Conn';
-  if SameText(ATypeName, TMySQL51ConnectionDef.TypeName) then
-    VUnit := 'MySQL51Conn';
-{$IFDEF JDO_NEW_FPC}
-  if SameText(ATypeName, TMySQL55ConnectionDef.TypeName) then
-    VUnit := 'MySQL55Conn';
+{$IFDEF HASMSSQLCONNECTION}
+  if SameText(ATypeName, TMSSQLConnectionDef.TypeName) then
+    VUnit := 'MSSQLConn';
+  if SameText(ATypeName, TSybaseConnectionDef.TypeName) then
+    VUnit := 'MSSQLConn';
 {$ENDIF}
   if SameText(ATypeName, TODBCConnectionDef.TypeName) then
     VUnit := 'ODBCConn';
+{$IFDEF HASPQCONNECTION}
+  if SameText(ATypeName, TPQConnectionDef.TypeName) then
+    VUnit := 'PQConnection';
+{$ENDIF}
 {$IFDEF HASORACLECONNECTION}
   if SameText(ATypeName, TOracleConnectionDef.TypeName) then
     VUnit := 'OracleConnection';
 {$ENDIF}
-{$IFDEF JDO_HASPQCONNECTION}
-  if SameText(ATypeName, TPQConnectionDef.TypeName) then
-    VUnit := 'PQConnection';
+{$IFDEF HASMYSQL4CONNECTION}
+  if SameText(ATypeName, TMySQL40ConnectionDef.TypeName) then
+    VUnit := 'MySQL40Conn';
+  if SameText(ATypeName, TMySQL41ConnectionDef.TypeName) then
+    VUnit := 'MySQL41Conn';
 {$ENDIF}
-{$IFDEF JDO_HASSQLITE3CONNECTION}
+  if SameText(ATypeName, TMySQL50ConnectionDef.TypeName) then
+    VUnit := 'MySQL50Conn';
+{$IFDEF HASMYSQL51CONNECTION}
+  if SameText(ATypeName, TMySQL51ConnectionDef.TypeName) then
+    VUnit := 'MySQL51Conn';
+{$ENDIF}
+{$IFDEF HASMYSQL55CONNECTION}
+  if SameText(ATypeName, TMySQL55ConnectionDef.TypeName) then
+    VUnit := 'MySQL55Conn';
+{$ENDIF}
+{$IF FPC_FULLVERSION>=21242}
+  {$IFDEF HASSQLITE3CONNECTION}
   if SameText(ATypeName, TSQLite3ConnectionDef.TypeName) then
     VUnit := 'SQLite3Conn';
-{$ENDIF}
-{$IFDEF JDO_NEW_FPC}
-  if SameText(ATypeName, TMSSQLConnectionDef.TypeName) then
-    VUnit := 'MSSQLConn';
+  {$ENDIF}
 {$ENDIF}
   CodeToolBoss.AddUnitToMainUsesSection(VCode, VUnit, ES);
 end;
@@ -180,28 +192,33 @@ end;
 
 procedure TJDOConnectorTypePropertyEditor.GetValues(AProc: TGetStrProc);
 begin
+{$IFDEF HASIBCONNECTION}
   AProc(TIBConnectionDef.TypeName);
-{$IFDEF JDO_HASMYSQL4CONNECTION}
-  AProc(TMySQL40ConnectionDef.TypeName);
 {$ENDIF}
-  AProc(TMySQL41ConnectionDef.TypeName);
-  AProc(TMySQL50ConnectionDef.TypeName);
-  AProc(TMySQL51ConnectionDef.TypeName);
-{$IFDEF JDO_NEW_FPC}
-  AProc(TMySQL55ConnectionDef.TypeName);
+{$IFDEF HASMSSQLCONNECTION}
+  AProc(TMSSQLConnectionDef.TypeName);
+  AProc(TSybaseConnectionDef.TypeName);
 {$ENDIF}
   AProc(TODBCConnectionDef.TypeName);
+{$IFDEF HASPQCONNECTION}
+  AProc(TPQConnectionDef.TypeName);
+{$ENDIF}
 {$IFDEF HASORACLECONNECTION}
   AProc(TOracleConnectionDef.TypeName);
 {$ENDIF}
-{$IFDEF JDO_HASPQCONNECTION}
-  AProc(TPQConnectionDef.TypeName);
+{$IFDEF HASMYSQL4CONNECTION}
+  AProc(TMySQL40ConnectionDef.TypeName);
+  AProc(TMySQL41ConnectionDef.TypeName);
 {$ENDIF}
-{$IFDEF JDO_HASSQLITE3CONNECTION}
+  AProc(TMySQL50ConnectionDef.TypeName);
+{$IFDEF HASMYSQL51CONNECTION}
+  AProc(TMySQL51ConnectionDef.TypeName);
+{$ENDIF}
+{$IFDEF HASMYSQL55CONNECTION}
+  AProc(TMySQL55ConnectionDef.TypeName);
+{$ENDIF}
+{$IFDEF HASSQLITE3CONNECTION}
   AProc(TSQLite3ConnectionDef.TypeName);
-{$ENDIF}
-{$IFDEF JDO_NEW_FPC}
-  AProc(TMSSQLConnectionDef.TypeName);
 {$ENDIF}
 end;
 
