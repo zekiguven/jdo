@@ -986,8 +986,8 @@ begin
   VBookMark := GetBookmark;
   try
     DataSetToJSON(Self, AJSON, FDateAsString);
-  finally
     GotoBookmark(VBookMark);
+  finally
     FreeBookmark(VBookmark);
     EnableControls;
   end;
@@ -1361,8 +1361,8 @@ begin
           Post;
         end;
       end;
-  finally
     GotoBookmark(VBookMark);
+  finally
     FreeBookmark(VBookmark);
   end;
 end;
@@ -1390,8 +1390,8 @@ begin
         inherited Edit;
         TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
       end;
-  finally
     GotoBookmark(VBookMark);
+  finally
     FreeBookmark(VBookmark);
   end;
 end;
@@ -1425,9 +1425,9 @@ begin
           VObject[VPrimaryKey.Fields].Value, []) then
           inherited Delete;
       end;
-  finally
     if not IsEmpty then
       GotoBookmark(VBookMark);
+  finally
     FreeBookmark(VBookmark);
   end;
 end;
@@ -1449,9 +1449,9 @@ begin
     else
       if Locate(VPrimaryKey.Fields, AJSON[VPrimaryKey.Fields].Value, []) then
         inherited Delete;
-  finally
     if not IsEmpty then
       GotoBookmark(VBookMark);
+  finally
     FreeBookmark(VBookmark);
   end;
 end;
