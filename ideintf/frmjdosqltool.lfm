@@ -557,6 +557,7 @@ object frJDOSQLTool: TfrJDOSQLTool
         ReadOnly = True
         TabOrder = 2
         Visible = False
+        OnDrawColumnCell = grResultDrawColumnCell
       end
       object sp1: TSplitter
         Cursor = crVSplit
