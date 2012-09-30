@@ -24,7 +24,8 @@ interface
 uses
   JDO, JDOConsts, JDOIDEIntf, DB, Forms, StdCtrls, ComCtrls, EditBtn, ExtCtrls,
   SysUtils, Controls, Dialogs, Spin, ActnList, StdActns, Menus, Buttons,
-  XMLPropStorage, DBGrids, SynHighlighterSQL, SynMemo, SynCompletion;
+  XMLPropStorage, DBGrids, SynHighlighterSQL, SynMemo, SynCompletion, Grids,
+  Classes, Graphics;
 
 type
   TfrJDOSQLTool = class(TForm)
@@ -108,6 +109,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure grResultDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure pcClientChange(Sender: TObject);
   private
     FBeginExec: TDateTime;
@@ -125,6 +128,7 @@ type
   end;
 
 const
+  NULL_STR = '<NULL>';
   SEmptyConfig = 'Please specify a configuration.';
   SEmptyTableName = 'Please specify a table name.';
 
@@ -149,6 +153,30 @@ end;
 procedure TfrJDOSQLTool.FormShow(Sender: TObject);
 begin
   sql.Query := db.Query;
+end;
+
+procedure TfrJDOSQLTool.grResultDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  with Sender as TDBGrid do
+  begin
+    if Column.Field = nil then
+      with Canvas do
+      begin
+        Font.Color := clBlue;
+        TextRect(Rect, Rect.Left, Rect.Top, NULL_STR);
+      end
+    else
+      if Column.Field.IsNull then
+      begin
+        with Canvas do
+        begin
+          Font.Color := clBlue;
+          TextRect(Rect, Rect.Left, Rect.Top, NULL_STR);
+        end;
+      end;
+  end;
+  grResult.DefaultDrawColumnCell(Rect, DataCol, Column, State);
 end;
 
 procedure TfrJDOSQLTool.pcClientChange(Sender: TObject);
