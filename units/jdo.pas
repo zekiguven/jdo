@@ -152,6 +152,7 @@ type
     constructor Create(AOwner: TComponent; AQuery: TSQLQuery;
       const ATableName: string = ES); overload;
     destructor Destroy; override;
+    procedure CreateFieldDefs;
     function Compose(const AStatementType: TJDOStatementType;
       const AIntoSQL: Boolean = False): Boolean; virtual;
     procedure ComposeAll;
@@ -457,6 +458,17 @@ destructor TJDOCustomSQL.Destroy;
 begin
   Query := nil;
   inherited Destroy;
+end;
+
+procedure TJDOCustomSQL.CreateFieldDefs;
+begin
+  CheckQuery;
+  CheckTableName;
+  FQuery.Close;
+  FQuery.SQL.Text := SQL_SELECT_TOKEN + SP + AK + SP + SQL_FROM_TOKEN + SP +
+    FTableName + SP + SQL_NOTHING_WHERE_TOKEN;
+  FQuery.Open;
+  FQuery.Close;
 end;
 
 procedure TJDOCustomSQL.CheckTableName;
