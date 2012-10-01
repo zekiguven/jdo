@@ -21,9 +21,7 @@ begin
       WriteLn('Creating FieldDefs ...');
       WriteLn;
       sql.Query := q;
-      sql.Compose(jstSelect);
-      q.Open;
-      q.Close;
+      sql.CreateFieldDefs;
 
       WriteLn('All SQL statements generated:');
       WriteLn;
