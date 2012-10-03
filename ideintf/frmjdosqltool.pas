@@ -128,7 +128,7 @@ type
   end;
 
 const
-  NULL_STR = '<NULL>';
+  NULL_STR = '(NULL)';
   SEmptyConfig = 'Please specify a configuration.';
   SEmptyTableName = 'Please specify a table name.';
 
@@ -167,7 +167,8 @@ begin
         TextRect(Rect, Rect.Left, Rect.Top, NULL_STR);
       end
     else
-      if Column.Field.IsNull then
+      if Column.Field.IsNull and ((Column.Field.DataType <> ftMemo) and
+        (Column.Field.DataType <> ftBlob)) then
       begin
         with Canvas do
         begin
@@ -176,7 +177,7 @@ begin
         end;
       end;
   end;
-  grResult.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  (Sender as TDBGrid).DefaultDrawColumnCell(Rect, DataCol, Column, State);
 end;
 
 procedure TfrJDOSQLTool.pcClientChange(Sender: TObject);
