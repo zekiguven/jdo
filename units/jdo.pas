@@ -327,6 +327,7 @@ begin
   inherited Create(AOwner);
   FConfigFile := TStringList.Create;
   FConfigFile.Delimiter := SC;
+  FConfigFile.StrictDelimiter := True;
 end;
 
 constructor TJDOCustomConfigurator.Create(AOwner: TComponent;
