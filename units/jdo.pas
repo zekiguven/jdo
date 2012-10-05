@@ -655,6 +655,7 @@ begin
     case AStatementType of
       jstSelect:
         begin
+          FQuery.Close;
           FQuery.SQL.Clear;
           if FPutBegin <> ES then
             VCols := FPutBegin
