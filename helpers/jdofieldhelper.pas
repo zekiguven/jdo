@@ -31,22 +31,22 @@ type
     function GetAsChar: Char;
     function GetAsDate: TDate;
     function GetAsJSON: TJSONStringType;
-    function GetAsLowerString: string;
+    function GetAsLowerStr: string;
     function GetAsQuotedStr: string;
     function GetAsSmallInt: SmallInt;
     function GetAsTime: TTime;
-    function GetAsTrimString: string;
-    function GetAsUpperString: string;
+    function GetAsTrimStr: string;
+    function GetAsUpperStr: string;
     procedure SetAsBase64(AValue: string);
     procedure SetAsChar(AValue: Char);
     procedure SetAsDate(AValue: TDate);
     procedure SetAsJSON(AValue: TJSONStringType);
-    procedure SetAsLowerString(AValue: string);
+    procedure SetAsLowerStr(AValue: string);
     procedure SetAsQuotedStr(AValue: string);
     procedure SetAsSmallInt(AValue: SmallInt);
     procedure SetAsTime(AValue: TTime);
-    procedure SetAsTrimString(AValue: string);
-    procedure SetAsUpperString(AValue: string);
+    procedure SetAsTrimStr(AValue: string);
+    procedure SetAsUpperStr(AValue: string);
   public
     procedure Show;
     procedure Hide;
@@ -55,9 +55,9 @@ type
     property AsTime: TTime read GetAsTime write SetAsTime;
     property AsDate: TDate read GetAsDate write SetAsDate;
     property AsJSON: TJSONStringType read GetAsJSON write SetAsJSON;
-    property AsTrimString: string read GetAsTrimString write SetAsTrimString;
-    property AsLowerString: string read GetAsLowerString write SetAsLowerString;
-    property AsUpperString: string read GetAsUpperString write SetAsUpperString;
+    property AsTrimStr: string read GetAsTrimStr write SetAsTrimStr;
+    property AsLowerStr: string read GetAsLowerStr write SetAsLowerStr;
+    property AsUpperStr: string read GetAsUpperStr write SetAsUpperStr;
     property AsBase64: string read GetAsBase64 write SetAsBase64;
     property AsQuotedStr: string read GetAsQuotedStr write SetAsQuotedStr;
   end;
@@ -84,7 +84,7 @@ begin
   Result := StringToJSONString(AsString);
 end;
 
-function TJDOFieldHelper.GetAsLowerString: string;
+function TJDOFieldHelper.GetAsLowerStr: string;
 begin
   Result := LowerCase(AsString);
 end;
@@ -104,12 +104,12 @@ begin
   Result := Frac(AsDateTime);
 end;
 
-function TJDOFieldHelper.GetAsTrimString: string;
+function TJDOFieldHelper.GetAsTrimStr: string;
 begin
   Result := Trim(AsString);
 end;
 
-function TJDOFieldHelper.GetAsUpperString: string;
+function TJDOFieldHelper.GetAsUpperStr: string;
 begin
   Result := UpperCase(AsString);
 end;
@@ -134,7 +134,7 @@ begin
   AsString := JSONStringToString(AValue);
 end;
 
-procedure TJDOFieldHelper.SetAsLowerString(AValue: string);
+procedure TJDOFieldHelper.SetAsLowerStr(AValue: string);
 begin
   AsString := LowerCase(AValue);
 end;
@@ -154,12 +154,12 @@ begin
   AsDateTime := AValue;
 end;
 
-procedure TJDOFieldHelper.SetAsTrimString(AValue: string);
+procedure TJDOFieldHelper.SetAsTrimStr(AValue: string);
 begin
   AsString := Trim(AValue);
 end;
 
-procedure TJDOFieldHelper.SetAsUpperString(AValue: string);
+procedure TJDOFieldHelper.SetAsUpperStr(AValue: string);
 begin
   AsString := UpperCase(AValue);
 end;
