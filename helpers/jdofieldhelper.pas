@@ -22,7 +22,7 @@ unit JDOFieldHelper;
 interface
 
 uses
-  JDOUtils, DB, FPJSON, SysUtils;
+  JDOUtils, JDOConsts, DB, FPJSON, SysUtils;
 
 type
   TJDOFieldHelper = class helper for TField
@@ -32,6 +32,7 @@ type
     function GetAsDate: TDate;
     function GetAsJSON: TJSONStringType;
     function GetAsLowerString: string;
+    function GetAsQuotedStr: string;
     function GetAsSmallInt: SmallInt;
     function GetAsTime: TTime;
     function GetAsTrimString: string;
@@ -41,6 +42,7 @@ type
     procedure SetAsDate(AValue: TDate);
     procedure SetAsJSON(AValue: TJSONStringType);
     procedure SetAsLowerString(AValue: string);
+    procedure SetAsQuotedStr(AValue: string);
     procedure SetAsSmallInt(AValue: SmallInt);
     procedure SetAsTime(AValue: TTime);
     procedure SetAsTrimString(AValue: string);
@@ -57,6 +59,7 @@ type
     property AsLowerString: string read GetAsLowerString write SetAsLowerString;
     property AsUpperString: string read GetAsUpperString write SetAsUpperString;
     property AsBase64: string read GetAsBase64 write SetAsBase64;
+    property AsQuotedStr: string read GetAsQuotedStr write SetAsQuotedStr;
   end;
 
 implementation
@@ -84,6 +87,11 @@ end;
 function TJDOFieldHelper.GetAsLowerString: string;
 begin
   Result := LowerCase(AsString);
+end;
+
+function TJDOFieldHelper.GetAsQuotedStr: string;
+begin
+  Result := AnsiQuotedStr(AsString, AP);
 end;
 
 function TJDOFieldHelper.GetAsSmallInt: SmallInt;
@@ -129,6 +137,11 @@ end;
 procedure TJDOFieldHelper.SetAsLowerString(AValue: string);
 begin
   AsString := LowerCase(AValue);
+end;
+
+procedure TJDOFieldHelper.SetAsQuotedStr(AValue: string);
+begin
+  AsString := AnsiQuotedStr(AValue, AP);
 end;
 
 procedure TJDOFieldHelper.SetAsSmallInt(AValue: SmallInt);
