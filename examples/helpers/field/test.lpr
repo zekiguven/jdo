@@ -20,13 +20,13 @@ begin
       q.Open;
 
       WriteLn('AsChar: ', q.Field('id').AsChar);
-      WriteLn('AsLowerString: ', q.Field('dummy').AsLowerString);
-      WriteLn('AsUpperString: ', q.Field('dummy').AsUpperString);
+      WriteLn('AsLowerStr: ', q.Field('dummy').AsLowerStr);
+      WriteLn('AsUpperStr: ', q.Field('dummy').AsUpperStr);
       WriteLn('AsJSON: ', q.Field('dummy').AsJSON);
 
       q.Next;
 
-      WriteLn('AsTrimString: ', '-', q.Field('dummy').AsTrimString, '-');
+      WriteLn('AsTrimStr: ', '-', q.Field('dummy').AsTrimStr, '-');
 
       q.Next;
 
