@@ -124,7 +124,7 @@ end;
 
 procedure TJDOParamHelper.SetAsDate(AValue: TDate);
 begin
-  AsDateTime := AValue;
+  AsDateTime := Trunc(AValue);
 end;
 
 procedure TJDOParamHelper.SetAsJSON(AValue: TJSONStringType);
@@ -149,7 +149,7 @@ end;
 
 procedure TJDOParamHelper.SetAsTime(AValue: TTime);
 begin
-  AsDateTime := AValue;
+  AsDateTime := Frac(AValue);
 end;
 
 procedure TJDOParamHelper.SetAsTrimStr(AValue: string);

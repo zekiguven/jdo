@@ -126,7 +126,7 @@ end;
 
 procedure TJDOFieldHelper.SetAsDate(AValue: TDate);
 begin
-  AsDateTime := AValue;
+  AsDateTime := Trunc(AValue);
 end;
 
 procedure TJDOFieldHelper.SetAsJSON(AValue: TJSONStringType);
@@ -151,7 +151,7 @@ end;
 
 procedure TJDOFieldHelper.SetAsTime(AValue: TTime);
 begin
-  AsDateTime := AValue;
+  AsDateTime := Frac(AValue);
 end;
 
 procedure TJDOFieldHelper.SetAsTrimStr(AValue: string);
