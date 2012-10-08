@@ -22,33 +22,42 @@ unit JDOParamHelper;
 interface
 
 uses
-  JDOUtils, DB, FPJSON, SysUtils;
+  JDOUtils, JDOConsts, DB, FPJSON, SysUtils;
 
 type
   TJDOParamHelper = class helper for TParam
   private
     function GetAsBase64: string;
     function GetAsChar: Char;
+    function GetAsDate: TDate;
     function GetAsJSON: TJSONStringType;
-    function GetAsLowerString: string;
+    function GetAsLowerStr: string;
+    function GetAsQuotedStr: string;
     function GetAsSmallInt: SmallInt;
-    function GetAsTrimString: string;
-    function GetAsUpperString: string;
+    function GetAsTime: TTime;
+    function GetAsTrimStr: string;
+    function GetAsUpperStr: string;
     procedure SetAsBase64(AValue: string);
     procedure SetAsChar(AValue: Char);
+    procedure SetAsDate(AValue: TDate);
     procedure SetAsJSON(AValue: TJSONStringType);
-    procedure SetAsLowerString(AValue: string);
+    procedure SetAsLowerStr(AValue: string);
+    procedure SetAsQuotedStr(AValue: string);
     procedure SetAsSmallInt(AValue: SmallInt);
-    procedure SetAsTrimString(AValue: string);
-    procedure SetAsUpperString(AValue: string);
+    procedure SetAsTime(AValue: TTime);
+    procedure SetAsTrimStr(AValue: string);
+    procedure SetAsUpperStr(AValue: string);
   public
     property AsChar: Char read GetAsChar write SetAsChar;
     property AsSmallInt: SmallInt read GetAsSmallInt write SetAsSmallInt;
+    property AsTime: TTime read GetAsTime write SetAsTime;
+    property AsDate: TDate read GetAsDate write SetAsDate;
     property AsJSON: TJSONStringType read GetAsJSON write SetAsJSON;
-    property AsTrimString: string read GetAsTrimString write SetAsTrimString;
-    property AsLowerString: string read GetAsLowerString write SetAsLowerString;
-    property AsUpperString: string read GetAsUpperString write SetAsUpperString;
+    property AsTrimStr: string read GetAsTrimStr write SetAsTrimStr;
+    property AsLowerStr: string read GetAsLowerStr write SetAsLowerStr;
+    property AsUpperStr: string read GetAsUpperStr write SetAsUpperStr;
     property AsBase64: string read GetAsBase64 write SetAsBase64;
+    property AsQuotedStr: string read GetAsQuotedStr write SetAsQuotedStr;
   end;
 
 implementation
@@ -63,14 +72,24 @@ begin
   Result := PChar(AsString)^;
 end;
 
+function TJDOParamHelper.GetAsDate: TDate;
+begin
+  Result := Trunc(AsDateTime);
+end;
+
 function TJDOParamHelper.GetAsJSON: TJSONStringType;
 begin
   Result := StringToJSONString(AsString);
 end;
 
-function TJDOParamHelper.GetAsLowerString: string;
+function TJDOParamHelper.GetAsLowerStr: string;
 begin
   Result := LowerCase(AsString);
+end;
+
+function TJDOParamHelper.GetAsQuotedStr: string;
+begin
+  Result := AnsiQuotedStr(AsString, AP);
 end;
 
 function TJDOParamHelper.GetAsSmallInt: SmallInt;
@@ -78,12 +97,17 @@ begin
   Result := AsInteger;
 end;
 
-function TJDOParamHelper.GetAsTrimString: string;
+function TJDOParamHelper.GetAsTime: TTime;
+begin
+  Result := Frac(AsDateTime);
+end;
+
+function TJDOParamHelper.GetAsTrimStr: string;
 begin
   Result := Trim(AsString);
 end;
 
-function TJDOParamHelper.GetAsUpperString: string;
+function TJDOParamHelper.GetAsUpperStr: string;
 begin
   Result := UpperCase(AsString);
 end;
@@ -98,14 +122,24 @@ begin
   AsString := AValue;
 end;
 
+procedure TJDOParamHelper.SetAsDate(AValue: TDate);
+begin
+  AsDateTime := AValue;
+end;
+
 procedure TJDOParamHelper.SetAsJSON(AValue: TJSONStringType);
 begin
   AsString := JSONStringToString(AValue);
 end;
 
-procedure TJDOParamHelper.SetAsLowerString(AValue: string);
+procedure TJDOParamHelper.SetAsLowerStr(AValue: string);
 begin
   AsString := LowerCase(AValue);
+end;
+
+procedure TJDOParamHelper.SetAsQuotedStr(AValue: string);
+begin
+  AsString := AnsiQuotedStr(AValue, AP);
 end;
 
 procedure TJDOParamHelper.SetAsSmallInt(AValue: SmallInt);
@@ -113,12 +147,17 @@ begin
   AsInteger := AValue;
 end;
 
-procedure TJDOParamHelper.SetAsTrimString(AValue: string);
+procedure TJDOParamHelper.SetAsTime(AValue: TTime);
+begin
+  AsDateTime := AValue;
+end;
+
+procedure TJDOParamHelper.SetAsTrimStr(AValue: string);
 begin
   AsString := Trim(AValue);
 end;
 
-procedure TJDOParamHelper.SetAsUpperString(AValue: string);
+procedure TJDOParamHelper.SetAsUpperStr(AValue: string);
 begin
   AsString := UpperCase(AValue);
 end;
