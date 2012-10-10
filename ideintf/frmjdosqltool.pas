@@ -318,6 +318,7 @@ var
 begin
   Validate(edConfig.Text <> ES, SEmptyConfig, edConfig);
   Validate(cbTableName.Text <> ES, SEmptyTableName, cbTableName);
+  cbTableNameEditingDone(Sender);
   db.Query.Close;
   db.Query.FieldDefs.Clear;
   db.Query.SQL.Text := SQL_SELECT_TOKEN + SP + AK + SP + SQL_FROM_TOKEN + SP +
@@ -357,6 +358,7 @@ end;
 procedure TfrJDOSQLTool.acExecSQLExecute(Sender: TObject);
 begin
   Validate(edConfig.Text <> ES, SEmptyConfig, edConfig);
+  cbTableNameEditingDone(Sender);
   db.Query.Close;
   db.StartTransaction(False);
   try
