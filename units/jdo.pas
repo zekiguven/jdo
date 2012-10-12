@@ -153,6 +153,7 @@ type
       const ATableName: string = ES); overload;
     destructor Destroy; override;
     procedure CreateFieldDefs;
+    function IgnoreField(const AName: string): Boolean;
     function Compose(const AStatementType: TJDOStatementType;
       const AIntoSQL: Boolean = False): Boolean; virtual;
     procedure ComposeAll;
@@ -470,6 +471,19 @@ begin
     FTableName + SP + SQL_NOTHING_WHERE_TOKEN;
   FQuery.Open;
   FQuery.Close;
+end;
+
+function TJDOCustomSQL.IgnoreField(const AName: string): Boolean;
+var
+  I: Integer;
+begin
+  if Assigned(FQuery) and Assigned(FQuery.FieldDefs) then
+  begin
+    I := FQuery.FieldDefs.IndexOf(AName);
+    Result := I <> -1;
+    if Result then
+      FQuery.FieldDefs.Delete(I);
+  end;
 end;
 
 procedure TJDOCustomSQL.CheckTableName;
