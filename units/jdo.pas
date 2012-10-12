@@ -154,6 +154,7 @@ type
     destructor Destroy; override;
     procedure CreateFieldDefs;
     function IgnoreField(const AName: string): Boolean;
+    procedure IgnoreFields(const ANames: array of string);
     function Compose(const AStatementType: TJDOStatementType;
       const AIntoSQL: Boolean = False): Boolean; virtual;
     procedure ComposeAll;
@@ -484,6 +485,14 @@ begin
     if Result then
       FQuery.FieldDefs.Delete(I);
   end;
+end;
+
+procedure TJDOCustomSQL.IgnoreFields(const ANames: array of string);
+var
+  S: string;
+begin
+  for S in ANames do
+    IgnoreField(S);
 end;
 
 procedure TJDOCustomSQL.CheckTableName;
