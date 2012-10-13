@@ -37,6 +37,9 @@ type
     function GetAsTime: TTime;
     function GetAsTrimStr: string;
     function GetAsUpperStr: string;
+    function GetBeginsWith: string;
+    function GetContains: string;
+    function GetEndsWith: string;
     procedure SetAsBase64(AValue: string);
     procedure SetAsChar(AValue: Char);
     procedure SetAsDate(AValue: TDate);
@@ -47,6 +50,9 @@ type
     procedure SetAsTime(AValue: TTime);
     procedure SetAsTrimStr(AValue: string);
     procedure SetAsUpperStr(AValue: string);
+    procedure SetBeginsWith(AValue: string);
+    procedure SetContains(AValue: string);
+    procedure SetEndsWith(AValue: string);
   public
     procedure Show;
     procedure Hide;
@@ -60,6 +66,9 @@ type
     property AsUpperStr: string read GetAsUpperStr write SetAsUpperStr;
     property AsBase64: string read GetAsBase64 write SetAsBase64;
     property AsQuotedStr: string read GetAsQuotedStr write SetAsQuotedStr;
+    property Contains: string read GetContains write SetContains;
+    property EndsWith: string read GetEndsWith write SetEndsWith;
+    property BeginsWith: string read GetBeginsWith write SetBeginsWith;
   end;
 
 implementation
@@ -114,6 +123,21 @@ begin
   Result := UpperCase(AsString);
 end;
 
+function TJDOFieldHelper.GetBeginsWith: string;
+begin
+  Result := AsString + PT;
+end;
+
+function TJDOFieldHelper.GetContains: string;
+begin
+  Result := PT + AsString + PT;
+end;
+
+function TJDOFieldHelper.GetEndsWith: string;
+begin
+  Result := PT + AsString;
+end;
+
 procedure TJDOFieldHelper.SetAsBase64(AValue: string);
 begin
   AsString := Base64ToStr(AValue);
@@ -162,6 +186,21 @@ end;
 procedure TJDOFieldHelper.SetAsUpperStr(AValue: string);
 begin
   AsString := UpperCase(AValue);
+end;
+
+procedure TJDOFieldHelper.SetBeginsWith(AValue: string);
+begin
+  AsString := AValue + PT;
+end;
+
+procedure TJDOFieldHelper.SetContains(AValue: string);
+begin
+  AsString := PT + AValue + PT;
+end;
+
+procedure TJDOFieldHelper.SetEndsWith(AValue: string);
+begin
+  AsString := PT + AValue;
 end;
 
 procedure TJDOFieldHelper.Show;
