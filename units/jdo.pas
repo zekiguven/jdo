@@ -158,8 +158,8 @@ type
     function Compose(const AStatementType: TJDOStatementType;
       const AIntoSQL: Boolean = False): Boolean; virtual;
     procedure ComposeAll;
-    procedure Reset;
-    procedure Clear;
+    function Reset: TJDOCustomSQL;
+    function Clear: TJDOCustomSQL;
     function Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle;
       const ALineBreak: ShortString = SP): TJDOCustomSQL;
     procedure Like(const AField: string; const ACaseInsensitive: Boolean = False);
@@ -755,8 +755,9 @@ begin
   Compose(jstDelete);
 end;
 
-procedure TJDOCustomSQL.Reset;
+function TJDOCustomSQL.Reset: TJDOCustomSQL;
 begin
+  Result := Self;
   FPutBegin := ES;
   FPutMiddle := ES;
   FPutEnd := ES;
@@ -764,8 +765,9 @@ begin
     FStatementType := jstUnknown;
 end;
 
-procedure TJDOCustomSQL.Clear;
+function TJDOCustomSQL.Clear: TJDOCustomSQL;
 begin
+  Result := Self;
   CheckQuery;
   Reset;
   FQuery.SQL.Clear;
