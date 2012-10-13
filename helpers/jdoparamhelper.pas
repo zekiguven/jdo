@@ -37,6 +37,9 @@ type
     function GetAsTime: TTime;
     function GetAsTrimStr: string;
     function GetAsUpperStr: string;
+    function GetBeginsWith: string;
+    function GetContains: string;
+    function GetEndsWith: string;
     procedure SetAsBase64(AValue: string);
     procedure SetAsChar(AValue: Char);
     procedure SetAsDate(AValue: TDate);
@@ -47,6 +50,9 @@ type
     procedure SetAsTime(AValue: TTime);
     procedure SetAsTrimStr(AValue: string);
     procedure SetAsUpperStr(AValue: string);
+    procedure SetBeginsWith(AValue: string);
+    procedure SetContains(AValue: string);
+    procedure SetEndsWith(AValue: string);
   public
     property AsChar: Char read GetAsChar write SetAsChar;
     property AsSmallInt: SmallInt read GetAsSmallInt write SetAsSmallInt;
@@ -58,6 +64,9 @@ type
     property AsUpperStr: string read GetAsUpperStr write SetAsUpperStr;
     property AsBase64: string read GetAsBase64 write SetAsBase64;
     property AsQuotedStr: string read GetAsQuotedStr write SetAsQuotedStr;
+    property Contains: string read GetContains write SetContains;
+    property EndsWith: string read GetEndsWith write SetEndsWith;
+    property BeginsWith: string read GetBeginsWith write SetBeginsWith;
   end;
 
 implementation
@@ -112,6 +121,21 @@ begin
   Result := UpperCase(AsString);
 end;
 
+function TJDOParamHelper.GetBeginsWith: string;
+begin
+  Result := AsString + PT;
+end;
+
+function TJDOParamHelper.GetContains: string;
+begin
+  Result := PT + AsString + PT;
+end;
+
+function TJDOParamHelper.GetEndsWith: string;
+begin
+  Result := PT + AsString;
+end;
+
 procedure TJDOParamHelper.SetAsBase64(AValue: string);
 begin
   AsString := Base64ToStr(AValue);
@@ -160,6 +184,21 @@ end;
 procedure TJDOParamHelper.SetAsUpperStr(AValue: string);
 begin
   AsString := UpperCase(AValue);
+end;
+
+procedure TJDOParamHelper.SetBeginsWith(AValue: string);
+begin
+  AsString := AValue + PT;
+end;
+
+procedure TJDOParamHelper.SetContains(AValue: string);
+begin
+  AsString := PT + AValue + PT;
+end;
+
+procedure TJDOParamHelper.SetEndsWith(AValue: string);
+begin
+  AsString := PT + AValue;
 end;
 
 end.
