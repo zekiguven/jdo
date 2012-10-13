@@ -160,8 +160,8 @@ type
     procedure ComposeAll;
     procedure Reset;
     procedure Clear;
-    procedure Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle;
-      const ALineBreak: ShortString = SP);
+    function Put(const ASQL: string; const AType: TJDOPutTypes = ptMiddle;
+      const ALineBreak: ShortString = SP): TJDOCustomSQL;
     procedure Like(const AField: string; const ACaseInsensitive: Boolean = False);
     property About: string read GetAbout write SetAbout stored False;
     property OrderBy: string read FOrderBy write FOrderBy;
@@ -218,32 +218,32 @@ type
       const ADateAsString: Boolean);
     class procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject); overload;
     class procedure QueryToSchema(AQuery: TSQLQuery; out ASchema: TJSONStringType); overload;
-    procedure GetJSON(out AJSON: TJSONArray); overload;
-    procedure GetJSON(out AJSON: TJSONObject); overload;
-    procedure SetJSON(AJSON: TJSONArray); overload;
-    procedure SetJSON(AJSON: TJSONObject); overload;
+    function GetJSON(out AJSON: TJSONArray): TJDOCustomQuery; overload;
+    function GetJSON(out AJSON: TJSONObject): TJDOCustomQuery; overload;
+    function SetJSON(AJSON: TJSONArray): TJDOCustomQuery; overload;
+    function SetJSON(AJSON: TJSONObject): TJDOCustomQuery; overload;
     procedure LoadJSONFromStream(AStream: TStream);
     procedure LoadJSONFromFile(const AFileName: TFileName);
     procedure SaveJSONToStream(AStream: TStream);
     procedure SaveJSONToFile(const AFileName: TFileName);
-    procedure Apply(const ARetaining: Boolean = False);
-    procedure Undo(const ARetaining: Boolean = False);
-    procedure Commit(const ARetaining: Boolean = False);
-    procedure Rollback(const ARetaining: Boolean = False);
+    function Apply(const ARetaining: Boolean = False): TJDOCustomQuery;
+    function Undo(const ARetaining: Boolean = False): TJDOCustomQuery;
+    function Commit(const ARetaining: Boolean = False): TJDOCustomQuery;
+    function Rollback(const ARetaining: Boolean = False): TJDOCustomQuery;
     function Execute: Boolean;
     function Open: Boolean;
-    procedure GetSchema(out ASchema: TJSONObject); overload;
-    procedure GetSchema(out ASchema: TJSONStringType); overload;
+    function GetSchema(out ASchema: TJSONObject): TJDOCustomQuery; overload;
+    function GetSchema(out ASchema: TJSONStringType): TJDOCustomQuery; overload;
     function Field(const AFieldName: string): TField;
     function Param(const AParamName: string): TParam;
-    procedure Append(AJSON: TJSONArray); overload;
-    procedure Append(AJSON: TJSONObject); overload;
-    procedure Insert(AJSON: TJSONArray); overload;
-    procedure Insert(AJSON: TJSONObject); overload;
-    procedure Edit(AJSON: TJSONArray); overload;
-    procedure Edit(AJSON: TJSONObject); overload;
-    procedure Delete(AJSON: TJSONArray); overload;
-    procedure Delete(AJSON: TJSONObject); overload;
+    function Append(AJSON: TJSONArray): TJDOCustomQuery; overload;
+    function Append(AJSON: TJSONObject): TJDOCustomQuery; overload;
+    function Insert(AJSON: TJSONArray): TJDOCustomQuery; overload;
+    function Insert(AJSON: TJSONObject): TJDOCustomQuery; overload;
+    function Edit(AJSON: TJSONArray): TJDOCustomQuery; overload;
+    function Edit(AJSON: TJSONObject): TJDOCustomQuery; overload;
+    function Delete(AJSON: TJSONArray): TJDOCustomQuery; overload;
+    function Delete(AJSON: TJSONObject): TJDOCustomQuery; overload;
     property About: string read GetAbout write SetAbout stored False;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property AsJSON: TJSONStringType read GetAsJSON write SetAsJSON;
@@ -774,9 +774,10 @@ begin
   FQuery.DeleteSQL.Clear;
 end;
 
-procedure TJDOCustomSQL.Put(const ASQL: string; const AType: TJDOPutTypes;
-  const ALineBreak: ShortString);
+function TJDOCustomSQL.Put(const ASQL: string; const AType: TJDOPutTypes;
+  const ALineBreak: ShortString): TJDOCustomSQL;
 begin
+  Result := Self;
   case AType of
     ptBegin:
       begin
@@ -1011,10 +1012,11 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.GetJSON(out AJSON: TJSONArray);
+function TJDOCustomQuery.GetJSON(out AJSON: TJSONArray): TJDOCustomQuery;
 var
   VBookMark: TBookMark;
 begin
+  Result := Self;
   AJSON := TJSONArray.Create;
   Open;
   if RecordCount = 0 then
@@ -1030,18 +1032,20 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.GetJSON(out AJSON: TJSONObject);
+function TJDOCustomQuery.GetJSON(out AJSON: TJSONObject): TJDOCustomQuery;
 begin
+  Result := Self;
   AJSON := TJSONObject.Create;
   Open;
   if RecordCount <> 0 then
     DataSetToJSON(Self, AJSON, FDateAsString);
 end;
 
-procedure TJDOCustomQuery.SetJSON(AJSON: TJSONArray);
+function TJDOCustomQuery.SetJSON(AJSON: TJSONArray): TJDOCustomQuery;
 var
   I: Integer;
 begin
+  Result := Self;
   InternalCheckFieldDefs;
   InternalCheckJSONParam(AJSON);
   for I := 0 to Pred(AJSON.Count) do
@@ -1051,8 +1055,9 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.SetJSON(AJSON: TJSONObject);
+function TJDOCustomQuery.SetJSON(AJSON: TJSONObject): TJDOCustomQuery;
 begin
+  Result := Self;
   InternalCheckFieldDefs;
   InternalCheckJSONParam(AJSON);
   TJDOCustomQuery.JSONToQuery(AJSON, Self, FDateAsString);
@@ -1165,10 +1170,11 @@ procedure TJDOCustomQuery.SetAbout(AValue: string);
 begin
 end;
 
-procedure TJDOCustomQuery.Apply(const ARetaining: Boolean);
+function TJDOCustomQuery.Apply(const ARetaining: Boolean): TJDOCustomQuery;
 var
   VTrans: TSQLTransaction;
 begin
+  Result := Self;
   VTrans := Transaction as TSQLTransaction;
   if not VTrans.Active then
     Exit;
@@ -1187,10 +1193,11 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.Undo(const ARetaining: Boolean);
+function TJDOCustomQuery.Undo(const ARetaining: Boolean): TJDOCustomQuery;
 var
   VTrans: TSQLTransaction;
 begin
+  Result := Self;
   VTrans := Transaction as TSQLTransaction;
   if not VTrans.Active then
     Exit;
@@ -1201,10 +1208,11 @@ begin
     VTrans.Rollback;
 end;
 
-procedure TJDOCustomQuery.Commit(const ARetaining: Boolean);
+function TJDOCustomQuery.Commit(const ARetaining: Boolean): TJDOCustomQuery;
 var
   VTrans: TSQLTransaction;
 begin
+  Result := Self;
   VTrans := Transaction as TSQLTransaction;
   if not VTrans.Active then
     Exit;
@@ -1222,10 +1230,11 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.Rollback(const ARetaining: Boolean);
+function TJDOCustomQuery.Rollback(const ARetaining: Boolean): TJDOCustomQuery;
 var
   VTrans: TSQLTransaction;
 begin
+  Result := Self;
   VTrans := Transaction as TSQLTransaction;
   if not VTrans.Active then
     Exit;
@@ -1262,8 +1271,9 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.GetSchema(out ASchema: TJSONObject);
+function TJDOCustomQuery.GetSchema(out ASchema: TJSONObject): TJDOCustomQuery;
 begin
+  Result := Self;
   ASchema := TJSONObject.Create;
   InternalCheckFieldDefs;
   TJDOCustomQuery.QueryToSchema(Self, ASchema);
@@ -1301,8 +1311,9 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.GetSchema(out ASchema: TJSONStringType);
+function TJDOCustomQuery.GetSchema(out ASchema: TJSONStringType): TJDOCustomQuery;
 begin
+  Result := Self;
   InternalCheckFieldDefs;
   TJDOCustomQuery.QueryToSchema(Self, ASchema);
 end;
@@ -1321,10 +1332,11 @@ begin
     DatabaseErrorFmt(SParameterNotFound, [AParamName], Self);
 end;
 
-procedure TJDOCustomQuery.Append(AJSON: TJSONArray);
+function TJDOCustomQuery.Append(AJSON: TJSONArray): TJDOCustomQuery;
 var
   I: Integer;
 begin
+  Result := Self;
   InternalCheckJSONParam(AJSON);
   for I := 0 to Pred(AJSON.Count) do
   begin
@@ -1334,17 +1346,19 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.Append(AJSON: TJSONObject);
+function TJDOCustomQuery.Append(AJSON: TJSONObject): TJDOCustomQuery;
 begin
+  Result := Self;
   InternalCheckJSONParam(AJSON);
   inherited Append;
   TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
 end;
 
-procedure TJDOCustomQuery.Insert(AJSON: TJSONArray);
+function TJDOCustomQuery.Insert(AJSON: TJSONArray): TJDOCustomQuery;
 var
   I: Integer;
 begin
+  Result := Self;
   InternalCheckJSONParam(AJSON);
   for I := 0 to Pred(AJSON.Count) do
   begin
@@ -1354,20 +1368,22 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.Insert(AJSON: TJSONObject);
+function TJDOCustomQuery.Insert(AJSON: TJSONObject): TJDOCustomQuery;
 begin
+  Result := Self;
   InternalCheckJSONParam(AJSON);
   inherited Insert;
   TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
 end;
 
-procedure TJDOCustomQuery.Edit(AJSON: TJSONArray);
+function TJDOCustomQuery.Edit(AJSON: TJSONArray): TJDOCustomQuery;
 var
   I: Integer;
   VBookMark: TBookMark;
   VObject: TJSONObject;
   VPrimaryKey: TIndexDef;
 begin
+  Result := Self;
   InternalCheckJSONParam(AJSON);
   VBookMark := GetBookmark;
   try
@@ -1404,11 +1420,12 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.Edit(AJSON: TJSONObject);
+function TJDOCustomQuery.Edit(AJSON: TJSONObject): TJDOCustomQuery;
 var
   VBookMark: TBookMark;
   VPrimaryKey: TIndexDef;
 begin
+  Result := Self;
   InternalCheckJSONParam(AJSON);
   VBookMark := GetBookmark;
   try
@@ -1433,13 +1450,14 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.Delete(AJSON: TJSONArray);
+function TJDOCustomQuery.Delete(AJSON: TJSONArray): TJDOCustomQuery;
 var
   I: Integer;
   VBookMark: TBookMark;
   VObject: TJSONObject;
   VPrimaryKey: TIndexDef;
 begin
+  Result := Self;
   InternalCheckJSONParam(AJSON);
   VBookMark := GetBookmark;
   try
@@ -1469,11 +1487,12 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.Delete(AJSON: TJSONObject);
+function TJDOCustomQuery.Delete(AJSON: TJSONObject): TJDOCustomQuery;
 var
   VBookMark: TBookMark;
   VPrimaryKey: TIndexDef;
 begin
+  Result := Self;
   InternalCheckJSONParam(AJSON);
   VBookMark := GetBookmark;
   try
