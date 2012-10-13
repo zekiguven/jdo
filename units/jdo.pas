@@ -136,8 +136,8 @@ type
     FTableName: string;
     FWhere: string;
     function GetAbout: string;
-    procedure InternalCheckFieldDefs(const ACount: Integer);
-    procedure InternalCheckServerIndexDefs(const ACount: Integer);
+    procedure CheckFieldDefs(const ACount: Integer);
+    procedure CheckServerIndexDefs(const ACount: Integer);
     procedure SetAbout({%H-}AValue: string);
     procedure SetQuery(AValue: TSQLQuery);
   protected
@@ -201,8 +201,8 @@ type
     procedure SetAbout({%H-}AValue: string);
     procedure SetAsJSON(const AValue: TJSONStringType);
   protected
-    procedure InternalCheckFieldDefs;
-    procedure InternalCheckJSONParam(AJSON: TJSONData);
+    procedure CheckFieldDefs;
+    procedure CheckJSONParam(AJSON: TJSONData);
   public
     constructor Create(AOwner: TComponent); override;
     class function GetJSONType(const AFieldType: TFieldType): ShortString;
@@ -507,7 +507,7 @@ begin
     raise EJDOSQL.Create(Self, SNilQueryError);
 end;
 
-procedure TJDOCustomSQL.InternalCheckFieldDefs(const ACount: Integer);
+procedure TJDOCustomSQL.CheckFieldDefs(const ACount: Integer);
 begin
   if ACount = 0 then
     raise EJDOSQL.Create(Self, SEmptyFieldDefsCountError);
@@ -522,7 +522,7 @@ procedure TJDOCustomSQL.SetAbout(AValue: string);
 begin
 end;
 
-procedure TJDOCustomSQL.InternalCheckServerIndexDefs(const ACount: Integer);
+procedure TJDOCustomSQL.CheckServerIndexDefs(const ACount: Integer);
 begin
   if ACount = 0 then
     raise EJDOSQL.Create(Self, SEmptyServerIndexDefsCountError);
@@ -594,7 +594,7 @@ begin
   end
   else
   begin
-    InternalCheckFieldDefs(C);
+    CheckFieldDefs(C);
     C := FQuery.ServerIndexDefs.Count;
     L := Length(CS + SP);
     case AStatementType of
@@ -631,7 +631,7 @@ begin
           end;
       jstUpdate, jstDelete:
       begin
-        InternalCheckServerIndexDefs(C);
+        CheckServerIndexDefs(C);
         try
           GetValues(VValues, VIndexDef, C, True);
           for I := 0 to Pred(FQuery.FieldDefs.Count) do
@@ -821,13 +821,13 @@ begin
   end;
 end;
 
-procedure TJDOCustomQuery.InternalCheckFieldDefs;
+procedure TJDOCustomQuery.CheckFieldDefs;
 begin
   if not Assigned(FieldDefs) then
     raise EJDOQuery.Create(Self, SNilFieldDefsError);
 end;
 
-procedure TJDOCustomQuery.InternalCheckJSONParam(AJSON: TJSONData);
+procedure TJDOCustomQuery.CheckJSONParam(AJSON: TJSONData);
 begin
   if not Assigned(AJSON) then
     raise EJDOQuery.Create(Self, SNilJSONParamError);
@@ -1046,8 +1046,8 @@ var
   I: Integer;
 begin
   Result := Self;
-  InternalCheckFieldDefs;
-  InternalCheckJSONParam(AJSON);
+  CheckFieldDefs;
+  CheckJSONParam(AJSON);
   for I := 0 to Pred(AJSON.Count) do
   begin
     TJDOCustomQuery.JSONToQuery(AJSON.Objects[I], Self, FDateAsString);
@@ -1058,8 +1058,8 @@ end;
 function TJDOCustomQuery.SetJSON(AJSON: TJSONObject): TJDOCustomQuery;
 begin
   Result := Self;
-  InternalCheckFieldDefs;
-  InternalCheckJSONParam(AJSON);
+  CheckFieldDefs;
+  CheckJSONParam(AJSON);
   TJDOCustomQuery.JSONToQuery(AJSON, Self, FDateAsString);
   ExecSQL;
 end;
@@ -1275,7 +1275,7 @@ function TJDOCustomQuery.GetSchema(out ASchema: TJSONObject): TJDOCustomQuery;
 begin
   Result := Self;
   ASchema := TJSONObject.Create;
-  InternalCheckFieldDefs;
+  CheckFieldDefs;
   TJDOCustomQuery.QueryToSchema(Self, ASchema);
 end;
 
@@ -1314,7 +1314,7 @@ end;
 function TJDOCustomQuery.GetSchema(out ASchema: TJSONStringType): TJDOCustomQuery;
 begin
   Result := Self;
-  InternalCheckFieldDefs;
+  CheckFieldDefs;
   TJDOCustomQuery.QueryToSchema(Self, ASchema);
 end;
 
@@ -1337,7 +1337,7 @@ var
   I: Integer;
 begin
   Result := Self;
-  InternalCheckJSONParam(AJSON);
+  CheckJSONParam(AJSON);
   for I := 0 to Pred(AJSON.Count) do
   begin
     inherited Append;
@@ -1349,7 +1349,7 @@ end;
 function TJDOCustomQuery.Append(AJSON: TJSONObject): TJDOCustomQuery;
 begin
   Result := Self;
-  InternalCheckJSONParam(AJSON);
+  CheckJSONParam(AJSON);
   inherited Append;
   TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
 end;
@@ -1359,7 +1359,7 @@ var
   I: Integer;
 begin
   Result := Self;
-  InternalCheckJSONParam(AJSON);
+  CheckJSONParam(AJSON);
   for I := 0 to Pred(AJSON.Count) do
   begin
     inherited Insert;
@@ -1371,7 +1371,7 @@ end;
 function TJDOCustomQuery.Insert(AJSON: TJSONObject): TJDOCustomQuery;
 begin
   Result := Self;
-  InternalCheckJSONParam(AJSON);
+  CheckJSONParam(AJSON);
   inherited Insert;
   TJDOCustomQuery.JSONToDataSet(AJSON, Self, FDateAsString);
 end;
@@ -1384,7 +1384,7 @@ var
   VPrimaryKey: TIndexDef;
 begin
   Result := Self;
-  InternalCheckJSONParam(AJSON);
+  CheckJSONParam(AJSON);
   VBookMark := GetBookmark;
   try
     VPrimaryKey := GetPrimaryKey;
@@ -1426,7 +1426,7 @@ var
   VPrimaryKey: TIndexDef;
 begin
   Result := Self;
-  InternalCheckJSONParam(AJSON);
+  CheckJSONParam(AJSON);
   VBookMark := GetBookmark;
   try
     VPrimaryKey := GetPrimaryKey;
@@ -1458,7 +1458,7 @@ var
   VPrimaryKey: TIndexDef;
 begin
   Result := Self;
-  InternalCheckJSONParam(AJSON);
+  CheckJSONParam(AJSON);
   VBookMark := GetBookmark;
   try
     VPrimaryKey := GetPrimaryKey;
@@ -1493,7 +1493,7 @@ var
   VPrimaryKey: TIndexDef;
 begin
   Result := Self;
-  InternalCheckJSONParam(AJSON);
+  CheckJSONParam(AJSON);
   VBookMark := GetBookmark;
   try
     VPrimaryKey := GetPrimaryKey;
