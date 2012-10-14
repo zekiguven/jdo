@@ -88,6 +88,7 @@ const
   SCfgFileNotFoundError = 'The config file was not found: "%s"';
   SNilQueryError = 'The "Query" must not be nil.';
   SEmptyTableNameError = 'The "TableName" must not be empty.';
+  SEmptyFieldsError = 'The "Fields" must not be empty.';
   SNilFieldDefsError = '"FieldDefs" must not be nil.';
   SNilJSONParamError = '"AJSON" must not be nil.';
   SEmptyTableError = 'Empty table.';
