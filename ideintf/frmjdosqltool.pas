@@ -372,6 +372,7 @@ begin
           else
             db.Query.SQL.Text := edSelect.Text;
           FBeginExec := Now;
+          db.Query.PacketRecords := -1;
           db.Query.Open;
           FEndExec := Now;
           ShowResult(edSelectStatistics, sp1, grResult);
