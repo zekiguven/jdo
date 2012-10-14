@@ -249,6 +249,8 @@ type
     function Edit(AJSON: TJSONObject): TJDOCustomQuery; overload;
     function Delete(AJSON: TJSONArray): TJDOCustomQuery; overload;
     function Delete(AJSON: TJSONObject): TJDOCustomQuery; overload;
+    procedure Persist(const ATableName: string; AJSON: TJSONArray);
+    procedure Persist(const ATableName: string; AJSON: TJSONObject);
     property About: string read GetAbout write SetAbout stored False;
     property DateAsString: Boolean read FDateAsString write FDateAsString;
     property AsJSON: TJSONStringType read GetAsJSON write SetAsJSON;
@@ -1561,6 +1563,26 @@ begin
   finally
     FreeBookmark(VBookmark);
   end;
+end;
+
+procedure TJDOCustomQuery.Persist(const ATableName: string; AJSON: TJSONArray);
+var
+  I: Integer;
+  VTable: TJDOCustomQuery;
+  VData: TJSONObject = nil;
+begin
+  CheckJSONParam(AJSON);
+  if AJSON.Count > 0 then
+    VData := AJSON.Objects[0];
+  VTable := Table(ATableName, VData);
+  for I := 0 to Pred(AJSON.Count) do
+    VTable.Insert(AJSON.Objects[I]);
+  VTable.Apply;
+end;
+
+procedure TJDOCustomQuery.Persist(const ATableName: string; AJSON: TJSONObject);
+begin
+  Table(ATableName, AJSON).Insert(AJSON).Apply;
 end;
 
 { TJDOCustomDataBase }
