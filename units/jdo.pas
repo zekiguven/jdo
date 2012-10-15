@@ -203,7 +203,6 @@ type
   protected
     procedure CheckFieldDefs;
     procedure CheckJSONParam(AJSON: TJSONData);
-    procedure CheckTableName(const ATableName: string);
   public
     constructor Create(AOwner: TComponent); override;
     class function GetJSONType(const AFieldType: TFieldType): ShortString;
@@ -223,18 +222,10 @@ type
     function GetJSON(out AJSON: TJSONObject): TJDOCustomQuery; overload;
     function SetJSON(AJSON: TJSONArray): TJDOCustomQuery; overload;
     function SetJSON(AJSON: TJSONObject): TJDOCustomQuery; overload;
-    function SetParam(AJSON: TJSONObject;
-      const ADateAsString: Boolean = False): TJDOCustomQuery;
-    function GetField(AJSON: TJSONObject;
-      const ADateAsString: Boolean = False): TJDOCustomQuery;
     procedure LoadJSONFromStream(AStream: TStream);
     procedure LoadJSONFromFile(const AFileName: TFileName);
     procedure SaveJSONToStream(AStream: TStream);
     procedure SaveJSONToFile(const AFileName: TFileName);
-    function Table(const ATableName: string;
-      const AFields: TJSONObject): TJDOCustomQuery;
-    function Table(const ATableName: string;
-      const AFields: array of string): TJDOCustomQuery;
     function Apply(const ARetaining: Boolean = False): TJDOCustomQuery;
     function Undo(const ARetaining: Boolean = False): TJDOCustomQuery;
     function Commit(const ARetaining: Boolean = False): TJDOCustomQuery;
@@ -844,12 +835,6 @@ begin
     raise EJDOQuery.Create(Self, SNilJSONParamError);
 end;
 
-procedure TJDOCustomQuery.CheckTableName(const ATableName: string);
-begin
-  if Trim(ATableName) = ES then
-    raise EJDOQuery.Create(Self, SEmptyTableNameError);
-end;
-
 class procedure TJDOCustomQuery.JSONToQuery(AJSON: TJSONObject;
   AQuery: TSQLQuery; const ADateAsString: Boolean);
 var
@@ -1081,22 +1066,6 @@ begin
   ExecSQL;
 end;
 
-function TJDOCustomQuery.SetParam(AJSON: TJSONObject;
-  const ADateAsString: Boolean): TJDOCustomQuery;
-begin
-  Result := Self;
-  CheckJSONParam(AJSON);
-  TJDOCustomQuery.JSONToQuery(AJSON, Self, ADateAsString);
-end;
-
-function TJDOCustomQuery.GetField(AJSON: TJSONObject;
-  const ADateAsString: Boolean): TJDOCustomQuery;
-begin
-  Result := Self;
-  CheckJSONParam(AJSON);
-  TJDOCustomQuery.DataSetToJSON(Self, AJSON, ADateAsString);
-end;
-
 function TJDOCustomQuery.Execute: Boolean;
 begin
   ExecSQL;
@@ -1179,44 +1148,6 @@ begin
   finally
     VFile.Free;
   end;
-end;
-
-function TJDOCustomQuery.Table(const ATableName: string;
-  const AFields: TJSONObject): TJDOCustomQuery;
-var
-  I: Integer;
-  VFields: string;
-begin
-  Result := Self;
-  CheckJSONParam(AFields);
-  CheckTableName(ATableName);
-  VFields := ES;
-  for I := 0 to Pred(AFields.Count) do
-    VFields += AFields.Names[I] + CS;
-  SetLength(VFields, Length(VFields) - 1);
-  inherited Close;
-  SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
-    ATableName + SP + SQL_NOTHING_WHERE_TOKEN;
-  inherited Open;
-end;
-
-function TJDOCustomQuery.Table(const ATableName: string;
-  const AFields: array of string): TJDOCustomQuery;
-var
-  VField, VFields: string;
-begin
-  Result := Self;
-  CheckTableName(ATableName);
-  if High(AFields) = 0 then
-    raise EJDOQuery.Create(Self, SEmptyFieldsError);
-  VFields := ES;
-  for VField in AFields do
-    VFields += VField + CS;
-  SetLength(VFields, Length(VFields) - 1);
-  inherited Close;
-  SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
-    ATableName + SP + SQL_NOTHING_WHERE_TOKEN;
-  inherited Open;
 end;
 
 function TJDOCustomQuery.GetAsJSON: TJSONStringType;

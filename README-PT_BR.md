@@ -1,5 +1,5 @@
 #JSON Data Objects (JDO) framework
-######Copyright (C) 2010-2012 Silvio Clecio.
+######Copyright (C) 2012-2014 Silvio Clecio.
 
 ##DESCRIÇÃO
 
