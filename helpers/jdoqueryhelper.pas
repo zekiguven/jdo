@@ -22,7 +22,7 @@ unit JDOQueryHelper;
 interface
 
 uses
-  JDO, JDOConsts, FPJSON, SysUtils;
+  JDO, JDOConsts, DB, FPJSON, SysUtils;
 
 type
   TJDOQueryHelper = class helper for TJDOQuery
@@ -37,6 +37,8 @@ type
       const ADateAsString: Boolean = False): TJDOCustomQuery;
     function GetField(AJSON: TJSONObject;
       const ADateAsString: Boolean = False): TJDOCustomQuery;
+    function FindByJSON(const ATableName: string; AJSON: TJSONObject;
+      const ADateAsString: Boolean = False): Boolean;
   end;
 
 implementation
@@ -99,6 +101,39 @@ begin
   Result := Self;
   CheckJSONParam(AJSON);
   TJDOCustomQuery.DataSetToJSON(Self, AJSON, ADateAsString);
+end;
+
+function TJDOQueryHelper.FindByJSON(const ATableName: string; AJSON: TJSONObject;
+  const ADateAsString: Boolean): Boolean;
+var
+  I: Integer;
+  VName, VFields, VFieldsParams: string;
+begin
+  CheckTableName(ATableName);
+  CheckJSONParam(AJSON);
+  VFields := ES;
+  VFieldsParams := ES;
+  for I := 0 to Pred(AJSON.Count) do
+  begin
+    VName := AJSON.Names[I];
+    VFields += VName + CS;
+    VFieldsParams += VName + SQL_EQ_PARAM_TOKEN + VName + SP +
+      SQL_AND_TOKEN + SP;
+  end;
+  SetLength(VFields, Length(VFields) - 1);
+  SetLength(VFieldsParams,
+    Length(VFieldsParams) - Length(SP + SQL_AND_TOKEN + SP));
+  if FieldDefs.Count = 0 then
+  begin
+    SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
+      ATableName + SP + SQL_NOTHING_WHERE_TOKEN;
+    Open;
+    Close;
+  end;
+  SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
+    ATableName + SP + SQL_WHERE_TOKEN + SP + VFieldsParams;
+  TJDOCustomQuery.JSONToQuery(AJSON, Self, ADateAsString);
+  Result := Open;
 end;
 
 end.
