@@ -18,7 +18,7 @@
     </CompilerOptions>
     <Description Value="JSON Data Objects runtime package."/>
     <License Value="See the file LICENSE, included in this distribution, for details about the copyright."/>
-    <Version Release="8" Build="8"/>
+    <Version Release="8" Build="9"/>
     <Files Count="6">
       <Item1>
         <Filename Value="..\helpers\jdofieldhelper.pas"/>
