@@ -189,9 +189,6 @@ type
     property OnCompose;
   end;
 
-  TJDODataSetToJSONCallback = procedure(ASender: TObject;
-    AItem: TJSONObject) of object;
-
   { TJDOCustomQuery }
 
   TJDOCustomQuery = class(TSQLQuery, IJDOAboutComponent)
@@ -216,23 +213,13 @@ type
     class procedure JSONToDataSet(AJSON: TJSONObject; ADataSet: TDataSet;
       const ADateAsString: Boolean);
     class procedure DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONArray;
-      const ADateAsString: Boolean;
-      ABeforeAddItem: TJDODataSetToJSONCallback = nil;
-      AAfterAddItem: TJDODataSetToJSONCallback = nil);
+      const ADateAsString: Boolean);
     class procedure DataSetToJSON(ADataSet: TDataSet; AJSON: TJSONObject;
-      const ADateAsString: Boolean;
-      ABeforeAddItem: TJDODataSetToJSONCallback = nil;
-      AAfterAddItem: TJDODataSetToJSONCallback = nil);
-    class procedure QueryToSchema(AQuery: TSQLQuery;
-      ASchema: TJSONObject); overload;
-    class procedure QueryToSchema(AQuery: TSQLQuery;
-      out ASchema: TJSONStringType); overload;
-    function GetJSON(out AJSON: TJSONArray;
-      ABeforeAddItem: TJDODataSetToJSONCallback = nil;
-      AAfterAddItem: TJDODataSetToJSONCallback = nil): TJDOCustomQuery; overload;
-    function GetJSON(out AJSON: TJSONObject;
-      ABeforeAddItem: TJDODataSetToJSONCallback = nil;
-      AAfterAddItem: TJDODataSetToJSONCallback = nil): TJDOCustomQuery; overload;
+      const ADateAsString: Boolean);
+    class procedure QueryToSchema(AQuery: TSQLQuery; ASchema: TJSONObject); overload;
+    class procedure QueryToSchema(AQuery: TSQLQuery; out ASchema: TJSONStringType); overload;
+    function GetJSON(out AJSON: TJSONArray): TJDOCustomQuery; overload;
+    function GetJSON(out AJSON: TJSONObject): TJDOCustomQuery; overload;
     function SetJSON(AJSON: TJSONArray): TJDOCustomQuery; overload;
     function SetJSON(AJSON: TJSONObject): TJDOCustomQuery; overload;
     procedure LoadJSONFromStream(AStream: TStream);
@@ -931,9 +918,7 @@ begin
 end;
 
 class procedure TJDOCustomQuery.DataSetToJSON(ADataSet: TDataSet;
-  AJSON: TJSONArray; const ADateAsString: Boolean;
-  ABeforeAddItem: TJDODataSetToJSONCallback;
-  AAfterAddItem: TJDODataSetToJSONCallback);
+  AJSON: TJSONArray; const ADateAsString: Boolean);
 var
   VJSON: TJSONObject;
 begin
@@ -941,16 +926,14 @@ begin
   while not ADataSet.EOF do
   begin
     VJSON := TJSONObject.Create;
-    DataSetToJSON(ADataSet, VJSON, ADateAsString, ABeforeAddItem, AAfterAddItem);
+    DataSetToJSON(ADataSet, VJSON, ADateAsString);
     AJSON.Add(VJSON);
     ADataSet.Next;
   end;
 end;
 
 class procedure TJDOCustomQuery.DataSetToJSON(ADataSet: TDataSet;
-  AJSON: TJSONObject; const ADateAsString: Boolean;
-  ABeforeAddItem: TJDODataSetToJSONCallback;
-  AAfterAddItem: TJDODataSetToJSONCallback);
+  AJSON: TJSONObject; const ADateAsString: Boolean);
 var
   I: Integer;
   VField: TField;
@@ -961,8 +944,6 @@ begin
     VField := ADataSet.Fields[I];
     VFieldType := TJDOCustomQuery.GetJSONType(VField.DataType);
     VFieldName := VField.FieldName;
-    if Assigned(ABeforeAddItem) then
-      ABeforeAddItem(ADataSet, AJSON);
     if (VFieldType = FT_NULL) or VField.IsNull then
     begin
       AJSON.Add(VFieldName);
@@ -981,8 +962,6 @@ begin
       AJSON.Add(VFieldName, VField.AsFloat);
     if VFieldType = FT_INT then
       AJSON.Add(VFieldName, VField.AsInteger);
-    if Assigned(AAfterAddItem) then
-      AAfterAddItem(ADataSet, AJSON);
   end;
 end;
 
@@ -1035,9 +1014,7 @@ begin
   end;
 end;
 
-function TJDOCustomQuery.GetJSON(out AJSON: TJSONArray;
-  ABeforeAddItem: TJDODataSetToJSONCallback;
-  AAfterAddItem: TJDODataSetToJSONCallback): TJDOCustomQuery;
+function TJDOCustomQuery.GetJSON(out AJSON: TJSONArray): TJDOCustomQuery;
 var
   VBookMark: TBookMark;
 begin
@@ -1049,7 +1026,7 @@ begin
   DisableControls;
   VBookMark := GetBookmark;
   try
-    DataSetToJSON(Self, AJSON, FDateAsString, ABeforeAddItem, AAfterAddItem);
+    DataSetToJSON(Self, AJSON, FDateAsString);
     GotoBookmark(VBookMark);
   finally
     FreeBookmark(VBookmark);
@@ -1057,15 +1034,13 @@ begin
   end;
 end;
 
-function TJDOCustomQuery.GetJSON(out AJSON: TJSONObject;
-  ABeforeAddItem: TJDODataSetToJSONCallback;
-  AAfterAddItem: TJDODataSetToJSONCallback): TJDOCustomQuery;
+function TJDOCustomQuery.GetJSON(out AJSON: TJSONObject): TJDOCustomQuery;
 begin
   Result := Self;
   AJSON := TJSONObject.Create;
   Open;
   if RecordCount <> 0 then
-    DataSetToJSON(Self, AJSON, FDateAsString, ABeforeAddItem, AAfterAddItem);
+    DataSetToJSON(Self, AJSON, FDateAsString);
 end;
 
 function TJDOCustomQuery.SetJSON(AJSON: TJSONArray): TJDOCustomQuery;
