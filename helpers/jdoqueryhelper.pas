@@ -39,6 +39,14 @@ type
       const ADateAsString: Boolean = False): TJDOQuery;
     function Find(AJSON: TJSONObject;
       const ADateAsString: Boolean = False): Boolean;
+    function Append(AJSON: TJSONArray): TJDOQuery;
+    function Append(AJSON: TJSONObject): TJDOQuery;
+    function Insert(AJSON: TJSONArray): TJDOQuery;
+    function Insert(AJSON: TJSONObject): TJDOQuery;
+    function Edit(AJSON: TJSONArray): TJDOQuery;
+    function Edit(AJSON: TJSONObject): TJDOQuery;
+    function Delete(AJSON: TJSONArray): TJDOQuery;
+    function Delete(AJSON: TJSONObject): TJDOQuery;
   end;
 
 implementation
@@ -123,6 +131,62 @@ begin
   SQL.Add(SQL_WHERE_TOKEN + SP + VFieldsParams);
   TJDOCustomQuery.JSONToQuery(AJSON, Self, ADateAsString);
   Result := inherited Open;
+end;
+
+function TJDOQueryHelper.Append(AJSON: TJSONArray): TJDOQuery;
+begin
+  Result := Self;
+  inherited Open;
+  inherited Append(AJSON);
+end;
+
+function TJDOQueryHelper.Append(AJSON: TJSONObject): TJDOQuery;
+begin
+  Result := Self;
+  inherited Open;
+  inherited Append(AJSON);
+end;
+
+function TJDOQueryHelper.Insert(AJSON: TJSONArray): TJDOQuery;
+begin
+  Result := Self;
+  inherited Open;
+  inherited Insert(AJSON);
+end;
+
+function TJDOQueryHelper.Insert(AJSON: TJSONObject): TJDOQuery;
+begin
+  Result := Self;
+  inherited Open;
+  inherited Insert(AJSON);
+end;
+
+function TJDOQueryHelper.Edit(AJSON: TJSONArray): TJDOQuery;
+begin
+  Result := Self;
+  inherited Open;
+  inherited Edit(AJSON);
+end;
+
+function TJDOQueryHelper.Edit(AJSON: TJSONObject): TJDOQuery;
+begin
+  Result := Self;
+  inherited Open;
+  inherited Edit(AJSON);
+end;
+
+function TJDOQueryHelper.Delete(AJSON: TJSONArray): TJDOQuery;
+begin
+  Result := Self;
+  inherited Open;
+  inherited Delete(AJSON);
+end;
+
+function TJDOQueryHelper.Delete(AJSON: TJSONObject): TJDOQuery;
+begin
+  Result := Self;
+  inherited Open;
+  inherited Delete(AJSON);
 end;
 
 end.
