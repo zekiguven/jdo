@@ -30,14 +30,14 @@ type
     procedure CheckTableName(const ATableName: string);
   public
     function Table(const ATableName: string;
-      const AFields: TJSONObject): TJDOCustomQuery;
+      const AFields: TJSONObject): TJDOQuery;
     function Table(const ATableName: string;
-      const AFields: array of string): TJDOCustomQuery;
+      const AFields: array of string): TJDOQuery;
     function SetParam(AJSON: TJSONObject;
-      const ADateAsString: Boolean = False): TJDOCustomQuery;
+      const ADateAsString: Boolean = False): TJDOQuery;
     function GetField(AJSON: TJSONObject;
-      const ADateAsString: Boolean = False): TJDOCustomQuery;
-    function FindByJSON(const ATableName: string; AJSON: TJSONObject;
+      const ADateAsString: Boolean = False): TJDOQuery;
+    function Find(AJSON: TJSONObject;
       const ADateAsString: Boolean = False): Boolean;
   end;
 
@@ -50,7 +50,7 @@ begin
 end;
 
 function TJDOQueryHelper.Table(const ATableName: string;
-  const AFields: TJSONObject): TJDOCustomQuery;
+  const AFields: TJSONObject): TJDOQuery;
 var
   I: Integer;
   VFields: string;
@@ -65,11 +65,10 @@ begin
   inherited Close;
   SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
     ATableName;
-  inherited Open;
 end;
 
 function TJDOQueryHelper.Table(const ATableName: string;
-  const AFields: array of string): TJDOCustomQuery;
+  const AFields: array of string): TJDOQuery;
 var
   VField, VFields: string;
 begin
@@ -81,14 +80,13 @@ begin
   for VField in AFields do
     VFields += VField + CS;
   SetLength(VFields, Length(VFields) - 1);
-  Close;
+  inherited Close;
   SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
-    ATableName + SP + SQL_NOTHING_WHERE_TOKEN;
-  Open;
+    ATableName;
 end;
 
 function TJDOQueryHelper.SetParam(AJSON: TJSONObject;
-  const ADateAsString: Boolean): TJDOCustomQuery;
+  const ADateAsString: Boolean): TJDOQuery;
 begin
   Result := Self;
   CheckJSONParam(AJSON);
@@ -96,44 +94,35 @@ begin
 end;
 
 function TJDOQueryHelper.GetField(AJSON: TJSONObject;
-  const ADateAsString: Boolean): TJDOCustomQuery;
+  const ADateAsString: Boolean): TJDOQuery;
 begin
   Result := Self;
   CheckJSONParam(AJSON);
   TJDOCustomQuery.DataSetToJSON(Self, AJSON, ADateAsString);
 end;
 
-function TJDOQueryHelper.FindByJSON(const ATableName: string; AJSON: TJSONObject;
+function TJDOQueryHelper.Find(AJSON: TJSONObject;
   const ADateAsString: Boolean): Boolean;
 var
   I: Integer;
-  VName, VFields, VFieldsParams: string;
+  VName, VFieldsParams: string;
 begin
-  CheckTableName(ATableName);
   CheckJSONParam(AJSON);
-  VFields := ES;
   VFieldsParams := ES;
   for I := 0 to Pred(AJSON.Count) do
   begin
     VName := AJSON.Names[I];
-    VFields += VName + CS;
     VFieldsParams += VName + SQL_EQ_PARAM_TOKEN + VName + SP +
       SQL_AND_TOKEN + SP;
   end;
-  SetLength(VFields, Length(VFields) - 1);
   SetLength(VFieldsParams,
     Length(VFieldsParams) - Length(SP + SQL_AND_TOKEN + SP));
   if FieldDefs.Count = 0 then
-  begin
-    SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
-      ATableName + SP + SQL_NOTHING_WHERE_TOKEN;
-    Open;
-    Close;
-  end;
-  SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
-    ATableName + SP + SQL_WHERE_TOKEN + SP + VFieldsParams;
+    inherited Open;
+  inherited Close;
+  SQL.Add(SQL_WHERE_TOKEN + SP + VFieldsParams);
   TJDOCustomQuery.JSONToQuery(AJSON, Self, ADateAsString);
-  Result := Open;
+  Result := inherited Open;
 end;
 
 end.
