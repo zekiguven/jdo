@@ -64,7 +64,7 @@ begin
   SetLength(VFields, Length(VFields) - 1);
   inherited Close;
   SQL.Text := SQL_SELECT_TOKEN + SP + VFields + SP + SQL_FROM_TOKEN + SP +
-    ATableName + SP + SQL_NOTHING_WHERE_TOKEN;
+    ATableName;
   inherited Open;
 end;
 
